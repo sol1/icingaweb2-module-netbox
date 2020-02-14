@@ -27,27 +27,27 @@ of Icinga Director. See the
 ### Example sync of devices to hosts
 
 1. Add an "Import Source" with an API token, with name "Netbox devices".
-1. Select "Devices" from Object type to import, then "Store" to save it.
-1. Read and perform steps in the "Property Modifiers" section below.
-1. Select the new import source "Netbox devices", then "Trigger import run".
-1. Select the "Sync rule" tab and create a rule with the fields filled out as follows:
+2. Select "Devices" from Object type to import, then "Store" to save it.
+3. Read and perform steps in the "Property Modifiers" section below.
+4. Select the new import source "Netbox devices", then "Trigger import run".
+5. Select the "Sync rule" tab and create a rule with the fields filled out as follows:
   * Rule name: Devices
   * Object Type: Hosts
   * Update Policy: Replace
   * Purge: Yes
-1. Select the new "Devices" rule and select the "Properties" tab.
-1. Add a sync property rule with the following fields set:
+6. Select the new "Devices" rule and select the "Properties" tab.
+7. Add a sync property rule with the following fields set:
   * Source Name: "Netbox devices"
   * Destination field: "object_name"
   * Source Column: "name"
   * Set based on filter: "No"
-1. Add another sync property with the following fields set:
+8. Add another sync property with the following fields set:
   * Source Name: "Netbox devices"
   * Destination field: "address"
   * Source Column: "ipv4_address"
   * Set based on filter: "No"
-1. Select the sync rule "Devices" again, then click "Trigger this sync".
-1. Select "Activity log" on the left, then "Deploy pending changes".
+9. Select the sync rule "Devices" again, then click "Trigger this sync".
+10. Select "Activity log" on the left, then "Deploy pending changes".
 
 What did we do? We created an import source "Netbox devices" which
 imports Netbox devices from the Netbox API into the Director database.
