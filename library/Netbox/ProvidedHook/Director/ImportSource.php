@@ -14,9 +14,10 @@ class ImportSource extends ImportSourceHook {
 	const DeviceRoleMode = 2;
 	const DeviceTypeMode = 3;
 	const PlatformMode = 4;
-	const SiteMode = 5;
-	const TenantMode = 6;
-	const VMMode = 7;
+	const ServiceMode = 5;
+	const SiteMode = 6;
+	const TenantMode = 7;
+	const VMMode = 8;
 
 	public static function addSettingsFormFields(QuickForm $form) {
 		$form->addElement('text', 'baseurl', array(
@@ -40,6 +41,7 @@ class ImportSource extends ImportSourceHook {
 			self::DeviceRoleMode => $form->translate('Device roles'),
 			self::DeviceTypeMode => $form->translate('Device types'),
 			self::PlatformMode => $form->translate('Platforms'),
+			self::ServiceMode => $form->translate('Services'),
 			self::SiteMode => $form->translate('Sites'),
 			self::TenantMode => $form->translate('Tenants'),
 			self::VMMode => $form->translate('Virtual machines')
@@ -57,6 +59,8 @@ class ImportSource extends ImportSourceHook {
 			return $netbox->devices(0);
 		case self::DeviceRoleMode:
 			return $netbox->deviceRoles();
+		case self::ServiceMode:
+			return $netbox->services();
 		case self::SiteMode:
 			return $netbox->sites();
 		case self::TenantMode:

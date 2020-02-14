@@ -50,4 +50,8 @@ class Netbox {
 	public function virtualMachines() {
 		return $this->get("/virtualization/virtual-machines", 0);
 	}
+
+	public function services() {
+		return $this->get("/ipam/services", 0);
+	}
 }
