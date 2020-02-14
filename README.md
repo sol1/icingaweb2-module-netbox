@@ -10,7 +10,16 @@ Download and install like any icingaweb2 module; drop the files into
 the modules directory in the icingaweb2 path. On Debian systems this
 is `/usr/share/icingaweb2/modules`.
 
-To run the current:
+Releases are managed on GitHub. [Latest](https://github.com/sol1/icingaweb2-module-netbox/releases/latest)
+
+To install version 1.1.0:
+
+```
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v1.1.0.tar.gz | tar xz
+mv icingaweb2-module-netbox-1.1.0 /usr/share/icingaweb2/modules/netbox
+```
+
+To run current:
 
 ```
 git clone https://github.com/sol1/icingaweb2-module-netboximport netboximport
