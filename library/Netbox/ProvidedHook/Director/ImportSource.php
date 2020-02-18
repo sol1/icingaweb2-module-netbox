@@ -53,7 +53,6 @@ class ImportSource extends ImportSourceHook {
 	public function fetchData() {
 		$baseurl = $this->getSetting('baseurl');
 		$apitoken = $this->getSetting('apitoken');
-		$activeonly = $this->getSetting('activeonly') === 'y';
 		$mode = $this->getSetting('mode');
 		$netbox = new Netbox($baseurl, $apitoken);
 		switch($mode) {
