@@ -96,6 +96,10 @@ class Netbox {
 		return $this->get("/dcim/sites");
 	}
 
+	public function regions() {
+		return $this->get("/dcim/regions");
+	}
+
 	public function deviceRoles() {
 		return $this->get("/dcim/device-roles");
 	}

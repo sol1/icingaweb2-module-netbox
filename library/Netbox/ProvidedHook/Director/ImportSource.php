@@ -16,9 +16,10 @@ class ImportSource extends ImportSourceHook {
 	const PlatformMode = 4;
 	const ServiceMode = 5;
 	const SiteMode = 6;
-	const TenantMode = 7;
-	const TestMode = 8;
-	const VMMode = 9;
+	const RegionMode = 7;
+	const TenantMode = 8;
+	const TestMode = 9;
+	const VMMode = 10;
 
 	public static function addSettingsFormFields(QuickForm $form) {
 		$form->addElement('text', 'baseurl', array(
@@ -44,6 +45,7 @@ class ImportSource extends ImportSourceHook {
 			self::PlatformMode => $form->translate('Platforms'),
 			self::ServiceMode => $form->translate('Services'),
 			self::SiteMode => $form->translate('Sites'),
+			self::RegionMode => $form->translate('Region'),
 			self::TenantMode => $form->translate('Tenants'),
 			self::TestMode => $form->translate('Test'),
 			self::VMMode => $form->translate('Virtual machines')
@@ -64,6 +66,8 @@ class ImportSource extends ImportSourceHook {
 			return $netbox->services();
 		case self::SiteMode:
 			return $netbox->sites();
+		case self::RegionMode:
+			return $netbox->regions();
 		case self::TenantMode:
 			return $netbox->tenants();
 		case self::TestMode:
