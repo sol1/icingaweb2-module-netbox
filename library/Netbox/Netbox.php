@@ -32,9 +32,9 @@ class Netbox {
 	// get returns the JSON decoded results.
 	private function get(string $resource) {
 		if (strpos($resource, '?') !== false) {
-			$resource = '&limit=1000';
+			$resource = $resource . '&limit=1000';
 		} else {
-			$resource = '?limit=1000';
+			$resource = $resource . '?limit=1000';
 		}
 		$body = $this->httpget($this->baseurl . $resource);
 		$response = json_decode($body);
@@ -100,31 +100,31 @@ class Netbox {
 	// objects from Netbox. A limit > 0 queries for and returns just $limit
 	// number of results; this is useful for testing.
 	public function devices(int $limit = 0) {
-		return $this->get_netbox("/dcim/devices", $limit);
+		return $this->get_netbox("/dcim/devices/", $limit);
 	}
 
 	public function sites(int $limit = 0) {
-		return $this->get_netbox("/dcim/sites", $limit);
+		return $this->get_netbox("/dcim/sites/", $limit);
 	}
 
 	public function regions(int $limit = 0) {
-		return $this->get_netbox("/dcim/regions", $limit);
+		return $this->get_netbox("/dcim/regions/", $limit);
 	}
 
 	public function deviceRoles(int $limit = 0) {
-		return $this->get_netbox("/dcim/device-roles", $limit);
+		return $this->get_netbox("/dcim/device-roles/", $limit);
 	}
 
 	public function tenants(int $limit = 0) {
-		return $this->get_netbox("/tenancy/tenants", $limit);
+		return $this->get_netbox("/tenancy/tenants/", $limit);
 	}
 
 	public function virtualMachines(int $limit = 0) {
-		return $this->get_netbox("/virtualization/virtual-machines", $limit);
+		return $this->get_netbox("/virtualization/virtual-machines/", $limit);
 	}
 
 	public function allservices(int $limit = 0) {
-		return $this->get_netbox("/ipam/services", $limit);
+		return $this->get_netbox("/ipam/services/", $limit);
 	}
 
 	private function services(string $device, int $limit = 0) {
