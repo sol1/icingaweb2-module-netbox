@@ -31,6 +31,11 @@ class Netbox {
 	// Netbox path $resource. It steps through each page of resource response.
 	// get returns the JSON decoded results.
 	private function get(string $resource) {
+		if (strpos($api_path, '?') !== false) {
+			$resource = '&limit=1000';
+		} else {
+			$resource = '?limit=1000';
+		}
 		$body = $this->httpget($this->baseurl . $resource);
 		$response = json_decode($body);
 		$results = array();
