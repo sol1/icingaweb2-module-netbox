@@ -95,16 +95,22 @@ class ImportSource extends ImportSourceHook {
 			return $this->devices_with_services($services, $devices);
 		case self::DeviceRoleMode:
 			$result = $netbox->deviceRoles($limit);
+			break;
 		case self::ServiceMode:
 			$result = $netbox->services();
+			break;
 		case self::SiteMode:
 			$result = $netbox->sites($limit);
+			break;
 		case self::RegionMode:
 			$result = $netbox->regions($limit);
+			break;
 		case self::TenantMode:
 			$result = $netbox->tenants($limit);
+			break;
 		case self::TestMode:
 			$result = $netbox->devices($limit);
+			break;
 		}
 		return $result;
 	}
