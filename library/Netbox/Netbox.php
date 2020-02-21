@@ -51,18 +51,6 @@ class Netbox {
 		return $results;
 	}
 
-	// devices returns an array of Device objects. A limit of 0 returns all
-	// devices from Netbox. A limit > 0 queries for and returns just $limit
-	// number of results; this is useful for testing.
-	public function devices(int $limit) {
-		if ($limit > 0) {
-			$body = $this->httpget($this->baseurl . "/dcim/devices/?limit=" . $limit);
-			$response = json_decode($body);
-			return $response->results;
-		}
-		return $this->get("/dcim/devices");
-	}
-
 	// returns an array of device objects, as with devices(). Any services
 	// belonging to each device is added to a new field called "services". For
 	// example:
@@ -92,32 +80,54 @@ class Netbox {
 		return $device;
 	}
 
-	public function sites() {
-		return $this->get("/dcim/sites");
+	private function get_netbox(string $api_path, int $limit = 0) {
+		if ($limit > 0) {
+			# if api_path contains paramaters append limit otherwise create paramater
+			if (strpos($api_path, '?') !== false) {
+				$limit = '&limit=' . $limit
+			} else {
+				$limit = '?limit=' . $limit
+			}
+			$body = $this->httpget($this->baseurl . $api_path . $limit);
+			$response = json_decode($body);
+			return $response->results;
+		}
+		return $this->get($api_path);
 	}
 
-	public function regions() {
-		return $this->get("/dcim/regions");
+	// returns an array of objects. A limit of 0 returns all
+	// objects from Netbox. A limit > 0 queries for and returns just $limit
+	// number of results; this is useful for testing.
+	public function devices(int $limit = 0) {
+		return $this->get_netbox("/dcim/devices", $limit);
 	}
 
-	public function deviceRoles() {
-		return $this->get("/dcim/device-roles");
+	public function sites(int $limit = 0) {
+		return $this->get_netbox("/dcim/sites", $limit);
 	}
 
-	public function tenants() {
-		return $this->get("/tenancy/tenants");
+	public function regions(int $limit = 0) {
+		return $this->get_netbox("/dcim/regions", $limit);
 	}
 
-	public function virtualMachines() {
-		return $this->get("/virtualization/virtual-machines");
+	public function deviceRoles(int $limit = 0) {
+		return $this->get_netbox("/dcim/device-roles", $limit);
 	}
 
-	public function allservices() {
-		return $this->get("/ipam/services");
+	public function tenants(int $limit = 0) {
+		return $this->get_netbox("/tenancy/tenants", $limit);
 	}
 
-	private function services(string $device) {
-		return $this->get("/ipam/services/?device=" . urlencode($device));
+	public function virtualMachines(int $limit = 0) {
+		return $this->get_netbox("/virtualization/virtual-machines", $limit);
+	}
+
+	public function allservices(int $limit = 0) {
+		return $this->get_netbox("/ipam/services", $limit);
+	}
+
+	private function services(string $device, int $limit = 0) {
+		return $this->get_netbox("/ipam/services/?device=" . urlencode($device), $limit);
 	}
 
 	// looks up services belonging to the device named $device using

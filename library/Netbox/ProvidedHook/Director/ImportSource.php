@@ -52,27 +52,28 @@ class ImportSource extends ImportSourceHook {
 		)));
 	}
 
-	public function fetchData() {
+	public function fetchData(int $limit = 0) {
 		$baseurl = $this->getSetting('baseurl');
 		$apitoken = $this->getSetting('apitoken');
 		$mode = $this->getSetting('mode');
 		$netbox = new Netbox($baseurl, $apitoken);
 		switch($mode) {
 		case self::DeviceMode:
-			return $netbox->devices_with_services();
+			$result = $netbox->devices_with_services($limit);
 		case self::DeviceRoleMode:
-			return $netbox->deviceRoles();
+			$result = $netbox->deviceRoles($limit);
 		case self::ServiceMode:
-			return $netbox->services();
+			$result = $netbox->services();
 		case self::SiteMode:
-			return $netbox->sites();
+			$result = $netbox->sites($limit);
 		case self::RegionMode:
-			return $netbox->regions();
+			$result = $netbox->regions($limit);
 		case self::TenantMode:
-			return $netbox->tenants();
+			$result = $netbox->tenants($limit);
 		case self::TestMode:
-			return $netbox->devices(1);
+			$result = $netbox->devices($limit);
 		}
+		return $result;
 	}
 
 	public static function getDefaultKeyColumnName() {
@@ -81,11 +82,7 @@ class ImportSource extends ImportSourceHook {
 
 	// fetch just one device object from Netbox and use the keys
 	public function listColumns() {
-		$baseurl = $this->getSetting('baseurl');
-		$apitoken = $this->getSetting('apitoken');
-		$netbox = new Netbox($baseurl, $apitoken);
-		$devices = $netbox->devices(1);
-		return array_keys(array_merge(...array_map('get_object_vars', $devices)));
+		return array_keys(array_merge(...array_map('get_object_vars', $this->fetchData(1))));
 	}
 
 	public function getName() {
