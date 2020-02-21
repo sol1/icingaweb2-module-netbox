@@ -20,6 +20,37 @@ class ImportSource extends ImportSourceHook {
 	const TestMode = 8;
 	const VMMode = 9;
 
+	// devices_with_services returns a copy of $devices with any services
+	// from $services belonging to it merged in. Each device has a new field
+	// "services" which contains an array of small service objects. For
+	// example:
+	//
+	//     $device->name = "mail.example.com"
+	//     $device->id =1234
+	//     $device->services = (SMTP->25, SSH->22)
+	//
+	// The services are cast to objects from arrays because Director requires the
+	// data as a stdClass.
+	private function devices_with_services($services, $devices) {
+		foreach($devices as &$device) {
+			$a = $this->servicearray($device, $services);
+			$device->services = (object) $a;
+		}
+		return $devices;
+	}
+
+	// servicearray returns an array of services belonging to $device from $services.
+	// The key is the service name, and value is the port.
+	private function servicearray($device, $services) {
+		$m = array();
+		foreach ($services as $service) {
+			if ($service->device->name == $device->name) {
+				$m[$service->name] = $service->port;
+			}
+		}
+		return $m;
+	}
+
 	public static function addSettingsFormFields(QuickForm $form) {
 		$form->addElement('text', 'baseurl', array(
 			'label' => $form->translate('Base URL'),
@@ -57,7 +88,9 @@ class ImportSource extends ImportSourceHook {
 		$netbox = new Netbox($baseurl, $apitoken);
 		switch($mode) {
 		case self::DeviceMode:
-			return $netbox->devices_with_services();
+			$services = $netbox->allservices();
+			$devices = $netbox->devices(0);
+			return $this->devices_with_services($services, $devices);
 		case self::DeviceRoleMode:
 			return $netbox->deviceRoles();
 		case self::ServiceMode:
