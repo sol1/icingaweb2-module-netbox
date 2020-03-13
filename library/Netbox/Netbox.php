@@ -100,29 +100,30 @@ class Netbox {
 	// objects from Netbox. A limit > 0 queries for and returns just $limit
 	// number of results; this is useful for testing.
 	public function devices(int $limit = 0) {
-		return $this->get_netbox("/dcim/devices/", $limit);
+		return $this->get_netbox("/dcim/devices/?status=active", $limit);
 	}
 
 	public function sites(int $limit = 0) {
-		return $this->get_netbox("/dcim/sites/", $limit);
+		return $this->get_netbox("/dcim/sites/?status=active", $limit);
 	}
 
 	public function regions(int $limit = 0) {
-		return $this->get_netbox("/dcim/regions/", $limit);
+		return $this->get_netbox("/dcim/regions/?status=active", $limit);
 	}
 
 	public function deviceRoles(int $limit = 0) {
-		return $this->get_netbox("/dcim/device-roles/", $limit);
+		return $this->get_netbox("/dcim/device-roles/?status=active", $limit);
 	}
 
 	public function tenants(int $limit = 0) {
-		return $this->get_netbox("/tenancy/tenants/", $limit);
+		return $this->get_netbox("/tenancy/tenants/?status=active", $limit);
 	}
 
 	public function virtualMachines(int $limit = 0) {
-		return $this->get_netbox("/virtualization/virtual-machines/", $limit);
+		return $this->get_netbox("/virtualization/virtual-machines/?status=active", $limit);
 	}
 
+	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
 	public function allservices(int $limit = 0) {
 		return $this->get_netbox("/ipam/services/", $limit);
 	}
