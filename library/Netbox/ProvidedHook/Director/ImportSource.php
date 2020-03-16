@@ -112,7 +112,6 @@ class ImportSource extends ImportSourceHook {
 		return "id";
 	}
 
-	// fetch just one device object from Netbox and use the keys
 	public function listColumns() {
 		return array_keys(array_merge(...array_map('get_object_vars', $this->fetchData(1))));
 	}
