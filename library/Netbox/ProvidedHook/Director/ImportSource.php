@@ -94,25 +94,18 @@ class ImportSource extends ImportSourceHook {
 			$devices = $netbox->devices($limit);
 			return $this->devices_with_services($services, $devices);
 		case self::DeviceRoleMode:
-			$result = $netbox->deviceRoles($limit);
-			break;
+			return $netbox->deviceRoles($limit);
 		case self::ServiceMode:
-			$result = $netbox->services();
-			break;
+			return $netbox->services();
 		case self::SiteMode:
-			$result = $netbox->sites($limit);
-			break;
+			return $netbox->sites($limit);
 		case self::RegionMode:
-			$result = $netbox->regions($limit);
-			break;
+			return $netbox->regions($limit);
 		case self::TenantMode:
-			$result = $netbox->tenants($limit);
-			break;
+			return $netbox->tenants($limit);
 		case self::TestMode:
-			$result = $netbox->devices($limit);
-			break;
+			return $netbox->devices($limit);
 		}
-		return $result;
 	}
 
 	public static function getDefaultKeyColumnName() {
