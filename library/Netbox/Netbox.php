@@ -54,23 +54,6 @@ class Netbox {
 		return $results;
 	}
 
-	// returns an array of device objects, as with devices(). Any services
-	// belonging to each device is added to a new field called "services". For
-	// example:
-	//
-	//     $device->name = "mail.example.com"
-	//     $device->id =1234
-	//     $device->services = (SMTP->25, SSH->22)
-	//
-	public function devices_with_services() {
-		$devices = $this->devices(0);
-		$this->servicedb = $this->allservices();
-		foreach ($devices as &$device) {
-			$device->services = $this->lookup_services($device->name);
-		}
-		return $devices;
-	}
-
 	// device returns the unique device object named $name. An
 	// exception is thrown if $name is not unique.
 	public function device(string $name) {
