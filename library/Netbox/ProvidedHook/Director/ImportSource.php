@@ -48,21 +48,20 @@ class ImportSource extends ImportSourceHook {
 			if ($service->device->name == $device->name) {
 				$ipaddr = array();
 				$cidr = array();
-				foreach($this->defaultValue($service->ipaddresses, []) as ip) {
+				foreach($this->defaultValue($service->ipaddresses, []) as $ip) {
 					array_push($ipaddr, explode('/', $ip->address));
 					array_push($cidr, $ip->address);
 				}
 				$m[$service->name] = array
 					(
-						"port" => $service->port;
-						"protocol" => $this->defaultValue($service->protocol->value, NULL);
-						"ipaddresses" => $ipaddr;
-						"cidrs" => $cidr;
-						"description" => $service->description;
-						"tags" => $service->tags;
-						"custom_fields" => $service->custom_fields;
-
-					)
+						"port" => $service->port,
+						"protocol" => $this->defaultValue($service->protocol->value, NULL),
+						"ipaddresses" => $ipaddr,
+						"cidrs" => $cidr,
+						"description" => $service->description,
+						"tags" => $this->defaultValue($service->tags, []),
+						"custom_fields" => $this->defaultValue($service->custom_fields, [])
+					);
 			}
 		}
 		return $m;
