@@ -46,29 +46,10 @@ class ImportSource extends ImportSourceHook {
 		$m = array();
 		foreach ($services as $service) {
 			if ($service->device->name == $device->name) {
-				$ipaddr = array();
-				$cidr = array();
-				foreach($this->defaultValue($service->ipaddresses, []) as $ip) {
-					array_push($ipaddr, explode('/', $ip->address));
-					array_push($cidr, $ip->address);
-				}
-				$m[$service->name] = array
-					(
-						"port" => $service->port,
-						"protocol" => $this->defaultValue($service->protocol->value, NULL),
-						"ipaddresses" => $ipaddr,
-						"cidrs" => $cidr,
-						"description" => $service->description,
-						"tags" => $this->defaultValue($service->tags, []),
-						"custom_fields" => $this->defaultValue($service->custom_fields, [])
-					);
+				$m[$service->name] = $service->port;
 			}
 		}
 		return $m;
-	}
-
-	private function defaultValue($var, $default) {
-		return isset($var) ? $var : $default;
 	}
 
 	public static function addSettingsFormFields(QuickForm $form) {
