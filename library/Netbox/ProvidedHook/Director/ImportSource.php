@@ -23,12 +23,12 @@ class ImportSource extends ImportSourceHook {
 
 	// devices_with_services returns a copy of $devices with any services
 	// from $services belonging to it merged in. Each device has a new field
-	// "services" which contains an array of small service objects. For
-	// example:
+	// "services" which contains an array of service objects belonging to the
+	// device. For example:
 	//
 	//     $device->name = "mail.example.com"
 	//     $device->id =1234
-	//     $device->services = (SMTP->25, SSH->22)
+	//     $device->services = (SMTP->port: 25, SSH->addresses...)
 	//
 	// The services are cast to objects from arrays because Director requires the
 	// data as a stdClass.
@@ -41,12 +41,12 @@ class ImportSource extends ImportSourceHook {
 	}
 
 	// servicearray returns an array of services belonging to $device from $services.
-	// The key is the service name, and value is the port.
+	// The key is the service name, and value is the entire service object.
 	private function servicearray($device, $services) {
 		$m = array();
 		foreach ($services as $service) {
 			if ($service->device->name == $device->name) {
-				$m[$service->name] = $service->port;
+				$m[$service->name] = $service;
 			}
 		}
 		return $m;
