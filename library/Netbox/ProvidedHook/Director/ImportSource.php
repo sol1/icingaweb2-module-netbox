@@ -67,6 +67,10 @@ class ImportSource extends ImportSourceHook {
 		return $m;
 	}
 
+	private function defaultValue($var, $default) {
+		return isset($var) ? $var : $default;
+	}
+
 	public static function addSettingsFormFields(QuickForm $form) {
 		$form->addElement('text', 'baseurl', array(
 			'label' => $form->translate('Base URL'),
