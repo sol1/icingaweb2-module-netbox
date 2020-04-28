@@ -45,7 +45,13 @@ class ImportSource extends ImportSourceHook {
 	private function servicearray($device, $services) {
 		$m = array();
 		foreach ($services as $service) {
-			if ($service->device->name == $device->name) {
+			$servicename = "";
+			if ( isset($service->device) ) {
+				$servicename = $service->device->name;
+			} elseif ( isset($service->virtual_machine) ) {
+				$servicename = $service->virtual_machine->name;
+			}
+			if ($servicename == $device->name) {
 				$ipaddr = array();
 				$cidr = array();
 				foreach($this->defaultValue($service->ipaddresses, []) as $ip) {
