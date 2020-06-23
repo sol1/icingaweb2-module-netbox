@@ -130,6 +130,10 @@ class ImportSource extends ImportSourceHook {
 			return $netbox->tenants($limit);
 		case self::TestMode:
 			return $netbox->devices($limit);
+		case self::VMMode:
+			$services = $netbox->allservices();
+			$devices = $netbox->virtualMachines($limit);
+			return $this->devices_with_services($services, $devices);
 		}
 	}
 
