@@ -3,13 +3,19 @@
 namespace Icinga\Module\Netbox;
 
 class Netbox {
-	function __construct($baseurl, $token) {
+	function __construct($baseurl, $token, $proxy) {
 		$this->baseurl = $baseurl;
 		$this->token = $token;
+		$this->proxy = $proxy;
 	}
+
+
 
 	private function httpget(string $url) {
 		$ch = curl_init($url);
+		if (!is_null($this->proxy)) {
+			curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+		}
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(

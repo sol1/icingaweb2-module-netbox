@@ -113,6 +113,12 @@ class ImportSource extends ImportSourceHook {
 			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active)')
 		));
 
+		$form->addElement('text', 'proxy', array(
+			'label' => $form->translate('Proxy'),
+			'required' => false,
+			'description' => $form->translate('Optional proxy server setting in the format <address>:<port>')
+		));
+
 	}
 
 	public function fetchData(int $limit = 0) {
@@ -120,7 +126,8 @@ class ImportSource extends ImportSourceHook {
 		$apitoken = $this->getSetting('apitoken');
 		$mode = $this->getSetting('mode');
 		$filter = (string)$this->getSetting('filter');
-		$netbox = new Netbox($baseurl, $apitoken);
+		$proxy = $this->getSetting('proxy');
+		$netbox = new Netbox($baseurl, $apitoken, $proxy);
 		switch($mode) {
 		case self::DeviceMode:
 			$services = $netbox->allservices();
