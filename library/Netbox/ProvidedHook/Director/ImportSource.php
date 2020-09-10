@@ -106,33 +106,41 @@ class ImportSource extends ImportSourceHook {
 			self::TestMode => $form->translate('Test'),
 			self::VMMode => $form->translate('Virtual machines')
 		)));
+
+		$form->addElement('text', 'filter', array(
+			'label' => $form->translate('Search filter'),
+			'required' => false,
+			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active)')
+		));
+
 	}
 
 	public function fetchData(int $limit = 0) {
 		$baseurl = $this->getSetting('baseurl');
 		$apitoken = $this->getSetting('apitoken');
 		$mode = $this->getSetting('mode');
+		$filter = (string)$this->getSetting('filter');
 		$netbox = new Netbox($baseurl, $apitoken);
 		switch($mode) {
 		case self::DeviceMode:
 			$services = $netbox->allservices();
-			$devices = $netbox->devices($limit);
-			return $this->devices_with_services($services, $devices);
+			$devices = $netbox->devices($limit, $filter);
+			return $this->devices_with_services($services, $devices, $filter);
 		case self::DeviceRoleMode:
-			return $netbox->deviceRoles($limit);
+			return $netbox->deviceRoles($limit, $filter);
 		case self::ServiceMode:
 			return $netbox->services();
 		case self::SiteMode:
-			return $netbox->sites($limit);
+			return $netbox->sites($limit, $filter);
 		case self::RegionMode:
-			return $netbox->regions($limit);
+			return $netbox->regions($limit, $filter);
 		case self::TenantMode:
-			return $netbox->tenants($limit);
+			return $netbox->tenants($limit, $filter);
 		case self::TestMode:
-			return $netbox->devices($limit);
+			return $netbox->devices($limit, $filter);
 		case self::VMMode:
 			$services = $netbox->allservices();
-			$devices = $netbox->virtualMachines($limit);
+			$devices = $netbox->virtualMachines($limit, $filter);
 			return $this->devices_with_services($services, $devices);
 		}
 	}
