@@ -3,10 +3,11 @@
 namespace Icinga\Module\Netbox;
 
 class Netbox {
-	function __construct($baseurl, $token, $proxy) {
+	function __construct($baseurl, $token, $proxy, $flattenseparator) {
 		$this->baseurl = $baseurl;
 		$this->token = $token;
 		$this->proxy = $proxy;
+		$this->flattenseperator = $flattenseparator;
 	}
 
 
@@ -70,6 +71,35 @@ class Netbox {
 		return $devices[0];
 	}
 
+
+	private function flattenRecursive(array &$out, $key, array $in, string $seperator){
+		foreach($in as $k=>$v){
+			if (is_array($v)) {
+				$this->flattenRecursive($out, $key . $k . $seperator, $v, $seperator);
+			} elseif(is_object($v)) {
+				$this->flattenRecursive($out, $key . $k . $seperator, (array)$v, $seperator);
+			} else {
+				$out[$key . $k] = $v;
+			}
+		}
+	}
+	    
+	private function flatten(array $in, string $seperator){
+		if (strlen($seperator) > 0) {
+			$new = array();
+			// error_log(print_r($in, TRUE));
+			foreach($in as $row) {
+				$out = array();
+				$this->flattenRecursive($out, '', (array)$row, $seperator);
+				$new = array_merge($new, [(object)$out]);
+			}
+			return $new;
+		} else {
+			return $in;
+		}
+	}
+
+
 	private function get_netbox(string $api_path, int $limit = 0) {
 		if ($limit > 0) {
 			# if api_path contains paramaters append limit otherwise create paramater
@@ -80,9 +110,9 @@ class Netbox {
 			}
 			$body = $this->httpget($this->baseurl . $api_path . $limit);
 			$response = json_decode($body);
-			return $response->results;
+			return $this->flatten($response->results, $this->flattenseperator);
 		}
-		return $this->get($api_path);
+		return $this->flatten($this->get($api_path), $this->flattenseperator);
 	}
 
 	// returns an array of objects. A limit of 0 returns all

@@ -91,26 +91,33 @@ class ImportSource extends ImportSourceHook {
 		));
 
 		$form->addElement('select', 'mode', array(
-		'label' => $form->translate('Object type to import'),
-		'description' => $form->translate('Not all object types are supported'),
-		'required' => true,
-		'multiOptions' => array(
-			self::DeviceMode => $form->translate('Devices'),
-			self::DeviceRoleMode => $form->translate('Device roles'),
-			self::DeviceTypeMode => $form->translate('Device types'),
-			self::PlatformMode => $form->translate('Platforms'),
-			self::ServiceMode => $form->translate('Services'),
-			self::SiteMode => $form->translate('Sites'),
-			self::RegionMode => $form->translate('Region'),
-			self::TenantMode => $form->translate('Tenants'),
-			self::TestMode => $form->translate('Test'),
-			self::VMMode => $form->translate('Virtual machines')
-		)));
+			'label' => $form->translate('Object type to import'),
+			'description' => $form->translate('Not all object types are supported'),
+			'required' => true,
+			'multiOptions' => array(
+				self::DeviceMode => $form->translate('Devices'),
+				self::DeviceRoleMode => $form->translate('Device roles'),
+				self::DeviceTypeMode => $form->translate('Device types'),
+				self::PlatformMode => $form->translate('Platforms'),
+				self::ServiceMode => $form->translate('Services'),
+				self::SiteMode => $form->translate('Sites'),
+				self::RegionMode => $form->translate('Region'),
+				self::TenantMode => $form->translate('Tenants'),
+				self::VMMode => $form->translate('Virtual machines'),
+				self::TestMode => $form->translate('Test')
+			)
+		));
+
+		$form->addElement('text', 'flatten', array(
+			'label' => $form->translate('Flatten seperator'),
+			'description' => $form->translate('Optional flattening of the data using the supplied seperator. Flattening won\'t happen without a seperator added.'),
+			'required' => false,
+		));
 
 		$form->addElement('text', 'filter', array(
 			'label' => $form->translate('Search filter'),
 			'required' => false,
-			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active)')
+			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active is added without a filter selected)')
 		));
 
 		$form->addElement('text', 'proxy', array(
@@ -127,7 +134,8 @@ class ImportSource extends ImportSourceHook {
 		$mode = $this->getSetting('mode');
 		$filter = (string)$this->getSetting('filter');
 		$proxy = $this->getSetting('proxy');
-		$netbox = new Netbox($baseurl, $apitoken, $proxy);
+		$flatten = (string)$this->getSetting('flatten');
+		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten);
 		switch($mode) {
 		case self::DeviceMode:
 			$services = $netbox->allservices();
