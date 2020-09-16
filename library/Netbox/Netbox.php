@@ -3,11 +3,12 @@
 namespace Icinga\Module\Netbox;
 
 class Netbox {
-	function __construct($baseurl, $token, $proxy, $flattenseparator) {
+	function __construct($baseurl, $token, $proxy, $flattenseparator, $munge) {
 		$this->baseurl = $baseurl;
 		$this->token = $token;
 		$this->proxy = $proxy;
 		$this->flattenseperator = $flattenseparator;
+		$this->munge = $munge;
 	}
 
 
@@ -84,19 +85,43 @@ class Netbox {
 		}
 	}
 	    
-	private function flatten(array $in, string $seperator){
-		if (strlen($seperator) > 0) {
-			$new = array();
-			// error_log(print_r($in, TRUE));
-			foreach($in as $row) {
+	private function transform(array $in){
+		// default output is input
+		$output = $in;
+
+		// Flatten the returned data here
+		if (strlen($this->flattenseperator) > 0) {
+			$fnew = array();
+			foreach($output as $row) {
 				$out = array();
-				$this->flattenRecursive($out, '', (array)$row, $seperator);
-				$new = array_merge($new, [(object)$out]);
+				$this->flattenRecursive($out, '', (array)$row, $this->flattenseperator);
+				$fnew = array_merge($fnew, [(object)$out]);
 			}
-			return $new;
-		} else {
-			return $in;
+			$output = $fnew;
 		}
+
+		if(!empty($this->munge)) {
+			$mungeheading = str_replace("s=", "", implode("_",$this->munge));
+			$mnew = array();
+			foreach($output as $row) {
+				$mungevalue = array();
+				foreach($this->munge as $key) {
+					if (strpos($key, "s=") !== false) {
+						$mungevalue = array_merge($mungevalue, [str_replace("s=", "", $key)]);
+					} else {
+						$mungevalue = array_merge($mungevalue, [$row->{$key}]);
+					}
+
+				}
+				$row->{$mungeheading} = implode("_", $mungevalue);
+				$mnew = array_merge($mnew, [(object)$row]);
+			}
+			$output = $mnew;
+		}	
+
+		return $output;
+
+
 	}
 
 
@@ -110,9 +135,9 @@ class Netbox {
 			}
 			$body = $this->httpget($this->baseurl . $api_path . $limit);
 			$response = json_decode($body);
-			return $this->flatten($response->results, $this->flattenseperator);
+			return $this->transform($response->results);
 		}
-		return $this->flatten($this->get($api_path), $this->flattenseperator);
+		return $this->transform($this->get($api_path));
 	}
 
 	// returns an array of objects. A limit of 0 returns all
@@ -143,8 +168,8 @@ class Netbox {
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
-	public function allservices(int $limit = 0) {
-		return $this->get_netbox("/ipam/services/", $limit);
+	public function allservices(int $limit = 0, string $filter) {
+		return $this->get_netbox("/ipam/services/?". $filter, $limit);
 	}
 
 	private function services(string $device, int $limit = 0) {

@@ -114,6 +114,12 @@ class ImportSource extends ImportSourceHook {
 			'required' => false,
 		));
 
+		$form->addElement('text', 'munge', array(
+			'label' => $form->translate('Munge fields'),
+			'description' => $form->translate('Optional munging of existing fields into a new combined field. Comma seperated field names of existing data that can be used to create a new unique index for the importer or string using s=. eg: input: id,name output: id_name = row(id) + "_" + row(name); input: s=example,id output: example_id = "example_" + row(id) '),
+			'required' => false,
+		));
+
 		$form->addElement('text', 'filter', array(
 			'label' => $form->translate('Search filter'),
 			'required' => false,
@@ -135,16 +141,17 @@ class ImportSource extends ImportSourceHook {
 		$filter = (string)$this->getSetting('filter');
 		$proxy = $this->getSetting('proxy');
 		$flatten = (string)$this->getSetting('flatten');
-		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten);
+		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode (",", (string)$this->getSetting('munge'));
+		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $munge);
 		switch($mode) {
 		case self::DeviceMode:
-			$services = $netbox->allservices();
+			$services = $netbox->allservices(0, "");
 			$devices = $netbox->devices($limit, $filter);
 			return $this->devices_with_services($services, $devices, $filter);
 		case self::DeviceRoleMode:
 			return $netbox->deviceRoles($limit, $filter);
 		case self::ServiceMode:
-			return $netbox->services();
+			return $netbox->allservices($limit, $filter);
 		case self::SiteMode:
 			return $netbox->sites($limit, $filter);
 		case self::RegionMode:
@@ -154,7 +161,7 @@ class ImportSource extends ImportSourceHook {
 		case self::TestMode:
 			return $netbox->devices($limit, $filter);
 		case self::VMMode:
-			$services = $netbox->allservices();
+			$services = $netbox->allservices(0, "");
 			$devices = $netbox->virtualMachines($limit, $filter);
 			return $this->devices_with_services($services, $devices);
 		}
