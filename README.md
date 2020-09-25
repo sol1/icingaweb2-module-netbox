@@ -30,8 +30,39 @@ icingacli module enable netboximport
 ## Configuration
 
 Configuration is done in the web interface under the "Automation" tab
-of Icinga Director. See the
-[official documentation](https://www.icinga.com/docs/director/latest/doc/70-Import-and-Sync/).
+of Icinga Director, [official documentation](https://www.icinga.com/docs/director/latest/doc/70-Import-and-Sync/).
+
+### Module specific options
+
+#### Key column name
+This is used by director and icingaweb2 to find objects before sync rules are parsed, your object names should use the key column name to avoid issues.
+
+#### Base URL
+Url to netbox install api with no trailing slash (/).
+
+eg: `http://netbox.example.com/api`
+
+#### API Token
+Netbox api token
+
+#### Object type to import
+Netbox object set to be imported
+
+#### Flatten seperator
+This will take nested data (`{ "foo": { "bar": "123 }, "bar": "321" }`) and use the seperator specified to flatten it (`{ foo__bar: 123, "bar": 321" }`)
+
+#### Munge fields
+This will take existing fields from netbox and combine them, the data is also combined. The list of fields to munge needs to be added as comma seperated field names (`slug,name`). It also supports adding strings using the syntax `s=thestring`
+
+Examples of this are 
+* combining `name` and `id` into a new field `name_id`, syntax: `name,id`
+* adding a identifier `netbox` to `slug` to create a new field `netbox_slug` so all objects are prefixed with `netbox_<device slug>`, syntax: `s=netbox,slug`
+
+#### Search filter
+Adds the filter string to the api call. The default filter is `status=active`, if you add your own filter it overwrites the default filter value.
+
+#### Proxy
+Proxy server ip, hostname, port combo in the format `proxy.example.com:1234`
 
 ### Example sync of devices to hosts
 
