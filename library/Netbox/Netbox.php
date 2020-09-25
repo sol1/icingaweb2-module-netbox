@@ -119,6 +119,19 @@ class Netbox {
 			$output = $mnew;
 		}	
 
+		// Because netbox changed tags and it is easy to add an array to icinga and see if a tag exists in it
+                $tnew = array();
+		foreach($output as $row) {
+			if(property_exists($row, 'tags')) {
+	                        $row->tag_slugs = array();
+        	                foreach($row->tags as $tag) {
+                	               $row->tag_slugs = array_merge($row->tag_slugs, [$tag->slug]);
+                        	}
+			}
+                        $tnew = array_merge($tnew, [(object)$row]);
+                }
+                $output = $tnew;
+
 		return $output;
 
 
