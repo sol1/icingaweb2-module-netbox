@@ -156,32 +156,53 @@ class Netbox {
 	// returns an array of objects. A limit of 0 returns all
 	// objects from Netbox. A limit > 0 queries for and returns just $limit
 	// number of results; this is useful for testing.
-	public function devices(int $limit = 0, string $filter = "status=active") {
+	public function devices(int $limit = 0, $filter) {
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
 		return $this->get_netbox("/dcim/devices/?" . $filter, $limit);
 	}
 
-	public function sites(int $limit = 0, string $filter = "status=active") {
+	public function sites(int $limit = 0, $filter) {
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
 		return $this->get_netbox("/dcim/sites/?" . $filter, $limit);
 	}
 
-	public function regions(int $limit = 0, string $filter = "status=active") {
+	public function regions(int $limit = 0, $filter) {
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
 		return $this->get_netbox("/dcim/regions/?" . $filter, $limit);
 	}
 
-	public function deviceRoles(int $limit = 0, string $filter = "status=active") {
+	public function deviceRoles(int $limit = 0, $filter) {
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
 		return $this->get_netbox("/dcim/device-roles/?" . $filter, $limit);
 	}
 
-	public function tenants(int $limit = 0, string $filter = "status=active") {
+	public function tenants(int $limit = 0, $filter) {
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
 		return $this->get_netbox("/tenancy/tenants/?" . $filter, $limit);
 	}
 
-	public function virtualMachines(int $limit = 0, string $filter = "status=active") {
+	public function virtualMachines(int $limit = 0, $filter) {
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
 		return $this->get_netbox("/virtualization/virtual-machines/?" . $filter, $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
-	public function allservices(int $limit = 0, string $filter) {
+	public function allservices(int $limit = 0, $filter) {
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
 		return $this->get_netbox("/ipam/services/?". $filter, $limit);
 	}
 
