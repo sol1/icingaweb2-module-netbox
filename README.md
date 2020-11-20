@@ -12,19 +12,19 @@ is `/usr/share/icingaweb2/modules`.
 
 Releases are managed on GitHub. [Latest](https://github.com/sol1/icingaweb2-module-netbox/releases/latest)
 
-To install version 1.1.0:
+To install version 1.3.0:
 
 ```
-curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v1.1.0.tar.gz | tar xz
-mv icingaweb2-module-netbox-1.1.0 /usr/share/icingaweb2/modules/netbox
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v1.3.0.tar.gz | tar xz
+mv icingaweb2-module-netbox-1.3.0 /usr/share/icingaweb2/modules/netbox
 ```
 
 To run current:
 
 ```
-git clone https://github.com/sol1/icingaweb2-module-netboximport netboximport
-mv netboximport /usr/share/icingaweb2/modules
-icingacli module enable netboximport
+git clone https://github.com/sol1/icingaweb2-module-netboximport netbox
+mv netbox /usr/share/icingaweb2/modules
+icingacli module enable netbox
 ```
 
 ## Configuration
