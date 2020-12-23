@@ -6,17 +6,25 @@ Director.
 
 ## Install
 
-Download and install like any icingaweb2 module; drop the files into
-the modules directory in the icingaweb2 path. On Debian systems this
-is `/usr/share/icingaweb2/modules`.
-
 Releases are managed on GitHub. [Latest](https://github.com/sol1/icingaweb2-module-netbox/releases/latest)
 
-To install version 1.3.0:
+Installing a new release involves removing any old release from the icingaweb2 module path, then copying in the new files.
+For example on Debian systems the path is `/usr/share/icingaweb2/modules`.
+
+To install a new release, first uninstall any existing release:
+
+```
+rm -r /usr/share/icingaweb2/modules/netbox
+```
+
+Download and extract the new release, then
+move the module into the icingaweb2 modules path.
+For example for version 1.3.0:
 
 ```
 curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v1.3.0.tar.gz | tar xz
 mv icingaweb2-module-netbox-1.3.0 /usr/share/icingaweb2/modules/netbox
+icingacli module enable netbox
 ```
 
 To run current:
