@@ -58,9 +58,15 @@ class ImportSource extends ImportSourceHook {
 					array_push($ipaddr, current(explode('/', $ip->address)));
 					array_push($cidr, $ip->address);
 				}
+				// This is hack for netbox 2.10+ so sync rules that assume there is only 1 port will continue to work after netbox service.port became the service.ports array
+				$first_port = "";
+				if ( ! empty($service->ports) ) {
+					$first_port = $service->ports[0];
+				}
 				$m[$service->name] = array
 					(
-						"port" => $service->ports,
+						"port" => $first_port,
+						"ports" => $service->ports,
 						"protocol" => $this->defaultValue($service->protocol->value, NULL),
 						"ipaddresses" => $ipaddr,
 						"cidrs" => $cidr,
