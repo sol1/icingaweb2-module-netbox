@@ -4,6 +4,8 @@ Icingaweb2 module to which, for now, just import objects from
 [Netbox](https://github.com/netbox-community/netbox) into Icinga
 Director.
 
+Note: Tags from 2.10.3 onwards match the major netbox version, the 4th version number is for this module only.
+
 ## Install
 
 Releases are managed on GitHub. [Latest](https://github.com/sol1/icingaweb2-module-netbox/releases/latest)
@@ -19,11 +21,11 @@ rm -r /usr/share/icingaweb2/modules/netbox
 
 Download and extract the new release, then
 move the module into the icingaweb2 modules path.
-For example for version 1.3.0:
+For example for version 2.10.3:
 
 ```
-curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v1.3.0.tar.gz | tar xz
-mv icingaweb2-module-netbox-1.3.0 /usr/share/icingaweb2/modules/netbox
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v2.10.3.0.tar.gz | tar xz
+mv icingaweb2-module-netbox-2.10.3.0 /usr/share/icingaweb2/modules/netbox
 icingacli module enable netbox
 ```
 
