@@ -60,7 +60,7 @@ class ImportSource extends ImportSourceHook {
 				}
 				$m[$service->name] = array
 					(
-						"port" => $service->port,
+						"port" => $service->ports,
 						"protocol" => $this->defaultValue($service->protocol->value, NULL),
 						"ipaddresses" => $ipaddr,
 						"cidrs" => $cidr,
