@@ -157,7 +157,7 @@ class ImportSource extends ImportSourceHook
 		$filter = (string)$this->getSetting('filter');
 		$proxy = $this->getSetting('proxy');
 		$flatten = (string)$this->getSetting('flatten');
-		$flattenkeys = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('flattenkeys'));
+		$flattenkeys = ((string)$this->getSetting('flattenkeys') == '') ? array() : explode(",", (string)$this->getSetting('flattenkeys'));
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
 		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
 		switch ($mode) {

@@ -108,11 +108,11 @@ class Netbox
 					$in = (array)$row;
 				} else {
 					# If the key is in the flatten keys array put it in the processing array in, otherwise it goes in out
-					foreach ((array)$row as $key) {
-						if (in_array($key, $this->flattenkeys)) {
-							$in[$key] = $row->{$key};
+					foreach ((array)$row as $k => $v) {
+						if (in_array($k, $this->flattenkeys)) {
+							$in[$k] = $v;
 						} else {
-							$out[$key] = $row->{$key};
+							$out[$k] = $v;
 						}
 					}
 				}
