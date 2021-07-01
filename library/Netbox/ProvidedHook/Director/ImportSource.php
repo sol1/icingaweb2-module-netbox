@@ -124,6 +124,12 @@ class ImportSource extends ImportSourceHook
 			'required' => false,
 		));
 
+		$form->addElement('text', 'flattenkeys', array(
+			'label' => $form->translate('Flatten keys'),
+			'description' => $form->translate('Optionally limit the flattening to specific top level keys in a comma seperated list. Flattening won\'t happen without a seperator added.'),
+			'required' => false,
+		));
+
 		$form->addElement('text', 'munge', array(
 			'label' => $form->translate('Munge fields'),
 			'description' => $form->translate('Optional munging of existing fields into a new combined field. Comma seperated field names of existing data that can be used to create a new unique index for the importer or string using s=. eg: input: id,name output: id_name = row(id) + "_" + row(name); input: s=example,id output: example_id = "example_" + row(id) '),
@@ -151,8 +157,9 @@ class ImportSource extends ImportSourceHook
 		$filter = (string)$this->getSetting('filter');
 		$proxy = $this->getSetting('proxy');
 		$flatten = (string)$this->getSetting('flatten');
+		$flattenkeys = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('flattenkeys'));
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
-		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $munge);
+		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
 		switch ($mode) {
 			case self::DeviceMode:
 				$services = $netbox->allservices(0, "");

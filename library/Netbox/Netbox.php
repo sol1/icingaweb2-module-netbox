@@ -4,12 +4,13 @@ namespace Icinga\Module\Netbox;
 
 class Netbox
 {
-	function __construct($baseurl, $token, $proxy, $flattenseparator, $munge)
+	function __construct($baseurl, $token, $proxy, $flattenseparator, $flattenkeys, $munge)
 	{
 		$this->baseurl = $baseurl;
 		$this->token = $token;
 		$this->proxy = $proxy;
 		$this->flattenseperator = $flattenseparator;
+		$this->flattenkeys = $flattenkeys;
 		$this->munge = $munge;
 	}
 
@@ -96,12 +97,26 @@ class Netbox
 		// default output is input
 		$output = $in;
 
-		// Flatten the returned data here
+		// Flatten the returned data here if we have a flatten seperator
 		if (strlen($this->flattenseperator) > 0) {
 			$fnew = array();
 			foreach ($output as $row) {
+				$in = array();
 				$out = array();
-				$this->flattenRecursive($out, '', (array)$row, $this->flattenseperator);
+				# If flattern keys is empty but seperator isn't that means we do all
+				if (empty($this->flattenkeys)) {
+					$in = (array)$row;
+				} else {
+					# If the key is in the flatten keys array put it in the processing array in, otherwise it goes in out
+					foreach ((array)$row as $key) {
+						if (in_array($key, $this->flattenkeys)) {
+							$in[$key] = $row->{$key};
+						} else {
+							$out[$key] = $row->{$key};
+						}
+					}
+				}
+				$this->flattenRecursive($out, '', $in, $this->flattenseperator);
 				$fnew = array_merge($fnew, [(object)$out]);
 			}
 			$output = $fnew;
