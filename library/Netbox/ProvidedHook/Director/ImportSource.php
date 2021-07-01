@@ -18,9 +18,10 @@ class ImportSource extends ImportSourceHook
 	const ServiceMode = 5;
 	const SiteMode = 6;
 	const RegionMode = 7;
-	const TenantMode = 8;
-	const TestMode = 9;
-	const VMMode = 10;
+	const TagMode = 8;
+	const TenantMode = 9;
+	const TestMode = 10;
+	const VMMode = 11;
 
 	// devices_with_services returns a copy of $devices with any services
 	// from $services belonging to it merged in. Each device has a new field
@@ -112,6 +113,7 @@ class ImportSource extends ImportSourceHook
 				self::ServiceMode => $form->translate('Services'),
 				self::SiteMode => $form->translate('Sites'),
 				self::RegionMode => $form->translate('Region'),
+				self::TagMode => $form->translate('Tags'),
 				self::TenantMode => $form->translate('Tenants'),
 				self::VMMode => $form->translate('Virtual machines'),
 				self::TestMode => $form->translate('Test')
@@ -160,12 +162,16 @@ class ImportSource extends ImportSourceHook
 				return $this->devices_with_services($services, $devices, $filter);
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($limit, $filter);
+			case self::PlatformMode:
+				return $netbox->platforms($limit, $filter);
 			case self::ServiceMode:
 				return $netbox->allservices($limit, $filter);
 			case self::SiteMode:
 				return $netbox->sites($limit, $filter);
 			case self::RegionMode:
 				return $netbox->regions($limit, $filter);
+			case self::TagMode:
+				return $netbox->tags($limit, $filter);
 			case self::TenantMode:
 				return $netbox->tenants($limit, $filter);
 			case self::TestMode:

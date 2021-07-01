@@ -169,6 +169,14 @@ class Netbox
 		return $this->get_netbox("/dcim/devices/?" . $filter, $limit);
 	}
 
+	public function platforms(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
+		return $this->get_netbox("/dcim/platforms/?" . $filter, $limit);
+	}
+
 	public function sites(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
@@ -191,6 +199,14 @@ class Netbox
 			$filter = "status=active";
 		}
 		return $this->get_netbox("/dcim/device-roles/?" . $filter, $limit);
+	}
+
+	public function tags(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/extras/tags/?" . $filter, $limit);
 	}
 
 	public function tenants(int $limit = 0, $filter)
