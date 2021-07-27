@@ -39,6 +39,10 @@ class ImportSource extends ImportSourceHook
 		foreach ($devices as &$device) {
 			$a = $this->servicearray($device, $services);
 			$device->services = (object) $a;
+			$device->service_names = array(); 
+			foreach ($a as $k => $v) {
+				array_push($device->service_names, $k);
+			}
 		}
 		return $devices;
 	}
