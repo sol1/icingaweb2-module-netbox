@@ -61,12 +61,17 @@ Netbox object set to be imported
 #### Flatten seperator
 This will take nested data (`{ "foo": { "bar": "123 }, "bar": "321" }`) and use the seperator specified to flatten it (`{ foo__bar: 123, "bar": 321" }`)
 
+#### Flatten keys
+This option causes the flattening to occur to the listed keys only. Provide a comma seperated list of keys you want to flatten here such as `config_context,site,tenant` 
+
 #### Munge fields
 This will take existing fields from netbox and combine them, the data is also combined. The list of fields to munge needs to be added as comma seperated field names (`slug,name`). It also supports adding strings using the syntax `s=thestring`
 
 Examples of this are 
 * combining `name` and `id` into a new field `name_id`, syntax: `name,id`
 * adding a identifier `netbox` to `slug` to create a new field `netbox_slug` so all objects are prefixed with `netbox_<device slug>`, syntax: `s=netbox,slug`
+
+In a complex setup you may like to show where icinga objects come from using a prefix showing the source, eg: `nbsite_`, `nb<projectname>_`.
 
 #### Search filter
 Adds the filter string to the api call. The default filter is `status=active`, if you add your own filter it overwrites the default filter value.
@@ -103,6 +108,18 @@ What did we do? We created an import source "Netbox devices" which
 imports Netbox devices from the Netbox API into the Director database.
 The sync rule "Devices" creates Icinga Host objects from the newly
 imported data in the Director database.
+
+
+### Linking netbox object in icinga
+If we wanted the details of a netbox site, lat/long for example, into a icinga host
+create a Import Source for the site and a sync rule that creates a Icinga hosts template 
+with all the site details based on the site slug.
+
+Then in the device host object you will be able to import this site host template using
+the site slug that exists on the netbox device.
+
+Netbox site -> Icinga site host template (netbox site.slug object name)
+Netbox device -> Icinga device host with import for site host template (netbox device.site.slug)
 
 ## Property Modifiers
 

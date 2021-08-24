@@ -16,12 +16,18 @@ class ImportSource extends ImportSourceHook
 	const DeviceTypeMode = 3;
 	const PlatformMode = 4;
 	const ServiceMode = 5;
-	const SiteMode = 6;
-	const RegionMode = 7;
-	const TagMode = 8;
-	const TenantMode = 9;
-	const TestMode = 10;
-	const VMMode = 11;
+	const LocationMode = 6;
+	const SiteMode = 7;
+	const RegionMode = 8;
+	const TagMode = 9;
+	const TenantMode = 10;
+	const TestMode = 11;
+	const VMMode = 12;
+	const Cluster = 13;
+
+	// TODO: VRF is linked to devices/vm's through ip's. If we need VRF's then we should
+	// create an array in the import of all the linked ip's and vrf inside the importer 
+	// rather than leaving it to the user to create host templates to link it all together.
 
 	// devices_with_services returns a copy of $devices with any services
 	// from $services belonging to it merged in. Each device has a new field
@@ -115,11 +121,13 @@ class ImportSource extends ImportSourceHook
 				self::DeviceTypeMode => $form->translate('Device types'),
 				self::PlatformMode => $form->translate('Platforms'),
 				self::ServiceMode => $form->translate('Services'),
+				self::LocationMode => $form->translate('Locations'),
 				self::SiteMode => $form->translate('Sites'),
 				self::RegionMode => $form->translate('Region'),
 				self::TagMode => $form->translate('Tags'),
 				self::TenantMode => $form->translate('Tenants'),
 				self::VMMode => $form->translate('Virtual machines'),
+				self::Cluster => $form->translate('Clusters'),
 				self::TestMode => $form->translate('Test')
 			)
 		));
@@ -177,6 +185,8 @@ class ImportSource extends ImportSourceHook
 				return $netbox->platforms($limit, $filter);
 			case self::ServiceMode:
 				return $netbox->allservices($limit, $filter);
+			case self::LocationMode:
+				return $netbox->locations($limit, $filter);
 			case self::SiteMode:
 				return $netbox->sites($limit, $filter);
 			case self::RegionMode:
@@ -191,7 +201,9 @@ class ImportSource extends ImportSourceHook
 				$services = $netbox->allservices(0, "");
 				$devices = $netbox->virtualMachines($limit, $filter);
 				return $this->devices_with_services($services, $devices);
-		}
+			case self::Cluster:
+				return $netbox->clusters($limit, $filter);
+			}
 	}
 
 	public static function getDefaultKeyColumnName()

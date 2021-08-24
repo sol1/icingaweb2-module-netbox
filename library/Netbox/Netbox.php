@@ -192,6 +192,14 @@ class Netbox
 		return $this->get_netbox("/dcim/platforms/?" . $filter, $limit);
 	}
 
+	public function locations(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/dcim/locations/?" . $filter, $limit);
+	}
+
 	public function sites(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
@@ -238,6 +246,13 @@ class Netbox
 			$filter = "status=active";
 		}
 		return $this->get_netbox("/virtualization/virtual-machines/?" . $filter, $limit);
+	}
+	public function clusters(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
+		return $this->get_netbox("/virtualization/clusters/?" . $filter, $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
