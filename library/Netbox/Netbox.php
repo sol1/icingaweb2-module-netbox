@@ -176,6 +176,41 @@ class Netbox
 	// returns an array of objects. A limit of 0 returns all
 	// objects from Netbox. A limit > 0 queries for and returns just $limit
 	// number of results; this is useful for testing.
+
+	//  VM's
+	public function virtualMachines(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
+		return $this->get_netbox("/virtualization/virtual-machines/?" . $filter, $limit);
+	}
+
+	public function clusters(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "status=active";
+		}
+		return $this->get_netbox("/virtualization/clusters/?" . $filter, $limit);
+	}
+
+	public function clusterGroups(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/virtualization/cluster-groups/?" . $filter, $limit);
+	}
+
+	public function clusterTypes(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/virtualization/cluster-types/?" . $filter, $limit);
+	}
+
+	// Devices
 	public function devices(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
@@ -184,14 +219,32 @@ class Netbox
 		return $this->get_netbox("/dcim/devices/?" . $filter, $limit);
 	}
 
-	public function platforms(int $limit = 0, $filter)
+	public function deviceRoles(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
-			$filter = "status=active";
+			$filter = "";
 		}
-		return $this->get_netbox("/dcim/platforms/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/device-roles/?" . $filter, $limit);
 	}
 
+	public function deviceTypes(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/dcim/device-types/?" . $filter, $limit);
+	}
+
+	// IPAM 
+	public function ipAddresses(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "status=active&assigned_to_interface=True";
+		}
+		return $this->get_netbox("/ipam/ip-addresses/?" . $filter, $limit);
+	}
+
+	// Where
 	public function locations(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
@@ -208,21 +261,48 @@ class Netbox
 		return $this->get_netbox("/dcim/sites/?" . $filter, $limit);
 	}
 
+	public function siteGroups(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/dcim/site-groups/?" . $filter, $limit);
+	}
+
 	public function regions(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
-			$filter = "status=active";
+			$filter = "";
 		}
 		return $this->get_netbox("/dcim/regions/?" . $filter, $limit);
 	}
 
-	public function deviceRoles(int $limit = 0, $filter)
+	// Who
+	public function tenants(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/tenancy/tenants/?" . $filter, $limit);
+	}
+
+	public function tenantGroups(int $limit = 0, $filter)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/tenancy/tenant-groups/?" . $filter, $limit);
+	}
+
+	// Other
+	public function platforms(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
 			$filter = "status=active";
 		}
-		return $this->get_netbox("/dcim/device-roles/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/platforms/?" . $filter, $limit);
 	}
+
 
 	public function tags(int $limit = 0, $filter)
 	{
@@ -230,29 +310,6 @@ class Netbox
 			$filter = "";
 		}
 		return $this->get_netbox("/extras/tags/?" . $filter, $limit);
-	}
-
-	public function tenants(int $limit = 0, $filter)
-	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/tenancy/tenants/?" . $filter, $limit);
-	}
-
-	public function virtualMachines(int $limit = 0, $filter)
-	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/virtualization/virtual-machines/?" . $filter, $limit);
-	}
-	public function clusters(int $limit = 0, $filter)
-	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/virtualization/clusters/?" . $filter, $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do

@@ -11,19 +11,36 @@ class ImportSource extends ImportSourceHook
 {
 	// To keep sorted: sort, strip assignments, print new value as line number
 	// Edit | sort | sed 's/ = [0-9]+;//' | awk '{ printf "%s = %d;\n", $0, NR }'
-	const DeviceMode = 1;
-	const DeviceRoleMode = 2;
-	const DeviceTypeMode = 3;
-	const PlatformMode = 4;
-	const ServiceMode = 5;
-	const LocationMode = 6;
-	const SiteMode = 7;
-	const RegionMode = 8;
-	const TagMode = 9;
-	const TenantMode = 10;
-	const TestMode = 11;
-	const VMMode = 12;
-	const Cluster = 13;
+	// VM
+	const ClusterGroupMode = 10;	
+	const ClusterMode = 12;
+	const ClusterTypeMode = 14;
+	const VMMode = 16;
+
+	// Device
+	const DeviceMode = 20;
+	const DeviceRoleMode = 22;
+	const DeviceTypeMode = 24;
+
+	// IPAM
+	const IPAddressMode = 30;
+	
+	// Where
+	const LocationMode = 40;
+	const RegionMode = 42;
+	const SiteGroupMode = 44;
+	const SiteMode = 46;
+
+	// Who
+	const TenantGroupMode = 50;
+	const TenantMode = 52;
+
+	// Other
+	const PlatformMode = 60;
+	const ServiceMode = 62;
+	const TagMode = 64;
+	const TestMode = 66;
+
 
 	// TODO: VRF is linked to devices/vm's through ip's. If we need VRF's then we should
 	// create an array in the import of all the linked ip's and vrf inside the importer 
@@ -116,18 +133,34 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Not all object types are supported'),
 			'required' => true,
 			'multiOptions' => array(
+				// VM's
+				self::ClusterMode => $form->translate('Clusters'),
+				self::ClusterGroupMode => $form->translate('Cluster groups'),
+				self::ClusterTypeMode => $form->translate('Cluster types'),
+				self::VMMode => $form->translate('Virtual machines'),
+			
+				// Device
 				self::DeviceMode => $form->translate('Devices'),
 				self::DeviceRoleMode => $form->translate('Device roles'),
 				self::DeviceTypeMode => $form->translate('Device types'),
-				self::PlatformMode => $form->translate('Platforms'),
-				self::ServiceMode => $form->translate('Services'),
+			
+				// IPAM
+				self::IPAddressMode => $form->translate('IP Addresses'),
+				
+				// Where
 				self::LocationMode => $form->translate('Locations'),
 				self::SiteMode => $form->translate('Sites'),
+				self::SiteGroupMode => $form->translate('Site groups'),
 				self::RegionMode => $form->translate('Region'),
-				self::TagMode => $form->translate('Tags'),
+			
+				// Who
 				self::TenantMode => $form->translate('Tenants'),
-				self::VMMode => $form->translate('Virtual machines'),
-				self::Cluster => $form->translate('Clusters'),
+				self::TenantGroupMode => $form->translate('Tenant Groups'),
+			
+				// Other
+				self::PlatformMode => $form->translate('Platforms'),
+				self::ServiceMode => $form->translate('Services'),
+				self::TagMode => $form->translate('Tags'),
 				self::TestMode => $form->translate('Test')
 			)
 		));
@@ -175,34 +208,57 @@ class ImportSource extends ImportSourceHook
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
 		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
 		switch ($mode) {
+			// VM's
+			case self::VMMode:
+				$services = $netbox->allservices(0, "");
+				$devices = $netbox->virtualMachines($limit, $filter);
+				return $this->devices_with_services($services, $devices);
+			case self::ClusterMode:
+				return $netbox->clusters($limit, $filter);
+			case self::ClusterGroupMode:
+				return $netbox->clusterGroups($limit, $filter);
+			case self::ClusterTypeMode:
+				return $netbox->clusterTypes($limit, $filter);
+							
+			// Device
 			case self::DeviceMode:
 				$services = $netbox->allservices(0, "");
 				$devices = $netbox->devices($limit, $filter);
 				return $this->devices_with_services($services, $devices, $filter);
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($limit, $filter);
-			case self::PlatformMode:
-				return $netbox->platforms($limit, $filter);
-			case self::ServiceMode:
-				return $netbox->allservices($limit, $filter);
+			case self::DeviceTypeMode:
+				return $netbox->deviceTypes($limit, $filter);
+
+			// IPAM
+			case self::IPAddressMode:
+				return $netbox->ipAddresses($limit, $filter);
+
+			// Where			
 			case self::LocationMode:
 				return $netbox->locations($limit, $filter);
 			case self::SiteMode:
 				return $netbox->sites($limit, $filter);
+			case self::SiteGroupMode:
+				return $netbox->siteGroups($limit, $filter);
 			case self::RegionMode:
 				return $netbox->regions($limit, $filter);
-			case self::TagMode:
-				return $netbox->tags($limit, $filter);
+
+			// Who
 			case self::TenantMode:
 				return $netbox->tenants($limit, $filter);
+			case self::TenantGroupMode:
+				return $netbox->tenantGroups($limit, $filter);
+		
+			// Other
+			case self::PlatformMode:
+				return $netbox->platforms($limit, $filter);
+			case self::ServiceMode:
+				return $netbox->allservices($limit, $filter);
+			case self::TagMode:
+				return $netbox->tags($limit, $filter);
 			case self::TestMode:
 				return $netbox->devices($limit, $filter);
-			case self::VMMode:
-				$services = $netbox->allservices(0, "");
-				$devices = $netbox->virtualMachines($limit, $filter);
-				return $this->devices_with_services($services, $devices);
-			case self::Cluster:
-				return $netbox->clusters($limit, $filter);
 			}
 	}
 
