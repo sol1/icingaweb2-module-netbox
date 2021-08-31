@@ -239,7 +239,7 @@ class Netbox
 	public function ipAddresses(int $limit = 0, $filter)
 	{
 		if (empty($filter)) {
-			$filter = "status=active&assigned_to_interface=True";
+			$filter = "assigned_to_interface=True";
 		}
 		return $this->get_netbox("/ipam/ip-addresses/?" . $filter, $limit);
 	}
