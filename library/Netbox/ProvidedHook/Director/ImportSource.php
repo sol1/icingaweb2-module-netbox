@@ -211,54 +211,54 @@ class ImportSource extends ImportSourceHook
 			// VM's
 			case self::VMMode:
 				$services = $netbox->allservices(0, "");
-				$devices = $netbox->virtualMachines($limit, $filter);
+				$devices = $netbox->virtualMachines($filter, $limit);
 				return $this->devices_with_services($services, $devices);
 			case self::ClusterMode:
-				return $netbox->clusters($limit, $filter);
+				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
-				return $netbox->clusterGroups($limit, $filter);
+				return $netbox->clusterGroups($filter, $limit);
 			case self::ClusterTypeMode:
-				return $netbox->clusterTypes($limit, $filter);
+				return $netbox->clusterTypes($filter, $limit);
 							
 			// Device
 			case self::DeviceMode:
 				$services = $netbox->allservices(0, "");
-				$devices = $netbox->devices($limit, $filter);
+				$devices = $netbox->devices($filter, $limit);
 				return $this->devices_with_services($services, $devices, $filter);
 			case self::DeviceRoleMode:
-				return $netbox->deviceRoles($limit, $filter);
+				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
-				return $netbox->deviceTypes($limit, $filter);
+				return $netbox->deviceTypes($filter, $limit);
 
 			// IPAM
 			case self::IPAddressMode:
-				return $netbox->ipAddresses($limit, $filter);
+				return $netbox->ipAddresses($filter, $limit);
 
 			// Where			
 			case self::LocationMode:
-				return $netbox->locations($limit, $filter);
+				return $netbox->locations($filter, $limit);
 			case self::SiteMode:
-				return $netbox->sites($limit, $filter);
+				return $netbox->sites($filter, $limit);
 			case self::SiteGroupMode:
-				return $netbox->siteGroups($limit, $filter);
+				return $netbox->siteGroups($filter, $limit);
 			case self::RegionMode:
-				return $netbox->regions($limit, $filter);
+				return $netbox->regions($filter, $limit);
 
 			// Who
 			case self::TenantMode:
-				return $netbox->tenants($limit, $filter);
+				return $netbox->tenants($filter, $limit);
 			case self::TenantGroupMode:
-				return $netbox->tenantGroups($limit, $filter);
+				return $netbox->tenantGroups($filter, $limit);
 		
 			// Other
 			case self::PlatformMode:
-				return $netbox->platforms($limit, $filter);
+				return $netbox->platforms($filter, $limit);
 			case self::ServiceMode:
-				return $netbox->allservices($limit, $filter);
+				return $netbox->allservices($filter, $limit);
 			case self::TagMode:
-				return $netbox->tags($limit, $filter);
+				return $netbox->tags($filter, $limit);
 			case self::TestMode:
-				return $netbox->devices($limit, $filter);
+				return $netbox->devices($filter, $limit);
 			}
 	}
 
