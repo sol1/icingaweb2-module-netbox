@@ -9,8 +9,8 @@ use Icinga\Module\Netbox\Netbox;
 
 class ImportSource extends ImportSourceHook
 {
-	// To keep sorted: sort, strip assignments, print new value as line number
-	// Edit | sort | sed 's/ = [0-9]+;//' | awk '{ printf "%s = %d;\n", $0, NR }'
+	// IMPORTANT: Existing installations store this numbers in the config. Changing them means the config needs to be redone. 
+	// 			  I've grouped and left spaces so we don't need to renumber any of these again.
 	// VM
 	const ClusterGroupMode = 10;	
 	const ClusterMode = 12;
@@ -128,6 +128,12 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('See https://netbox.example.com/user/api-tokens')
 		));
 
+		$form->addElement('text', 'proxy', array(
+			'label' => $form->translate('Proxy'),
+			'required' => false,
+			'description' => $form->translate('Optional proxy server setting in the format <address>:<port>')
+		));
+
 		$form->addElement('select', 'mode', array(
 			'label' => $form->translate('Object type to import'),
 			'description' => $form->translate('Not all object types are supported'),
@@ -194,15 +200,16 @@ class ImportSource extends ImportSourceHook
 			'required' => false,
 			'description' => $form->translate('Optional proxy server setting in the format <address>:<port>')
 		));
+
 	}
 
 	public function fetchData(int $limit = 0)
 	{
 		$baseurl = $this->getSetting('baseurl');
 		$apitoken = $this->getSetting('apitoken');
+		$proxy = $this->getSetting('proxy');
 		$mode = $this->getSetting('mode');
 		$filter = (string)$this->getSetting('filter');
-		$proxy = $this->getSetting('proxy');
 		$flatten = (string)$this->getSetting('flatten');
 		$flattenkeys = ((string)$this->getSetting('flattenkeys') == '') ? array() : explode(",", (string)$this->getSetting('flattenkeys'));
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
