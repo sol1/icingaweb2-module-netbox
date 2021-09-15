@@ -178,7 +178,7 @@ class Netbox
 	// number of results; this is useful for testing.
 
 	//  VM's
-	public function virtualMachines(int $limit = 0, $filter)
+	public function virtualMachines($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "status=active";
@@ -186,7 +186,7 @@ class Netbox
 		return $this->get_netbox("/virtualization/virtual-machines/?" . $filter, $limit);
 	}
 
-	public function clusters(int $limit = 0, $filter)
+	public function clusters($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "status=active";
@@ -194,7 +194,7 @@ class Netbox
 		return $this->get_netbox("/virtualization/clusters/?" . $filter, $limit);
 	}
 
-	public function clusterGroups(int $limit = 0, $filter)
+	public function clusterGroups($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -202,7 +202,7 @@ class Netbox
 		return $this->get_netbox("/virtualization/cluster-groups/?" . $filter, $limit);
 	}
 
-	public function clusterTypes(int $limit = 0, $filter)
+	public function clusterTypes($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -211,7 +211,7 @@ class Netbox
 	}
 
 	// Devices
-	public function devices(int $limit = 0, $filter)
+	public function devices($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "status=active";
@@ -219,7 +219,7 @@ class Netbox
 		return $this->get_netbox("/dcim/devices/?" . $filter, $limit);
 	}
 
-	public function deviceRoles(int $limit = 0, $filter)
+	public function deviceRoles($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -227,7 +227,7 @@ class Netbox
 		return $this->get_netbox("/dcim/device-roles/?" . $filter, $limit);
 	}
 
-	public function deviceTypes(int $limit = 0, $filter)
+	public function deviceTypes($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -236,7 +236,7 @@ class Netbox
 	}
 
 	// IPAM 
-	public function ipAddresses(int $limit = 0, $filter)
+	public function ipAddresses($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "assigned_to_interface=True";
@@ -245,7 +245,7 @@ class Netbox
 	}
 
 	// Where
-	public function locations(int $limit = 0, $filter)
+	public function locations($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -253,7 +253,7 @@ class Netbox
 		return $this->get_netbox("/dcim/locations/?" . $filter, $limit);
 	}
 
-	public function sites(int $limit = 0, $filter)
+	public function sites($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "status=active";
@@ -261,7 +261,7 @@ class Netbox
 		return $this->get_netbox("/dcim/sites/?" . $filter, $limit);
 	}
 
-	public function siteGroups(int $limit = 0, $filter)
+	public function siteGroups($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -269,7 +269,7 @@ class Netbox
 		return $this->get_netbox("/dcim/site-groups/?" . $filter, $limit);
 	}
 
-	public function regions(int $limit = 0, $filter)
+	public function regions($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -278,7 +278,7 @@ class Netbox
 	}
 
 	// Who
-	public function tenants(int $limit = 0, $filter)
+	public function tenants($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -286,7 +286,7 @@ class Netbox
 		return $this->get_netbox("/tenancy/tenants/?" . $filter, $limit);
 	}
 
-	public function tenantGroups(int $limit = 0, $filter)
+	public function tenantGroups($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -295,7 +295,7 @@ class Netbox
 	}
 
 	// Other
-	public function platforms(int $limit = 0, $filter)
+	public function platforms($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "status=active";
@@ -304,7 +304,7 @@ class Netbox
 	}
 
 
-	public function tags(int $limit = 0, $filter)
+	public function tags($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "";
@@ -313,7 +313,7 @@ class Netbox
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
-	public function allservices(int $limit = 0, $filter)
+	public function allservices($filter, int $limit = 0)
 	{
 		if (empty($filter)) {
 			$filter = "status=active";
