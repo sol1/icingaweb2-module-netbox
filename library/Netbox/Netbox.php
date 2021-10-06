@@ -210,6 +210,14 @@ class Netbox
 		return $this->get_netbox("/virtualization/cluster-types/?" . $filter, $limit);
 	}
 
+	public function virtualMachineInterfaces($filter, int $limit = 0)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/virtualization/interfaces/?" . $filter, $limit);
+	}
+
 	// Devices
 	public function devices($filter, int $limit = 0)
 	{
@@ -233,6 +241,14 @@ class Netbox
 			$filter = "";
 		}
 		return $this->get_netbox("/dcim/device-types/?" . $filter, $limit);
+	}
+
+	public function deviceInterfaces($filter, int $limit = 0)
+	{
+		if (empty($filter)) {
+			$filter = "";
+		}
+		return $this->get_netbox("/dcim/interfaces/?" . $filter, $limit);
 	}
 
 	// IPAM 
