@@ -16,11 +16,13 @@ class ImportSource extends ImportSourceHook
 	const ClusterMode = 12;
 	const ClusterTypeMode = 14;
 	const VMMode = 16;
+	const VMInterfaceMode = 18;
 
 	// Device
 	const DeviceMode = 20;
 	const DeviceRoleMode = 22;
 	const DeviceTypeMode = 24;
+	const DeviceInterfaceMode = 26;
 
 	// IPAM
 	const IPAddressMode = 30;
@@ -144,11 +146,13 @@ class ImportSource extends ImportSourceHook
 				self::ClusterGroupMode => $form->translate('Cluster groups'),
 				self::ClusterTypeMode => $form->translate('Cluster types'),
 				self::VMMode => $form->translate('Virtual machines'),
+				self::VMInterfaceMode => $form->translate('Virtual machine interfaces'),
 			
 				// Device
 				self::DeviceMode => $form->translate('Devices'),
 				self::DeviceRoleMode => $form->translate('Device roles'),
 				self::DeviceTypeMode => $form->translate('Device types'),
+				self::DeviceInterfaceMode => $form->translate('Device interfaces'),
 			
 				// IPAM
 				self::IPAddressMode => $form->translate('IP Addresses'),
@@ -226,6 +230,8 @@ class ImportSource extends ImportSourceHook
 				return $netbox->clusterGroups($filter, $limit);
 			case self::ClusterTypeMode:
 				return $netbox->clusterTypes($filter, $limit);
+			case self::VMInterfaceMode:
+				return $netbox->virtualMachineInterfaces($filter, $limit);
 							
 			// Device
 			case self::DeviceMode:
@@ -236,6 +242,8 @@ class ImportSource extends ImportSourceHook
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
 				return $netbox->deviceTypes($filter, $limit);
+			case self::DeviceInterfaceMode:
+				return $netbox->deviceInterfaces($filter, $limit);
 
 			// IPAM
 			case self::IPAddressMode:
