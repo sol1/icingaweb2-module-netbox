@@ -39,8 +39,18 @@ class ImportSource extends ImportSourceHook
 	const PlatformMode = 60;
 	const ServiceMode = 62;
 	const TagMode = 64;
-	const TestMode = 66;
 
+	// Circuits
+	const CircuitMode = 70;
+	const CircuitTypeMode = 72;
+	const ProviderMode = 74;
+	const ProviderNetworkMode = 76;
+
+	// Connections
+	const CableMode = 80;
+
+	// Test mode
+	const TestMode = 600;
 
 	// TODO: VRF is linked to devices/vm's through ip's. If we need VRF's then we should
 	// create an array in the import of all the linked ip's and vrf inside the importer 
@@ -167,7 +177,19 @@ class ImportSource extends ImportSourceHook
 				self::PlatformMode => $form->translate('Platforms'),
 				self::ServiceMode => $form->translate('Services'),
 				self::TagMode => $form->translate('Tags'),
-				self::TestMode => $form->translate('Test')
+
+				// Circuits
+				self::CircuitMode => $form->translate('Circuits'),
+				self::CircuitTypeMode => $form->translate('Circuit Types'),
+				self::ProviderMode => $form->translate('Providers'),
+				self::ProviderNetworkMode => $form->translate('Provider Networks'),
+
+				// Connections
+				self::CableMode => $form->translate('Cables')
+
+				// Keep test at the end
+				self::TestMode => $form->translate('Test'),
+
 			)
 		));
 
@@ -266,6 +288,20 @@ class ImportSource extends ImportSourceHook
 				return $netbox->tags($limit, $filter);
 			case self::TestMode:
 				return $netbox->devices($limit, $filter);
+
+			// Circuits
+			case self::CircuitMode:
+				return $netbox->circuits($limit, $filter);
+			case self::CircuitTypeMode:
+				return $netbox->circuittypes($limit, $filter);
+			case self::ProviderMode:
+				return $netbox->providers($limit, $filter);
+			case self::ProviderNetworkMode:
+				return $netbox->providernetworks($limit, $filter);
+
+			// Connections
+			case self::CableMode:
+				return $netbox->cables($limit, $filter);
 			}
 	}
 

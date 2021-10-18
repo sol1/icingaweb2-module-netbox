@@ -173,6 +173,15 @@ class Netbox
 		return $this->transform($this->get($api_path));
 	}
 
+	private function default_filter($filter, $default_filter)
+	{
+		if (empty($filter)) {
+			$filter = $default_filter;
+		}
+		return $filter;
+	}
+
+
 	// returns an array of objects. A limit of 0 returns all
 	// objects from Netbox. A limit > 0 queries for and returns just $limit
 	// number of results; this is useful for testing.
@@ -180,77 +189,50 @@ class Netbox
 	//  VM's
 	public function virtualMachines(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/virtualization/virtual-machines/?" . $filter, $limit);
+		return $this->get_netbox("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function clusters(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/virtualization/clusters/?" . $filter, $limit);
+		return $this->get_netbox("/virtualization/clusters/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function clusterGroups(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/virtualization/cluster-groups/?" . $filter, $limit);
+		return $this->get_netbox("/virtualization/cluster-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function clusterTypes(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/virtualization/cluster-types/?" . $filter, $limit);
+		return $this->get_netbox("/virtualization/cluster-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Devices
 	public function devices(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/dcim/devices/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function deviceRoles(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/dcim/device-roles/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function deviceTypes(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/dcim/device-types/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// IPAM 
 	public function ipAddresses(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "assigned_to_interface=True";
-		}
-		return $this->get_netbox("/ipam/ip-addresses/?" . $filter, $limit);
+		return $this->get_netbox("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
 	}
 
 	// Where
 	public function locations(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/dcim/locations/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/locations/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function sites(int $limit = 0, $filter)
@@ -258,67 +240,74 @@ class Netbox
 		if (empty($filter)) {
 			$filter = "status=active";
 		}
-		return $this->get_netbox("/dcim/sites/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function siteGroups(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/dcim/site-groups/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/site-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function regions(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/dcim/regions/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Who
 	public function tenants(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/tenancy/tenants/?" . $filter, $limit);
+		return $this->get_netbox("/tenancy/tenants/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function tenantGroups(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/tenancy/tenant-groups/?" . $filter, $limit);
+		return $this->get_netbox("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Other
 	public function platforms(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/dcim/platforms/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 
 	public function tags(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/extras/tags/?" . $filter, $limit);
+		return $this->get_netbox("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+
+	// Circuits
+	public function circuits(int $limit =0, $filter)
+	{
+		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function circuittypes(int $limit =0, $filter)
+	{
+		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function providers(int $limit =0, $filter)
+	{
+		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function providernetworks(int $limit =0, $filter)
+	{
+		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	// Connections
+	public function cables(int $limit =0, $filter)
+	{
+		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
 	public function allservices(int $limit = 0, $filter)
 	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
-		return $this->get_netbox("/ipam/services/?" . $filter, $limit);
+		return $this->get_netbox("/ipam/services/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	private function services(string $device, int $limit = 0)
