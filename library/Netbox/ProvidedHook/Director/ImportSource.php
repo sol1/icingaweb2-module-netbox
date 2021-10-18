@@ -294,8 +294,6 @@ class ImportSource extends ImportSourceHook
 				return $netbox->allservices($filter, $limit);
 			case self::TagMode:
 				return $netbox->tags($filter, $limit);
-			case self::TestMode:
-				return $netbox->devices($limit, $filter);
 
 			// Circuits
 			case self::CircuitMode:
@@ -310,6 +308,11 @@ class ImportSource extends ImportSourceHook
 			// Connections
 			case self::CableMode:
 				return $netbox->cables($limit, $filter);
+
+			// Test mode should always be last
+			case self::TestMode:
+				return $netbox->devices($limit, $filter);
+	
 			}
 	}
 
