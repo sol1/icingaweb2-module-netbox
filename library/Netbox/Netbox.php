@@ -296,28 +296,28 @@ class Netbox
 	// Circuits
 	public function circuits(int $limit =0, $filter)
 	{
-		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_netbox("/circuits/circuits/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function circuittypes(int $limit =0, $filter)
 	{
-		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_netbox("/circuits/circuit-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providers(int $limit =0, $filter)
 	{
-		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_netbox("/circuits/providers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providernetworks(int $limit =0, $filter)
 	{
-		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_netbox("/circuits/provider-networks/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Connections
 	public function cables(int $limit =0, $filter)
 	{
-		return $this->get_netbox("///?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_netbox("/dcim/cables/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
