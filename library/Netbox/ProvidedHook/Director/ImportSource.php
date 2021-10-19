@@ -297,21 +297,21 @@ class ImportSource extends ImportSourceHook
 
 			// Circuits
 			case self::CircuitMode:
-				return $netbox->circuits($limit, $filter);
+				return $netbox->circuits($filter, $limit);
 			case self::CircuitTypeMode:
-				return $netbox->circuittypes($limit, $filter);
+				return $netbox->circuittypes($filter, $limit);
 			case self::ProviderMode:
-				return $netbox->providers($limit, $filter);
+				return $netbox->providers($filter, $limit);
 			case self::ProviderNetworkMode:
-				return $netbox->providernetworks($limit, $filter);
+				return $netbox->providernetworks($filter, $limit);
 
 			// Connections
 			case self::CableMode:
-				return $netbox->cables($limit, $filter);
+				return $netbox->cables($filter, $limit);
 
 			// Test mode should always be last
 			case self::TestMode:
-				return $netbox->devices($limit, $filter);
+				return $netbox->devices($filter, $limit);
 	
 			}
 	}

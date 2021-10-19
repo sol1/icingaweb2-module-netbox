@@ -209,10 +209,7 @@ class Netbox
 
 	public function virtualMachineInterfaces($filter, int $limit = 0)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/virtualization/interfaces/?" . $filter, $limit);
+		return $this->get_netbox("/virtualization/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Devices
@@ -233,10 +230,7 @@ class Netbox
 
 	public function deviceInterfaces($filter, int $limit = 0)
 	{
-		if (empty($filter)) {
-			$filter = "";
-		}
-		return $this->get_netbox("/dcim/interfaces/?" . $filter, $limit);
+		return $this->get_netbox("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// IPAM 
@@ -253,9 +247,6 @@ class Netbox
 
 	public function sites($filter, int $limit = 0)
 	{
-		if (empty($filter)) {
-			$filter = "status=active";
-		}
 		return $this->get_netbox("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
@@ -294,28 +285,28 @@ class Netbox
 
 
 	// Circuits
-	public function circuits(int $limit =0, $filter)
+	public function circuits($filter, int $limit = 0)
 	{
 		return $this->get_netbox("/circuits/circuits/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	public function circuittypes(int $limit =0, $filter)
+	public function circuittypes($filter, int $limit = 0)
 	{
 		return $this->get_netbox("/circuits/circuit-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	public function providers(int $limit =0, $filter)
+	public function providers($filter, int $limit = 0)
 	{
 		return $this->get_netbox("/circuits/providers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	public function providernetworks(int $limit =0, $filter)
+	public function providernetworks($filter, int $limit = 0)
 	{
 		return $this->get_netbox("/circuits/provider-networks/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Connections
-	public function cables(int $limit =0, $filter)
+	public function cables($filter, int $limit = 0)
 	{
 		return $this->get_netbox("/dcim/cables/?" . $this->default_filter($filter, ""), $limit);
 	}
