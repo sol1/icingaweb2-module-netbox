@@ -32,7 +32,7 @@ icingacli module enable netbox
 To run current:
 
 ```
-git clone https://github.com/sol1/icingaweb2-module-netboximport netbox
+git clone https://github.com/sol1/icingaweb2-module-netbox.git netbox
 mv netbox /usr/share/icingaweb2/modules
 icingacli module enable netbox
 ```
