@@ -4,6 +4,10 @@ namespace Icinga\Module\Netbox;
 
 class Netbox
 {
+	public string $object_type;
+	public array $type_map;
+	public string $prefix = 'nb';
+
 	function __construct($baseurl, $token, $proxy, $flattenseparator, $flattenkeys, $munge)
 	{
 		$this->baseurl = $baseurl;
@@ -92,10 +96,73 @@ class Netbox
 		}
 	}
 
+
+	private function keymaker(string $s, string $nb_type = $this->object_type) {
+		$s = preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $s);
+		$s = preg_replace('/__+/i', '_', $s);
+		return $this->prefix . $nb_type . $s;
+		
+	}
+
+	// Automatically make fields that are likely to be needed so we can skip config in director
+	private function makeHelperKeys(array $in)	{
+		$output = array();
+		foreach ($in as $row) {
+			// Device type uses model as the 'name' field
+			// Add it first in so that name can overwrite if netbox changes it later
+			if (property_exists($row, 'model')) {
+				$row->keyid = $this->keymaker($row->model);
+			}
+
+			// The name of the current row
+			if (property_exists($row, 'name')) {
+				$row->keyid = $this->keymaker($row->name);
+			}
+
+			// Extract the address for the primary ip
+			// TODO: ipv6 ??
+			if ($k == 'primary_ip') {
+				if (property_exists($v, 'address')) {
+					$row->primary_ip_address = explode('/', $v->address)[0];
+				}
+			}
+			
+			// Because netbox changed tags and it isn't easy to turn a dict key in an array of dicts into an new array
+			if (property_exists($row, 'tags')) {
+				$row->tag_slugs = array();
+				foreach ($row->tags as $tag) {
+					$row->tag_slugs = array_merge($row->tag_slugs, [$tag->slug]);
+				}
+			}
+
+			$tnew = array_merge($tnew, [(object)$row]);
+			// Get child object and add a parent key to the device id
+			foreach ((array)$row as $k => $v) {
+				if (is_object($v)) {
+					// Device type is a special snowflake, it doesn't use name and also has a manufacture (it is a nice setup, it just needs more code)
+					if ($k == 'device_type') {
+						$row->device_model_keyid = $k->model;
+						$row->device_manufacturer_keyid = $k->manufacturer->name;
+					} elseif (property_exists($v, 'name')) {
+						$key = $k;
+						if (array_key_exists($k, $type_map)) {
+							$key = $type_map[$k]
+						}
+						$row->{$key . '_keyid'} = $this->keymaker($v->name, $key);
+					}
+				}
+
+			}
+
+			$output = array_merge($output, [(object)$row]);
+		}
+		return $output;
+	}
+
 	private function transform(array $in)
 	{
 		// default output is input
-		$output = $in;
+		$output = $this->makeHelperKeys($in);
 
 		// Flatten the returned data here if we have a flatten seperator
 		if (strlen($this->flattenseperator) > 0) {
@@ -122,6 +189,7 @@ class Netbox
 			$output = $fnew;
 		}
 
+		// Create new column from munge
 		if (!empty($this->munge)) {
 			$mungeheading = str_replace("s=", "", implode("_", $this->munge));
 			$mnew = array();
@@ -140,18 +208,18 @@ class Netbox
 			$output = $mnew;
 		}
 
-		// Because netbox changed tags and it is easy to add an array to icinga and see if a tag exists in it
-		$tnew = array();
-		foreach ($output as $row) {
-			if (property_exists($row, 'tags')) {
-				$row->tag_slugs = array();
-				foreach ($row->tags as $tag) {
-					$row->tag_slugs = array_merge($row->tag_slugs, [$tag->slug]);
-				}
-			}
-			$tnew = array_merge($tnew, [(object)$row]);
-		}
-		$output = $tnew;
+		// // Because netbox changed tags and it is easy to add an array to icinga and see if a tag exists in it
+		// $tnew = array();
+		// foreach ($output as $row) {
+		// 	if (property_exists($row, 'tags')) {
+		// 		$row->tag_slugs = array();
+		// 		foreach ($row->tags as $tag) {
+		// 			$row->tag_slugs = array_merge($row->tag_slugs, [$tag->slug]);
+		// 		}
+		// 	}
+		// 	$tnew = array_merge($tnew, [(object)$row]);
+		// }
+		// $output = $tnew;
 
 		return $output;
 	}
@@ -189,117 +257,178 @@ class Netbox
 	//  VM's
 	public function virtualMachines($filter, int $limit = 0)
 	{
+		$this->object_type = 'vm';
 		return $this->get_netbox("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
+	}
+
+	public function virtualMachineInterfaces($filter, int $limit = 0)
+	{
+		$this->object_type = 'vm_interface';
+		$this->type_map = array(
+			"virtual_machine" => "vm"
+		);
+		return $this->get_netbox("/virtualization/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function clusters($filter, int $limit = 0)
 	{
+		$this->object_type = 'cluster';
+		$this->type_map = array(
+			"type" => "cluster_type",
+			"group" => "cluster_group"
+		);
 		return $this->get_netbox("/virtualization/clusters/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function clusterGroups($filter, int $limit = 0)
 	{
+		$this->object_type = 'cluster_group';
 		return $this->get_netbox("/virtualization/cluster-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function clusterTypes($filter, int $limit = 0)
 	{
+		$this->object_type = 'cluster_type';
 		return $this->get_netbox("/virtualization/cluster-types/?" . $this->default_filter($filter, ""), $limit);
-	}
-
-	public function virtualMachineInterfaces($filter, int $limit = 0)
-	{
-		return $this->get_netbox("/virtualization/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Devices
 	public function devices($filter, int $limit = 0)
 	{
+		$this->object_type = 'device';
+		$this->type_map = array(
+			"parent_device" => "device"
+		);
 		return $this->get_netbox("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function deviceRoles($filter, int $limit = 0)
 	{
+		$this->object_type = 'device_role';
 		return $this->get_netbox("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function deviceTypes($filter, int $limit = 0)
 	{
+		$this->object_type = 'device_type';
 		return $this->get_netbox("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function manufacturers($filter, int $limit = 0)
 	{
+		$this->object_type = 'manufacturer';
 		return $this->get_netbox("/dcim/manufacturers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function deviceInterfaces($filter, int $limit = 0)
 	{
+		$this->object_type = 'device_interface';
+		$this->type_map = array(
+			"parent_device" => "device"
+		);
 		return $this->get_netbox("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// IPAM 
 	public function ipAddresses($filter, int $limit = 0)
 	{
+		$this->object_type = 'ip';
 		return $this->get_netbox("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
 	}
 
 	// Where
 	public function locations($filter, int $limit = 0)
 	{
+		$this->object_type = 'location';
+		$this->type_map = array(
+			"parent" => "location"
+		);
+
 		return $this->get_netbox("/dcim/locations/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function sites($filter, int $limit = 0)
 	{
+		$this->object_type = 'site';
+		$this->type_map = array(
+			"group" => "site_group"
+		);
+
 		return $this->get_netbox("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function siteGroups($filter, int $limit = 0)
 	{
+		$this->object_type = 'site_group';
 		return $this->get_netbox("/dcim/site-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function regions($filter, int $limit = 0)
 	{
+		$this->object_type = 'region';
+		$this->type_map = array(
+			"parent" => "region"
+		);
+
 		return $this->get_netbox("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Who
 	public function tenants($filter, int $limit = 0)
 	{
+		$this->object_type = 'tenant';
+		$this->type_map = array(
+			"group" => "tenant_group"
+		);
+
 		return $this->get_netbox("/tenancy/tenants/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function tenantGroups($filter, int $limit = 0)
 	{
+		$this->object_type = 'tenant_group';
 		return $this->get_netbox("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contacts($filter, int $limit = 0)
 	{
+		$this->object_type = 'contact';
+		$this->type_map = array(
+			"group" => "contact_group"
+		);
+
 		return $this->get_netbox("/tenancy/contacts/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contactGroups($filter, int $limit = 0)
 	{
+		$this->object_type = 'contact_group';
+		$this->type_map = array(
+			"parent" => "contact_group"
+		);
+
 		return $this->get_netbox("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contactModes($filter, int $limit = 0)
 	{
+		$this->object_type = 'contact_role';
 		return $this->get_netbox("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
+
+	// TODO: contactAssignement
 
 	// Other
 	public function platforms($filter, int $limit = 0)
 	{
+		$this->object_type = 'platform';
 		return $this->get_netbox("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 
 	public function tags($filter, int $limit = 0)
 	{
+		$this->object_type = 'tag';
 		return $this->get_netbox("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -307,38 +436,45 @@ class Netbox
 	// Circuits
 	public function circuits($filter, int $limit = 0)
 	{
+		$this->object_type = 'circuit';
 		return $this->get_netbox("/circuits/circuits/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function circuittypes($filter, int $limit = 0)
 	{
+		$this->object_type = 'circuit_type';
 		return $this->get_netbox("/circuits/circuit-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providers($filter, int $limit = 0)
 	{
+		$this->object_type = 'provider';
 		return $this->get_netbox("/circuits/providers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providernetworks($filter, int $limit = 0)
 	{
+		$this->object_type = 'provider_network';
 		return $this->get_netbox("/circuits/provider-networks/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Connections
 	public function cables($filter, int $limit = 0)
 	{
+		$this->object_type = 'cable';
 		return $this->get_netbox("/dcim/cables/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
 	public function allservices($filter, int $limit = 0)
 	{
+		$this->object_type = 'service';
 		return $this->get_netbox("/ipam/services/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	private function services(string $device, int $limit = 0)
 	{
+		$this->object_type = 'service';
 		return $this->get_netbox("/ipam/services/?device=" . urlencode($device), $limit);
 	}
 }
