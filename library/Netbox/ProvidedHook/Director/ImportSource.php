@@ -36,6 +36,9 @@ class ImportSource extends ImportSourceHook
 	// Who
 	const TenantGroupMode = 50;
 	const TenantMode = 52;
+	const ContactMode = 54;
+	const ContactGroupMode = 56;
+	const ContactRoleMode = 58;
 
 	// Other
 	const PlatformMode = 60;
@@ -153,16 +156,16 @@ class ImportSource extends ImportSourceHook
 			'multiOptions' => array(
 				// VM's
 				self::ClusterMode => $form->translate('Clusters'),
-				self::ClusterGroupMode => $form->translate('Cluster groups'),
-				self::ClusterTypeMode => $form->translate('Cluster types'),
-				self::VMMode => $form->translate('Virtual machines'),
-				self::VMInterfaceMode => $form->translate('Virtual machine interfaces'),
+				self::ClusterGroupMode => $form->translate('Cluster Groups'),
+				self::ClusterTypeMode => $form->translate('Cluster Types'),
+				self::VMMode => $form->translate('Virtual Machines'),
+				self::VMInterfaceMode => $form->translate('Virtual Machine Interfaces'),
 			
 				// Device
 				self::DeviceMode => $form->translate('Devices'),
-				self::DeviceRoleMode => $form->translate('Device roles'),
-				self::DeviceTypeMode => $form->translate('Device types'),
-				self::DeviceInterfaceMode => $form->translate('Device interfaces'),
+				self::DeviceRoleMode => $form->translate('Device Roles'),
+				self::DeviceTypeMode => $form->translate('Device Types'),
+				self::DeviceInterfaceMode => $form->translate('Device Interfaces'),
 			
 				// IPAM
 				self::IPAddressMode => $form->translate('IP Addresses'),
@@ -170,12 +173,15 @@ class ImportSource extends ImportSourceHook
 				// Where
 				self::LocationMode => $form->translate('Locations'),
 				self::SiteMode => $form->translate('Sites'),
-				self::SiteGroupMode => $form->translate('Site groups'),
+				self::SiteGroupMode => $form->translate('Site Groups'),
 				self::RegionMode => $form->translate('Region'),
 			
 				// Who
 				self::TenantMode => $form->translate('Tenants'),
 				self::TenantGroupMode => $form->translate('Tenant Groups'),
+				self::ContactMode => $form->translate('Contacts'),
+				self::ContactGroupMode => $form->translate('Contact Groups'),
+				self::ContactRoleMode => $form->translate('Contact Roles'),
 			
 				// Other
 				self::PlatformMode => $form->translate('Platforms'),
@@ -219,12 +225,6 @@ class ImportSource extends ImportSourceHook
 			'label' => $form->translate('Search filter'),
 			'required' => false,
 			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active is added without a filter selected)')
-		));
-
-		$form->addElement('text', 'proxy', array(
-			'label' => $form->translate('Proxy'),
-			'required' => false,
-			'description' => $form->translate('Optional proxy server setting in the format <address>:<port>')
 		));
 
 	}
@@ -286,6 +286,12 @@ class ImportSource extends ImportSourceHook
 				return $netbox->tenants($filter, $limit);
 			case self::TenantGroupMode:
 				return $netbox->tenantGroups($filter, $limit);
+			case self::ContactMode:
+				return $netbox->contacts($filter, $limit);
+			case self::ContactGroupMode:
+				return $netbox->contactGroups($filter, $limit);
+			case self::ContactRoleMode:
+				return $netbox->contactModes($filter, $limit);
 		
 			// Other
 			case self::PlatformMode:

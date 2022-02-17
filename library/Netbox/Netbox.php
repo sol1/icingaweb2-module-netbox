@@ -271,6 +271,21 @@ class Netbox
 		return $this->get_netbox("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
+	public function contacts($filter, int $limit = 0)
+	{
+		return $this->get_netbox("/tenancy/contacts/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function contactGroups($filter, int $limit = 0)
+	{
+		return $this->get_netbox("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function contactModes($filter, int $limit = 0)
+	{
+		return $this->get_netbox("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
+	}
+
 	// Other
 	public function platforms($filter, int $limit = 0)
 	{
