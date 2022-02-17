@@ -228,6 +228,11 @@ class Netbox
 		return $this->get_netbox("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
+	public function manufacturers($filter, int $limit = 0)
+	{
+		return $this->get_netbox("/dcim/manufacturers/?" . $this->default_filter($filter, ""), $limit);
+	}
+
 	public function deviceInterfaces($filter, int $limit = 0)
 	{
 		return $this->get_netbox("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);

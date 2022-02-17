@@ -22,6 +22,7 @@ class ImportSource extends ImportSourceHook
 	const DeviceMode = 20;
 	const DeviceRoleMode = 22;
 	const DeviceTypeMode = 24;
+	const ManufacturerMode = 25;
 	const DeviceInterfaceMode = 26;
 
 	// IPAM
@@ -165,6 +166,7 @@ class ImportSource extends ImportSourceHook
 				self::DeviceMode => $form->translate('Devices'),
 				self::DeviceRoleMode => $form->translate('Device Roles'),
 				self::DeviceTypeMode => $form->translate('Device Types'),
+				self::ManufacturerMode => $form->translate('Manufacturers'),
 				self::DeviceInterfaceMode => $form->translate('Device Interfaces'),
 			
 				// IPAM
@@ -264,6 +266,8 @@ class ImportSource extends ImportSourceHook
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
 				return $netbox->deviceTypes($filter, $limit);
+			case self::ManufacturerMode:
+				return $netbox->manufacturers($filter, $limit);
 			case self::DeviceInterfaceMode:
 				return $netbox->deviceInterfaces($filter, $limit);
 
