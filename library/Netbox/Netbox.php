@@ -143,8 +143,8 @@ class Netbox
 				if (is_object($v)) {
 					// Device type is a special snowflake, it doesn't use name and also has a manufacture (it is a nice setup, it just needs more code)
 					if ($k == 'device_type') {
-						$row->device_model_keyid = $k->model;
-						$row->device_manufacturer_keyid = $k->manufacturer->name;
+						$row->device_model_keyid = $v->model;
+						$row->device_manufacturer_keyid = $v->manufacturer->name;
 					} elseif (property_exists($v, 'name')) {
 						$key = $k;
 						if (array_key_exists($k, $this->type_map)) {
