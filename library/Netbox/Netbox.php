@@ -138,7 +138,6 @@ class Netbox
 				}
 			}
 
-			$tnew = array_merge($tnew, [(object)$row]);
 			// Get child object and add a parent key to the device id
 			foreach ((array)$row as $k => $v) {
 				if (is_object($v)) {
