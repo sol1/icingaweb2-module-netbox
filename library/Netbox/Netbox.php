@@ -260,6 +260,9 @@ class Netbox
 	public function virtualMachines($filter, int $limit = 0)
 	{
 		$this->object_type = 'vm';
+		$this->type_map = array(
+			"role" => "role"
+		);
 		return $this->get_netbox("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
@@ -299,7 +302,8 @@ class Netbox
 	{
 		$this->object_type = 'device';
 		$this->type_map = array(
-			"parent_device" => "device"
+			"parent_device" => "device",
+			"device_role" => "role"
 		);
 		return $this->get_netbox("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
@@ -307,6 +311,7 @@ class Netbox
 	public function deviceRoles($filter, int $limit = 0)
 	{
 		$this->object_type = 'device_role';
+		// Device role is shard between vm and devices but differes in name, this importer uses 'role_keyid' to unify them
 		return $this->get_netbox("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
