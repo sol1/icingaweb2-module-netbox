@@ -146,7 +146,7 @@ class Netbox
 					} elseif (property_exists($v, 'name')) {
 						$key = $k;
 						if (array_key_exists($k, $type_map)) {
-							$key = $type_map[$k]
+							$key = $type_map[$k];
 						}
 						$row->{$key . '_keyid'} = $this->keymaker($v->name, $key);
 					}
