@@ -103,7 +103,7 @@ class Netbox
 		}
 		$s = preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $s);
 		$s = preg_replace('/__+/i', '_', $s);
-		return $this->prefix . $nb_type . $s;
+		return $this->prefix . $nb_type . " " .  $s;
 		
 	}
 
