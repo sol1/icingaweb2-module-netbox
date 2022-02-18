@@ -4,9 +4,9 @@ namespace Icinga\Module\Netbox;
 
 class Netbox
 {
-	public string $object_type;
-	public array $type_map;
-	public string $prefix = 'nb';
+	public $object_type;
+	public $type_map;
+	public $prefix = 'nb';
 
 	function __construct($baseurl, $token, $proxy, $flattenseparator, $flattenkeys, $munge)
 	{
