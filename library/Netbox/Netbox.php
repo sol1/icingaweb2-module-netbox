@@ -141,15 +141,15 @@ class Netbox
 			// Get child object and add a parent key to the device id
 			foreach ((array)$row as $k => $v) {
 				if (is_object($v)) {
+					$key = $k;
+					if (array_key_exists($k, $this->type_map)) {
+						$key = $this->type_map[$k];
+					}
 					// Device type is a special snowflake, it doesn't use name and also has a manufacture (it is a nice setup, it just needs more code)
 					if ($k == 'device_type') {
-						$row->device_model_keyid = $v->model;
-						$row->device_manufacturer_keyid = $v->manufacturer->name;
+						$row->device_model_keyid = $this->keymaker($v->model, $key);
+						$row->device_manufacturer_keyid = $this->keymaker($v->manufacturer->name, $key);
 					} elseif (property_exists($v, 'name')) {
-						$key = $k;
-						if (array_key_exists($k, $this->type_map)) {
-							$key = $this->type_map[$k];
-						}
 						$row->{$key . '_keyid'} = $this->keymaker($v->name, $key);
 					}
 				}
@@ -299,7 +299,9 @@ class Netbox
 	{
 		$this->object_type = 'device';
 		$this->type_map = array(
-			"parent_device" => "device"
+			"parent_device" => "device",
+			"model" => "model",
+			"manufacturer" => "manufacturer"
 		);
 		return $this->get_netbox("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
