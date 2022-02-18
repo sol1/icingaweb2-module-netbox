@@ -97,7 +97,10 @@ class Netbox
 	}
 
 
-	private function keymaker(string $s, string $nb_type = $this->object_type) {
+	private function keymaker(string $s, string $nb_type = NULL) {
+		if (is_null($nb_type)) {
+			$nb_type = $this->object_type;
+		}
 		$s = preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $s);
 		$s = preg_replace('/__+/i', '_', $s);
 		return $this->prefix . $nb_type . $s;
