@@ -147,8 +147,8 @@ class Netbox
 						$row->device_manufacturer_keyid = $k->manufacturer->name;
 					} elseif (property_exists($v, 'name')) {
 						$key = $k;
-						if (array_key_exists($k, $type_map)) {
-							$key = $type_map[$k];
+						if (array_key_exists($k, $this->type_map)) {
+							$key = $this->type_map[$k];
 						}
 						$row->{$key . '_keyid'} = $this->keymaker($v->name, $key);
 					}
