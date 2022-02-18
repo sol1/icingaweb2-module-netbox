@@ -124,7 +124,7 @@ class Netbox
 
 			// Extract the address for the primary ip
 			// TODO: ipv6 ??
-			if ($k == 'primary_ip') {
+			if (property_exists($row,'primary_ip')) {
 				if (property_exists($v, 'address')) {
 					$row->primary_ip_address = explode('/', $v->address)[0];
 				}
