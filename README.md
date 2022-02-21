@@ -164,9 +164,83 @@ Strip the subnet suffix:
 
 ![Import source - Modifiers](doc/screenshot/import-modifier-2.png)
 
+## Modifiers
+Some of the data Netbox contains benifits from consistent Director import source modifiers. 
+These include object names, linked object names, primary ip address and config context data to manage satellite creation.
+
+The Netbox Import Module creates top level keys with default null values with the following paramaters
+
+### Object names and Linked Object Names
+For the object itself the key `keyid` is added based on the object name. The object name first has characters that aren't in `[^0-9a-zA-Z_\-. ]` with `_` and making the name lowercase then a prefix is added for the type.
+
+---
+**NOTE**
+
+This format was chosen as Icinga is case insensitive for names where as Netbox is case sensitive. It would be good to setup a [custom validator](https://demo.netbox.dev/static/docs/customization/custom-validation/) in Netbox that ensures the `name` entered into Netbox, when sanatised in this method, is unique for the all objects of that type.
+
+---
+
+For linked objects a key is added with the type followed by `_keyid` for key name, the same object name sanitisation occurs.
+
+eg: for a device with the follow name and site info the following is returned
+```
+name: "Foo (123)"
+keyid: "vmdevice_foo_123"
+site: {
+  name: "bar"
+}
+site_keyid: "vmsite_bar"
+```
+
+### Primary IP
+The ip address from `primary_ip.address` is extracted and added to `primary_ip_address`
+```
+primary_ip :{
+  address: "127.0.0.1/32"
+}
+primary_ip_address: "127.0.0.1"
+```
+
+# Icinga info in config context auto extraction
+```			
+// Icinga satellite 
+{
+  "icinga": {
+    "satellite": {
+      "client_zone": "<zone name>",
+      "parent_endpoint": "<parent endpoint name>",
+      "parent_fqdn": "<parent fqdn or address>",
+      "parent_zone": "<parent zone name>"
+    }
+  }
+}
+// Icinga host in zone
+{
+  "icinga": {
+    "host": {
+      "zone": "<zone name>"
+    }
+  }
+}
+// Icinga services and vars
+{
+  "icinga": {
+    "service": {
+    }
+    "var": {
+    }
+  }
+}
+```
+If any of the above is found in `config_context` for devices or vm's the importer will automatically create `icinga_satellite_<key>`, `icinga_host_<key>`, `icinga_service` or `icinga_var`.
+
+This allows the easy configuration of host and satellites from Netbox with accuration zone and endpoint information. It also allows vars or service vars to be placed on the host for easy parsing.
+
+This structure is useful in automated satellite deployment using tools such as ansible as these are the same values required to setup a satellite.
+
 ## Acknowledgements
 
 This module was initially based on a module by Uberspace:
 https://github.com/Uberspace/icingaweb2-module-netboximport
 
-It was rewritten by Oliver at [Sol1](https://www.sol1.com.au)
+It was rewritten by Oliver at [Sol1](https://www.sol1.com.au) and is maintained by Matt at [Sol1](https://www.sol1.com.au)

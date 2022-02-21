@@ -1,4 +1,4 @@
 Name: Netbox
-Version: 3.1.10.1
+Version: 3.1.16.1
 Depends: director
 Description: Import devices, sites and other objects from Netbox
