@@ -164,6 +164,79 @@ class Netbox
 
 			}
 
+			// Custom fields for Netbox
+			// Icinga satellite
+			/* 
+			{
+				"icinga": {
+					"satellite": {
+						"client_zone": "<zone name>",
+						"parent_endpoint": "<parent endpoint name>",
+						"parent_fqdn": "<parent fqdn or address>",
+						"parent_zone": "<parent zone name>"
+					}
+				}
+			}
+			// Icinga host in zone
+			{
+				"icinga": {
+					"host": {
+						"zone": "<zone name>"
+					}
+				}
+			}
+			// Icinga services and vars
+			{
+				"icinga": {
+					"service": {
+					}
+					"var": {
+					}
+				}
+			}
+			 */
+
+			if (property_exists($row, 'config_context') {
+				if (property_exists($row->config_context, 'icinga') {
+					$satellite_keys = [ "client_zone", "parent_endpoint", "parent_fqdn", "parent_zone" ];
+					$host_keys = [ "zone" ];
+					$other_keys = [ "service", "var" ]
+					// Default empty values for column headings
+					foreach ($satellite_keys as $s) {
+						$row->{'icinga_satellite_' . $s} = NULL;
+					} 
+					foreach ($host_keys, $h)) {
+						$row->{'icinga_host_' . $h} = NULL;
+					}
+					foreach ($other_keys, $o)) {
+						$row->{'icinga_' . $o} = NULL;
+					}
+
+					// Parse the data and set values
+					$icinga = $row->config_context->icinga;
+					if (property_exists($icinga, 'satellite') {
+						foreach ($satellite_keys as $s){
+							if (property_exists($icinga->satellite, $s)) {
+								$row->{'icinga_satellite_' . $s} = $icinga->satellite->{$s};
+							}
+						}
+					}
+					if (property_exists($icinga, 'host') {
+						foreach ($host_keys as $h){
+							if (property_exists($icinga->satellite, $h)) {
+								$row->{'icinga_host_' . $h} = $icinga->satellite->{$h};
+							}
+						}
+					}
+					foreach ($other_keys as $okey) {
+						if (property_exists($icinga, $okey) {
+							$row->{"icinga_" . $okey} = $icinga->{$okey};
+						}
+					}	
+
+				}
+			}
+
 			$output = array_merge($output, [(object)$row]);
 		}
 		return $output;
