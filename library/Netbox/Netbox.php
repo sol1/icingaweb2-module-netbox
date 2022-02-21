@@ -221,7 +221,7 @@ class Netbox
 							}
 						}
 					}
-					if (property_exists($icinga, 'host') {
+					if (property_exists($icinga, 'host')) {
 						foreach ($host_keys as $h) {
 							if (property_exists($icinga->satellite, $h)) {
 								$row->{'icinga_host_' . $h} = $icinga->satellite->{$h};
