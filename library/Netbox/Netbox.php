@@ -142,7 +142,7 @@ class Netbox
 
 			// Headings use a call that has a single row so some fields may not be created
 			// Pre create all required fields that may be used with a null value before putting in available data
-			foreach ((array)$this->type_map as $k => $v)
+			foreach ((array)$this->type_map as $k => $v) {
 				$row->{$v . '_keyid'} = NULL;
 			}
 
