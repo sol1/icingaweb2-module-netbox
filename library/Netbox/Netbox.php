@@ -204,13 +204,13 @@ class Netbox
 					// Default empty values for column headings
 					foreach ($satellite_keys as $s) {
 						$row->{'icinga_satellite_' . $s} = NULL;
-					} 
+					};
 					foreach ($host_keys, $h)) {
 						$row->{'icinga_host_' . $h} = NULL;
-					}
+					};
 					foreach ($other_keys, $o)) {
 						$row->{'icinga_' . $o} = NULL;
-					}
+					};
 
 					// Parse the data and set values
 					$icinga = $row->config_context->icinga;
