@@ -196,8 +196,8 @@ class Netbox
 			}
 			 */
 
-			if (property_exists($row, 'config_context') {
-				if (property_exists($row->config_context, 'icinga') {
+			if (property_exists($row, 'config_context')) {
+				if (property_exists($row->config_context, 'icinga')) {
 					$satellite_keys = [ "client_zone", "parent_endpoint", "parent_fqdn", "parent_zone" ];
 					$host_keys = [ "zone" ];
 					$other_keys = [ "service", "var" ]
@@ -214,22 +214,22 @@ class Netbox
 
 					// Parse the data and set values
 					$icinga = $row->config_context->icinga;
-					if (property_exists($icinga, 'satellite') {
-						foreach ($satellite_keys as $s){
+					if (property_exists($icinga, 'satellite')) {
+						foreach ($satellite_keys as $s) {
 							if (property_exists($icinga->satellite, $s)) {
 								$row->{'icinga_satellite_' . $s} = $icinga->satellite->{$s};
 							}
 						}
 					}
 					if (property_exists($icinga, 'host') {
-						foreach ($host_keys as $h){
+						foreach ($host_keys as $h) {
 							if (property_exists($icinga->satellite, $h)) {
 								$row->{'icinga_host_' . $h} = $icinga->satellite->{$h};
 							}
 						}
 					}
 					foreach ($other_keys as $okey) {
-						if (property_exists($icinga, $okey) {
+						if (property_exists($icinga, $okey)) {
 							$row->{"icinga_" . $okey} = $icinga->{$okey};
 						}
 					}	
