@@ -200,7 +200,7 @@ class Netbox
 				if (property_exists($row->config_context, 'icinga')) {
 					$satellite_keys = [ "client_zone", "parent_endpoint", "parent_fqdn", "parent_zone" ];
 					$host_keys = [ "zone" ];
-					$other_keys = [ "service", "var" ]
+					$other_keys = [ "service", "var" ];
 					// Default empty values for column headings
 					foreach ($satellite_keys as $s) {
 						$row->{'icinga_satellite_' . $s} = NULL;
