@@ -124,18 +124,26 @@ class Netbox
 
 			// Extract the address for the primary ip
 			// TODO: ipv6 ??
+			$row->primary_ip_address = NULL;	// Make empty field for column headings if no values exist
 			if (property_exists($row,'primary_ip')) {
 				if (! is_null($row->primary_ip) and property_exists($row->primary_ip, 'address')) {
 					$row->primary_ip_address = explode('/', $row->primary_ip->address)[0];
 				}
-			}
+			} 
 			
 			// Because netbox changed tags and it isn't easy to turn a dict key in an array of dicts into an new array
+			$row->tag_slugs = NULL;
 			if (property_exists($row, 'tags')) {
 				$row->tag_slugs = array();
 				foreach ($row->tags as $tag) {
 					$row->tag_slugs = array_merge($row->tag_slugs, [$tag->slug]);
 				}
+			}
+
+			// Headings use a call that has a single row so some fields may not be created
+			// Pre create all required fields that may be used with a null value before putting in available data
+			foreach ((array)$this->type_map as $k => $v)
+				$row->{$v . '_keyid'} = NULL;
 			}
 
 			// Get child object and add a parent key to the device id
@@ -261,7 +269,11 @@ class Netbox
 	{
 		$this->object_type = 'vm';
 		$this->type_map = array(
-			"role" => "device_role"
+			"cluster" => "cluster",
+			"platform" => "platform",
+			"role" => "device_role",
+			"site" => "site",
+			"tenant" => "tenant"
 		);
 		return $this->get_netbox("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
@@ -279,8 +291,10 @@ class Netbox
 	{
 		$this->object_type = 'cluster';
 		$this->type_map = array(
-			"type" => "cluster_type",
-			"group" => "cluster_group"
+			"group" => "cluster_group",
+			"site" => "site",
+			"tenant" => "tenant",
+			"type" => "cluster_type"
 		);
 		return $this->get_netbox("/virtualization/clusters/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
@@ -302,8 +316,10 @@ class Netbox
 	{
 		$this->object_type = 'device';
 		$this->type_map = array(
+			"device_role" => "device_role",
 			"parent_device" => "device",
-			"device_role" => "device_role"
+			"site" => "site",
+			"tenant" => "tenant"
 		);
 		return $this->get_netbox("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
@@ -318,6 +334,9 @@ class Netbox
 	public function deviceTypes($filter, int $limit = 0)
 	{
 		$this->object_type = 'device_type';
+		$this->type_map = array(
+			"manufacturer" => "manufacturer"
+		);
 		return $this->get_netbox("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -331,7 +350,9 @@ class Netbox
 	{
 		$this->object_type = 'device_interface';
 		$this->type_map = array(
-			"parent_device" => "device"
+			"device" => "device",
+			"parent" => "device_interface"
+
 		);
 		return $this->get_netbox("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
@@ -340,6 +361,12 @@ class Netbox
 	public function ipAddresses($filter, int $limit = 0)
 	{
 		$this->object_type = 'ip';
+		$this->type_map = array(
+			"assigned_object" => "device_interface",
+			"device" => "device",
+			"parent" => "device_interface",
+			"tenant" => "tenant"
+		);
 		return $this->get_netbox("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
 	}
 
@@ -348,9 +375,9 @@ class Netbox
 	{
 		$this->object_type = 'location';
 		$this->type_map = array(
-			"parent" => "location"
+			"parent" => "location",
+			"site" => "site"
 		);
-
 		return $this->get_netbox("/dcim/locations/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -358,9 +385,9 @@ class Netbox
 	{
 		$this->object_type = 'site';
 		$this->type_map = array(
-			"group" => "site_group"
+			"group" => "site_group",
+			"tenant" => "tenant"
 		);
-
 		return $this->get_netbox("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
@@ -376,7 +403,6 @@ class Netbox
 		$this->type_map = array(
 			"parent" => "region"
 		);
-
 		return $this->get_netbox("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -387,7 +413,6 @@ class Netbox
 		$this->type_map = array(
 			"group" => "tenant_group"
 		);
-
 		return $this->get_netbox("/tenancy/tenants/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -403,7 +428,6 @@ class Netbox
 		$this->type_map = array(
 			"group" => "contact_group"
 		);
-
 		return $this->get_netbox("/tenancy/contacts/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -413,7 +437,6 @@ class Netbox
 		$this->type_map = array(
 			"parent" => "contact_group"
 		);
-
 		return $this->get_netbox("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -429,6 +452,9 @@ class Netbox
 	public function platforms($filter, int $limit = 0)
 	{
 		$this->object_type = 'platform';
+		$this->type_map = array(
+			"manufacturer" => "manufacturer"
+		);
 		return $this->get_netbox("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
@@ -476,12 +502,20 @@ class Netbox
 	public function allservices($filter, int $limit = 0)
 	{
 		$this->object_type = 'service';
+		$this->type_map = array(
+			"device" => "device",
+			"virtual_machine" => "vm"
+		);		
 		return $this->get_netbox("/ipam/services/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	private function services(string $device, int $limit = 0)
 	{
 		$this->object_type = 'service';
+		$this->type_map = array(
+			"device" => "device",
+			"virtual_machine" => "vm"
+		);		
 		return $this->get_netbox("/ipam/services/?device=" . urlencode($device), $limit);
 	}
 }
