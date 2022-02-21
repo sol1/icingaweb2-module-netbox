@@ -205,10 +205,10 @@ class Netbox
 					foreach ($satellite_keys as $s) {
 						$row->{'icinga_satellite_' . $s} = NULL;
 					}
-					foreach ($host_keys as $h)) {
+					foreach ($host_keys as $h) {
 						$row->{'icinga_host_' . $h} = NULL;
 					}
-					foreach ($other_keys as $o)) {
+					foreach ($other_keys as $o) {
 						$row->{'icinga_' . $o} = NULL;
 					}
 
