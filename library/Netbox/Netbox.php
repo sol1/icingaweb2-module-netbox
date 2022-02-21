@@ -196,7 +196,7 @@ class Netbox
 			}
 			 */
 
-			if (property_exists($row, 'config_context') and in_array($this->object_type, ['device', 'vm']) {
+			if (property_exists($row, 'config_context') and in_array($this->object_type, ['device', 'vm'])) {
 				$satellite_keys = [ "client_zone", "parent_endpoint", "parent_fqdn", "parent_zone" ];
 				$host_keys = [ "zone" ];
 				$other_keys = [ "service", "var" ];
