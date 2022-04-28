@@ -149,10 +149,12 @@ class Netbox
 			// Get child object and add a parent key to the device id
 			foreach ((array)$row as $k => $v) {
 				if (is_object($v)) {
-					// Device type is a special snowflake, it doesn't use name and also has a manufacture (it is a nice setup, it just needs more code)
+					// Device type is a special snowflake, it doesn't use name and also has a manufacture (it is a nice setup, it just needs more config to get the settings in Icinga)
 					if ($k == 'device_type') {
 						$row->device_model_keyid = $this->keymaker($v->model, 'model');
+						$row->device_model = $v->model;
 						$row->device_manufacturer_keyid = $this->keymaker($v->manufacturer->name, 'manufacturer');
+						$row->device_manufacturer = $v->manufacturer->name;
 					} elseif (! is_null($v) and property_exists($v, 'name')) {
 						$key = $k;
 						if (array_key_exists($k, $this->type_map)) {
