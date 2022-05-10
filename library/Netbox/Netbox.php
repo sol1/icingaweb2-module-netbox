@@ -245,10 +245,20 @@ class Netbox
 		return $output;
 	}
 
+	// This is a function that you can use to add complex rules to define 
+	// host zones based on netbox data, eg: ip range mapping to zone.
+	// While possible using Import modifiers and Sync rule property filters 
+	// forking this repo and writing your own function reduces the number require in complex setups.
+	private function zoneHelper(array $in) 	{
+		return $in
+	}
+
 	private function transform(array $in)
 	{
-		// default output is input
-		$output = $this->makeHelperKeys($in);
+		// Makes Helper Keys then
+		// runs any custom zone helper with the result
+		// which is the default transform data
+		$output = $this->zoneHelper($this->makeHelperKeys($in));
 
 		// Flatten the returned data here if we have a flatten seperator
 		if (strlen($this->flattenseperator) > 0) {
