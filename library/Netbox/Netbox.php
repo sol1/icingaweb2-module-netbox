@@ -250,7 +250,7 @@ class Netbox
 	// While possible using Import modifiers and Sync rule property filters 
 	// forking this repo and writing your own function reduces the number require in complex setups.
 	private function zoneHelper(array $in) 	{
-		return $in
+		return $in;
 	}
 
 	private function transform(array $in)
