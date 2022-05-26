@@ -130,7 +130,14 @@ class Netbox
 					$row->primary_ip_address = explode('/', $row->primary_ip->address)[0];
 				}
 			} 
-			
+
+			// IP range is odd in that it doesn't have a name
+			if ($this->object_type == 'ip_range') {
+				if (property_exists($row,'display')) {
+					$row->keyid = $this->keymaker(explode('/', $row->display)[0]);
+				} 
+			}
+
 			// Because netbox changed tags and it isn't easy to turn a dict key in an array of dicts into an new array
 			$row->tag_slugs = NULL;
 			if (property_exists($row, 'tags')) {
@@ -458,7 +465,7 @@ class Netbox
 
 	public function ipRanges($filter, int $limit = 0)
 	{
-		$this->object_type = 'iprange';
+		$this->object_type = 'ip_range';
 		return $this->get_netbox("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
 	}
 
