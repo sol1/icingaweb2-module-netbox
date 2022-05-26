@@ -456,6 +456,12 @@ class Netbox
 		return $this->get_netbox("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
 	}
 
+	public function ipRanges($filter, int $limit = 0)
+	{
+		$this->object_type = 'iprange';
+		return $this->get_netbox("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
+	}
+
 	// Where
 	public function locations($filter, int $limit = 0)
 	{

@@ -27,6 +27,7 @@ class ImportSource extends ImportSourceHook
 
 	// IPAM
 	const IPAddressMode = 30;
+	const IPRangeMode = 32;
 	
 	// Where
 	const LocationMode = 40;
@@ -171,6 +172,7 @@ class ImportSource extends ImportSourceHook
 			
 				// IPAM
 				self::IPAddressMode => $form->translate('IP Addresses'),
+				self::IPRangeMode => $form->translate('IP Ranges'),
 				
 				// Where
 				self::LocationMode => $form->translate('Locations'),
@@ -274,7 +276,9 @@ class ImportSource extends ImportSourceHook
 			// IPAM
 			case self::IPAddressMode:
 				return $netbox->ipAddresses($filter, $limit);
-
+			case self::IPRangeMode:
+				return $netbox->ipRanges($filter, $limit);
+	
 			// Where			
 			case self::LocationMode:
 				return $netbox->locations($filter, $limit);
