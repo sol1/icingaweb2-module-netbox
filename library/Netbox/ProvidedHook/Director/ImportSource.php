@@ -74,10 +74,9 @@ class ImportSource extends ImportSourceHook
 				foreach ($ranges as $range) {
 					if ($this->ip_in_range($range->start_address, $range->end_address, $thing->primary_ip_address)){
 						$thing->keyid_ip_range = $range->keyid;
-						$thing->ip_range->id = $range->id;
-						$thing->ip_range->url = $range->url;
-						$thing->ip_range->name = $range->display;
-
+						// $thing->ip_range->id = $range->id;
+						// $thing->ip_range->url = $range->url;
+						// $thing->ip_range->name = $range->display;
 					}
 				}
 			}
