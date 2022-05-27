@@ -69,7 +69,7 @@ class ImportSource extends ImportSourceHook
 	{
 		$output = array();
 		foreach ($things as $thing) {
-			$thing->ip_range_keyid = NULL;
+			$thing->keyid_ip_range = NULL;
 			if (property_exists($thing, 'primary_ip_address')) {
 				foreach ($ranges as $range) {
 					if ($this->ip_in_range($range->start_address, $range->end_address, $thing->primary_ip_address)){
