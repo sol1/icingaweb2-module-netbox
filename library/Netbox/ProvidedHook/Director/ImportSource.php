@@ -284,7 +284,7 @@ class ImportSource extends ImportSourceHook
 			case self::VMMode:
 				$services = $netbox->allservices("", 0);
 				$ranges = $netbox->ipRanges("", 0);
-				$devices = $this->ip_in_range($ranges, $netbox->virtualMachines($filter, $limit));
+				$devices = $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit));
 				return $this->devices_with_services($services, $devices);
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
@@ -299,7 +299,7 @@ class ImportSource extends ImportSourceHook
 			case self::DeviceMode:
 				$services = $netbox->allservices("", 0);
 				$ranges = $netbox->ipRanges("", 0);
-				$devices = $this->ip_in_range($ranges, $netbox->devices($filter, $limit));
+				$devices = $this->get_ip_range($ranges, $netbox->devices($filter, $limit));
 				return $this->devices_with_services($services, $devices, $filter);
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);
