@@ -74,7 +74,12 @@ class ImportSource extends ImportSourceHook
 				foreach ($ranges as $range) {
 					if ($this->ip_in_range($range->start_address, $range->end_address, $thing->primary_ip_address)){
 						$thing->ip_range_keyid = $range->keyid;
-						// $thing->ip_range->id = $range->id;
+						$thing->ip_range_zone = NULL;
+						if (property_exists($thing, 'custom_fields')) {
+							if (property_exists($thing->custom_fields, 'icinga_zone')) {
+								$thing->ip_range_zone = $range->custom_fields->icinga_zone;
+							}
+						}
 						// $thing->ip_range->url = $range->url;
 						// $thing->ip_range->name = $range->display;
 					}
