@@ -1,18 +1,18 @@
 <?php
 
-namespace Icinga\Module\Netbox\ProvidedHook\Director;
+namespace Icinga\Module\Nautobot\ProvidedHook\Director;
 
 use Icinga\Application\Config;
 use Icinga\Module\Director\Web\Form\QuickForm;
 use Icinga\Module\Director\Hook\ImportSourceHook;
-use Icinga\Module\Netbox\Netbox;
+use Icinga\Module\Nautobot\Nautobot;
 
 class ImportSource extends ImportSourceHook
 {
-	// IMPORTANT: Existing installations store this numbers in the config. Changing them means the config needs to be redone. 
+	// IMPORTANT: Existing installations store this numbers in the config. Changing them means the config needs to be redone.
 	// 			  I've grouped and left spaces so we don't need to renumber any of these again.
 	// VM
-	const ClusterGroupMode = 10;	
+	const ClusterGroupMode = 10;
 	const ClusterMode = 12;
 	const ClusterTypeMode = 14;
 	const VMMode = 16;
@@ -28,7 +28,7 @@ class ImportSource extends ImportSourceHook
 	// IPAM
 	const IPAddressMode = 30;
 	const IPRangeMode = 32;
-	
+
 	// Where
 	const LocationMode = 40;
 	const RegionMode = 42;
@@ -60,7 +60,7 @@ class ImportSource extends ImportSourceHook
 	const TestMode = 600;
 
 	// TODO: VRF is linked to devices/vm's through ip's. If we need VRF's then we should
-	// create an array in the import of all the linked ip's and vrf inside the importer 
+	// create an array in the import of all the linked ip's and vrf inside the importer
 	// rather than leaving it to the user to create host templates to link it all together.
 
 	// devices_with_services returns a copy of $devices with any services
@@ -79,7 +79,7 @@ class ImportSource extends ImportSourceHook
 		foreach ($devices as &$device) {
 			$a = $this->servicearray($device, $services);
 			$device->services = (object) $a;
-			$device->service_names = array(); 
+			$device->service_names = array();
 			foreach ($a as $k => $v) {
 				array_push($device->service_names, $k);
 			}
@@ -106,7 +106,7 @@ class ImportSource extends ImportSourceHook
 					array_push($ipaddr, current(explode('/', $ip->address)));
 					array_push($cidr, $ip->address);
 				}
-				// This is hack for netbox 2.10+ so sync rules that assume there is only 1 port will continue to work after netbox service.port became the service.ports array
+				// This is hack for Nautobot 2.10+ so sync rules that assume there is only 1 port will continue to work after Nautobot service.port became the service.ports array
 				$first_port = "";
 				if (!empty($service->ports)) {
 					$first_port = $service->ports[0];
@@ -136,13 +136,13 @@ class ImportSource extends ImportSourceHook
 		$form->addElement('text', 'baseurl', array(
 			'label' => $form->translate('Base URL'),
 			'required' => true,
-			'description' => $form->translate('Base URL to the Netbox API, e.g. https://netbox.example.com/api')
+			'description' => $form->translate('Base URL to the Nautobot API, e.g. https://Nautobot.example.com/api')
 		));
 
 		$form->addElement('text', 'apitoken', array(
 			'label' => $form->translate('API token'),
 			'required' => true,
-			'description' => $form->translate('See https://netbox.example.com/user/api-tokens')
+			'description' => $form->translate('See https://Nautobot.example.com/user/api-tokens')
 		));
 
 		$form->addElement('text', 'proxy', array(
@@ -162,31 +162,31 @@ class ImportSource extends ImportSourceHook
 				self::ClusterTypeMode => $form->translate('Cluster Types'),
 				self::VMMode => $form->translate('Virtual Machines'),
 				self::VMInterfaceMode => $form->translate('Virtual Machine Interfaces'),
-			
+
 				// Device
 				self::DeviceMode => $form->translate('Devices'),
 				self::DeviceRoleMode => $form->translate('Device Roles'),
 				self::DeviceTypeMode => $form->translate('Device Types'),
 				self::ManufacturerMode => $form->translate('Manufacturers'),
 				self::DeviceInterfaceMode => $form->translate('Device Interfaces'),
-			
+
 				// IPAM
 				self::IPAddressMode => $form->translate('IP Addresses'),
 				self::IPRangeMode => $form->translate('IP Ranges'),
-				
+
 				// Where
 				self::LocationMode => $form->translate('Locations'),
 				self::SiteMode => $form->translate('Sites'),
 				self::SiteGroupMode => $form->translate('Site Groups'),
 				self::RegionMode => $form->translate('Region'),
-			
+
 				// Who
 				self::TenantMode => $form->translate('Tenants'),
 				self::TenantGroupMode => $form->translate('Tenant Groups'),
 				self::ContactMode => $form->translate('Contacts'),
 				self::ContactGroupMode => $form->translate('Contact Groups'),
 				self::ContactRoleMode => $form->translate('Contact Roles'),
-			
+
 				// Other
 				self::PlatformMode => $form->translate('Platforms'),
 				self::ServiceMode => $form->translate('Services'),
@@ -228,7 +228,7 @@ class ImportSource extends ImportSourceHook
 		$form->addElement('text', 'filter', array(
 			'label' => $form->translate('Search filter'),
 			'required' => false,
-			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active is added without a filter selected)')
+			'description' => $form->translate('Optional search filter to the url to limit Nautobot data returned (Default: status=active is added without a filter selected)')
 		));
 
 	}
@@ -243,90 +243,90 @@ class ImportSource extends ImportSourceHook
 		$flatten = (string)$this->getSetting('flatten');
 		$flattenkeys = ((string)$this->getSetting('flattenkeys') == '') ? array() : explode(",", (string)$this->getSetting('flattenkeys'));
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
-		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
+		$nautobot = new Nautobot($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
 		switch ($mode) {
 			// VM's
 			case self::VMMode:
-				$services = $netbox->allservices("", 0);
-				$devices = $netbox->virtualMachines($filter, $limit);
+				$services = $nautobot->allservices("", 0);
+				$devices = $nautobot->virtualMachines($filter, $limit);
 				return $this->devices_with_services($services, $devices);
 			case self::ClusterMode:
-				return $netbox->clusters($filter, $limit);
+				return $nautobot->clusters($filter, $limit);
 			case self::ClusterGroupMode:
-				return $netbox->clusterGroups($filter, $limit);
+				return $nautobot->clusterGroups($filter, $limit);
 			case self::ClusterTypeMode:
-				return $netbox->clusterTypes($filter, $limit);
+				return $nautobot->clusterTypes($filter, $limit);
 			case self::VMInterfaceMode:
-				return $netbox->virtualMachineInterfaces($filter, $limit);
-							
+				return $nautobot->virtualMachineInterfaces($filter, $limit);
+
 			// Device
 			case self::DeviceMode:
-				$services = $netbox->allservices("", 0);
-				$devices = $netbox->devices($filter, $limit);
+				$services = $nautobot->allservices("", 0);
+				$devices = $nautobot->devices($filter, $limit);
 				return $this->devices_with_services($services, $devices, $filter);
 			case self::DeviceRoleMode:
-				return $netbox->deviceRoles($filter, $limit);
+				return $nautobot->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
-				return $netbox->deviceTypes($filter, $limit);
+				return $nautobot->deviceTypes($filter, $limit);
 			case self::ManufacturerMode:
-				return $netbox->manufacturers($filter, $limit);
+				return $nautobot->manufacturers($filter, $limit);
 			case self::DeviceInterfaceMode:
-				return $netbox->deviceInterfaces($filter, $limit);
+				return $nautobot->deviceInterfaces($filter, $limit);
 
 			// IPAM
 			case self::IPAddressMode:
-				return $netbox->ipAddresses($filter, $limit);
+				return $nautobot->ipAddresses($filter, $limit);
 			case self::IPRangeMode:
-				return $netbox->ipRanges($filter, $limit);
-	
-			// Where			
+				return $nautobot->ipRanges($filter, $limit);
+
+			// Where
 			case self::LocationMode:
-				return $netbox->locations($filter, $limit);
+				return $nautobot->locations($filter, $limit);
 			case self::SiteMode:
-				return $netbox->sites($filter, $limit);
+				return $nautobot->sites($filter, $limit);
 			case self::SiteGroupMode:
-				return $netbox->siteGroups($filter, $limit);
+				return $nautobot->siteGroups($filter, $limit);
 			case self::RegionMode:
-				return $netbox->regions($filter, $limit);
+				return $nautobot->regions($filter, $limit);
 
 			// Who
 			case self::TenantMode:
-				return $netbox->tenants($filter, $limit);
+				return $nautobot->tenants($filter, $limit);
 			case self::TenantGroupMode:
-				return $netbox->tenantGroups($filter, $limit);
+				return $nautobot->tenantGroups($filter, $limit);
 			case self::ContactMode:
-				return $netbox->contacts($filter, $limit);
+				return $nautobot->contacts($filter, $limit);
 			case self::ContactGroupMode:
-				return $netbox->contactGroups($filter, $limit);
+				return $nautobot->contactGroups($filter, $limit);
 			case self::ContactRoleMode:
-				return $netbox->contactModes($filter, $limit);
-		
+				return $nautobot->contactModes($filter, $limit);
+
 			// Other
 			case self::PlatformMode:
-				return $netbox->platforms($filter, $limit);
+				return $nautobot->platforms($filter, $limit);
 			case self::ServiceMode:
-				return $netbox->allservices($filter, $limit);
+				return $nautobot->allservices($filter, $limit);
 			case self::TagMode:
-				return $netbox->tags($filter, $limit);
+				return $nautobot->tags($filter, $limit);
 
 			// Circuits
 			case self::CircuitMode:
-				return $netbox->circuits($filter, $limit);
+				return $nautobot->circuits($filter, $limit);
 			case self::CircuitTypeMode:
-				return $netbox->circuittypes($filter, $limit);
+				return $nautobot->circuittypes($filter, $limit);
 			case self::ProviderMode:
-				return $netbox->providers($filter, $limit);
+				return $nautobot->providers($filter, $limit);
 			case self::ProviderNetworkMode:
-				return $netbox->providernetworks($filter, $limit);
+				return $nautobot->providernetworks($filter, $limit);
 
 			// Connections
 			case self::CableMode:
-				return $netbox->cables($filter, $limit);
+				return $nautobot->cables($filter, $limit);
 
 			// Test mode should always be last
 			case self::TestMode:
-				return $netbox->devices($filter, $limit);
-	
+				return $nautobot->devices($filter, $limit);
+
 			}
 	}
 
@@ -342,6 +342,6 @@ class ImportSource extends ImportSourceHook
 
 	public function getName()
 	{
-		return 'Netbox';
+		return 'Nautobot';
 	}
 }

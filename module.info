@@ -1,4 +1,4 @@
-Name: Netbox
+Name: Nautobot
 Version: 3.1.16.2
 Depends: director
-Description: Import devices, sites and other objects from Netbox
+Description: Import devices, sites and other objects from Nautobot

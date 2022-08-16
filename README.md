@@ -1,4 +1,8 @@
-# Icingaweb2 Netbox
+# Icingaweb2 Nautobot
+
+The Netbot module does no longer work with Nautobot 1.4.
+
+All credits go to Sol1
 
 Icingaweb2 module to which, for now, just import objects from
 [Netbox](https://github.com/netbox-community/netbox) into Icinga
@@ -62,12 +66,12 @@ Netbox object set to be imported
 This will take nested data (`{ "foo": { "bar": "123 }, "bar": "321" }`) and use the seperator specified to flatten it (`{ foo__bar: 123, "bar": 321" }`)
 
 #### Flatten keys
-This option causes the flattening to occur to the listed keys only. Provide a comma seperated list of keys you want to flatten here such as `config_context,site,tenant` 
+This option causes the flattening to occur to the listed keys only. Provide a comma seperated list of keys you want to flatten here such as `config_context,site,tenant`
 
 #### Munge fields
 This will take existing fields from netbox and combine them, the data is also combined. The list of fields to munge needs to be added as comma seperated field names (`slug,name`). It also supports adding strings using the syntax `s=thestring`
 
-Examples of this are 
+Examples of this are
 * combining `name` and `id` into a new field `name_id`, syntax: `name,id`
 * adding a identifier `netbox` to `slug` to create a new field `netbox_slug` so all objects are prefixed with `netbox_<device slug>`, syntax: `s=netbox,slug`
 
@@ -112,7 +116,7 @@ imported data in the Director database.
 
 ### Linking netbox object in icinga
 If we wanted the details of a netbox site, lat/long for example, into a icinga host
-create a Import Source for the site and a sync rule that creates a Icinga hosts template 
+create a Import Source for the site and a sync rule that creates a Icinga hosts template
 with all the site details based on the site slug.
 
 Then in the device host object you will be able to import this site host template using
@@ -165,7 +169,7 @@ Strip the subnet suffix:
 ![Import source - Modifiers](doc/screenshot/import-modifier-2.png)
 
 ## Modifiers
-Some of the data Netbox contains benifits from consistent Director import source modifiers. 
+Some of the data Netbox contains benifits from consistent Director import source modifiers.
 These include object names, linked object names, primary ip address and config context data to manage satellite creation.
 
 The Netbox Import Module creates top level keys with default null values with the following paramaters
@@ -202,8 +206,8 @@ primary_ip_address: "127.0.0.1"
 ```
 
 # Icinga info in config context auto extraction
-```			
-// Icinga satellite 
+```
+// Icinga satellite
 {
   "icinga": {
     "satellite": {

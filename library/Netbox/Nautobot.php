@@ -1,8 +1,8 @@
 <?php
 
-namespace Icinga\Module\Netbox;
+namespace Icinga\Module\Nautobot;
 
-class Netbox
+class Nautobot
 {
 	public $object_type;
 	public $type_map = array();
@@ -44,7 +44,7 @@ class Netbox
 	}
 
 	// get performs the necessary HTTP GET request to fetch data from the
-	// Netbox path $resource. It steps through each page of resource response.
+	// Nautobot path $resource. It steps through each page of resource response.
 	// get returns the JSON decoded results.
 	private function get(string $resource)
 	{
@@ -104,7 +104,7 @@ class Netbox
 		$s = preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $s);
 		$s = preg_replace('/__+/i', '_', $s);
 		return strtolower($this->prefix . $nb_type . " " .  trim($s,"_"));
-		
+
 	}
 
 	// Automatically make fields that are likely to be needed so we can skip config in director
@@ -112,7 +112,7 @@ class Netbox
 		$output = array();
 		foreach ($in as $row) {
 			// Device type uses model as the 'name' field
-			// Add it first in so that name can overwrite if netbox changes it later
+			// Add it first in so that name can overwrite if Nautobot changes it later
 			if (property_exists($row, 'model')) {
 				$row->keyid = $this->keymaker($row->model);
 			}
@@ -129,16 +129,16 @@ class Netbox
 				if (! is_null($row->primary_ip) and property_exists($row->primary_ip, 'address')) {
 					$row->primary_ip_address = explode('/', $row->primary_ip->address)[0];
 				}
-			} 
+			}
 
 			// IP range is odd in that it doesn't have a name
 			if ($this->object_type == 'ip_range') {
 				if (property_exists($row,'display')) {
 					$row->keyid = $this->keymaker(explode('/', $row->display)[0]);
-				} 
+				}
 			}
 
-			// Because netbox changed tags and it isn't easy to turn a dict key in an array of dicts into an new array
+			// Because Nautobot changed tags and it isn't easy to turn a dict key in an array of dicts into an new array
 			$row->tag_slugs = NULL;
 			if (property_exists($row, 'tags')) {
 				$row->tag_slugs = array();
@@ -173,9 +173,9 @@ class Netbox
 
 			}
 
-			// Custom fields for Netbox
+			// Custom fields for Nautobot
 			// Icinga satellite
-			/* 
+			/*
 			{
 				"icinga": {
 					"satellite": {
@@ -242,7 +242,7 @@ class Netbox
 						if (property_exists($icinga, $okey)) {
 							$row->{"icinga_" . $okey} = $icinga->{$okey};
 						}
-					}	
+					}
 
 				}
 			}
@@ -252,9 +252,9 @@ class Netbox
 		return $output;
 	}
 
-	// This is a function that you can use to add complex rules to define 
-	// host zones based on netbox data, eg: ip range mapping to zone.
-	// While possible using Import modifiers and Sync rule property filters 
+	// This is a function that you can use to add complex rules to define
+	// host zones based on Nautobot data, eg: ip range mapping to zone.
+	// While possible using Import modifiers and Sync rule property filters
 	// forking this repo and writing your own function reduces the number require in complex setups.
 	private function zoneHelper(array $in) 	{
 		return $in;
@@ -311,7 +311,7 @@ class Netbox
 			$output = $mnew;
 		}
 
-		// // Because netbox changed tags and it is easy to add an array to icinga and see if a tag exists in it
+		// // Because Nautobot changed tags and it is easy to add an array to icinga and see if a tag exists in it
 		// $tnew = array();
 		// foreach ($output as $row) {
 		// 	if (property_exists($row, 'tags')) {
@@ -328,7 +328,7 @@ class Netbox
 	}
 
 
-	private function get_netbox(string $api_path, int $limit = 0)
+	private function get_Nautobot(string $api_path, int $limit = 0)
 	{
 		if ($limit > 0) {
 			# if api_path contains paramaters append limit otherwise create paramater
@@ -354,7 +354,7 @@ class Netbox
 
 
 	// returns an array of objects. A limit of 0 returns all
-	// objects from Netbox. A limit > 0 queries for and returns just $limit
+	// objects from Nautobot. A limit > 0 queries for and returns just $limit
 	// number of results; this is useful for testing.
 
 	//  VM's
@@ -368,7 +368,7 @@ class Netbox
 			"site" => "site",
 			"tenant" => "tenant"
 		);
-		return $this->get_netbox("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_Nautobot("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function virtualMachineInterfaces($filter, int $limit = 0)
@@ -377,7 +377,7 @@ class Netbox
 		$this->type_map = array(
 			"virtual_machine" => "vm"
 		);
-		return $this->get_netbox("/virtualization/interfaces/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/virtualization/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function clusters($filter, int $limit = 0)
@@ -389,19 +389,19 @@ class Netbox
 			"tenant" => "tenant",
 			"type" => "cluster_type"
 		);
-		return $this->get_netbox("/virtualization/clusters/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_Nautobot("/virtualization/clusters/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function clusterGroups($filter, int $limit = 0)
 	{
 		$this->object_type = 'cluster_group';
-		return $this->get_netbox("/virtualization/cluster-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/virtualization/cluster-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function clusterTypes($filter, int $limit = 0)
 	{
 		$this->object_type = 'cluster_type';
-		return $this->get_netbox("/virtualization/cluster-types/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/virtualization/cluster-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Devices
@@ -414,14 +414,14 @@ class Netbox
 			"site" => "site",
 			"tenant" => "tenant"
 		);
-		return $this->get_netbox("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_Nautobot("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function deviceRoles($filter, int $limit = 0)
 	{
 		$this->object_type = 'device_role';
 		// Device role is shard between vm and devices but use diffent names, this importer uses 'device_role' to unify them
-		return $this->get_netbox("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function deviceTypes($filter, int $limit = 0)
@@ -430,13 +430,13 @@ class Netbox
 		$this->type_map = array(
 			"manufacturer" => "manufacturer"
 		);
-		return $this->get_netbox("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function manufacturers($filter, int $limit = 0)
 	{
 		$this->object_type = 'manufacturer';
-		return $this->get_netbox("/dcim/manufacturers/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/manufacturers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function deviceInterfaces($filter, int $limit = 0)
@@ -447,10 +447,10 @@ class Netbox
 			"parent" => "device_interface"
 
 		);
-		return $this->get_netbox("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	// IPAM 
+	// IPAM
 	public function ipAddresses($filter, int $limit = 0)
 	{
 		$this->object_type = 'ip';
@@ -460,13 +460,13 @@ class Netbox
 			"parent" => "device_interface",
 			"tenant" => "tenant"
 		);
-		return $this->get_netbox("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
+		return $this->get_Nautobot("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
 	}
 
 	public function ipRanges($filter, int $limit = 0)
 	{
 		$this->object_type = 'ip_range';
-		return $this->get_netbox("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Where
@@ -477,7 +477,7 @@ class Netbox
 			"parent" => "location",
 			"site" => "site"
 		);
-		return $this->get_netbox("/dcim/locations/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/locations/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function sites($filter, int $limit = 0)
@@ -487,13 +487,13 @@ class Netbox
 			"group" => "site_group",
 			"tenant" => "tenant"
 		);
-		return $this->get_netbox("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_Nautobot("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function siteGroups($filter, int $limit = 0)
 	{
 		$this->object_type = 'site_group';
-		return $this->get_netbox("/dcim/site-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/site-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function regions($filter, int $limit = 0)
@@ -502,7 +502,7 @@ class Netbox
 		$this->type_map = array(
 			"parent" => "region"
 		);
-		return $this->get_netbox("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Who
@@ -512,13 +512,13 @@ class Netbox
 		$this->type_map = array(
 			"group" => "tenant_group"
 		);
-		return $this->get_netbox("/tenancy/tenants/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/tenancy/tenants/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function tenantGroups($filter, int $limit = 0)
 	{
 		$this->object_type = 'tenant_group';
-		return $this->get_netbox("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contacts($filter, int $limit = 0)
@@ -527,7 +527,7 @@ class Netbox
 		$this->type_map = array(
 			"group" => "contact_group"
 		);
-		return $this->get_netbox("/tenancy/contacts/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/tenancy/contacts/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contactGroups($filter, int $limit = 0)
@@ -536,13 +536,13 @@ class Netbox
 		$this->type_map = array(
 			"parent" => "contact_group"
 		);
-		return $this->get_netbox("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contactModes($filter, int $limit = 0)
 	{
 		$this->object_type = 'contact_role';
-		return $this->get_netbox("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// TODO: contactAssignement
@@ -554,14 +554,14 @@ class Netbox
 		$this->type_map = array(
 			"manufacturer" => "manufacturer"
 		);
-		return $this->get_netbox("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_Nautobot("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 
 	public function tags($filter, int $limit = 0)
 	{
 		$this->object_type = 'tag';
-		return $this->get_netbox("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 
@@ -569,32 +569,32 @@ class Netbox
 	public function circuits($filter, int $limit = 0)
 	{
 		$this->object_type = 'circuit';
-		return $this->get_netbox("/circuits/circuits/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/circuits/circuits/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function circuittypes($filter, int $limit = 0)
 	{
 		$this->object_type = 'circuit_type';
-		return $this->get_netbox("/circuits/circuit-types/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/circuits/circuit-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providers($filter, int $limit = 0)
 	{
 		$this->object_type = 'provider';
-		return $this->get_netbox("/circuits/providers/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/circuits/providers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providernetworks($filter, int $limit = 0)
 	{
 		$this->object_type = 'provider_network';
-		return $this->get_netbox("/circuits/provider-networks/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/circuits/provider-networks/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Connections
 	public function cables($filter, int $limit = 0)
 	{
 		$this->object_type = 'cable';
-		return $this->get_netbox("/dcim/cables/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_Nautobot("/dcim/cables/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
@@ -604,8 +604,8 @@ class Netbox
 		$this->type_map = array(
 			"device" => "device",
 			"virtual_machine" => "vm"
-		);		
-		return $this->get_netbox("/ipam/services/?" . $this->default_filter($filter, "status=active"), $limit);
+		);
+		return $this->get_Nautobot("/ipam/services/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	private function services(string $device, int $limit = 0)
@@ -614,7 +614,7 @@ class Netbox
 		$this->type_map = array(
 			"device" => "device",
 			"virtual_machine" => "vm"
-		);		
-		return $this->get_netbox("/ipam/services/?device=" . urlencode($device), $limit);
+		);
+		return $this->get_Nautobot("/ipam/services/?device=" . urlencode($device), $limit);
 	}
 }
