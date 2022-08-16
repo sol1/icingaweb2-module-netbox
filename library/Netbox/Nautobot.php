@@ -328,7 +328,7 @@ class Nautobot
 	}
 
 
-	private function get_Nautobot(string $api_path, int $limit = 0)
+	private function get_nautobot(string $api_path, int $limit = 0)
 	{
 		if ($limit > 0) {
 			# if api_path contains paramaters append limit otherwise create paramater
@@ -368,7 +368,7 @@ class Nautobot
 			"site" => "site",
 			"tenant" => "tenant"
 		);
-		return $this->get_Nautobot("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_nautobot("/virtualization/virtual-machines/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function virtualMachineInterfaces($filter, int $limit = 0)
@@ -377,7 +377,7 @@ class Nautobot
 		$this->type_map = array(
 			"virtual_machine" => "vm"
 		);
-		return $this->get_Nautobot("/virtualization/interfaces/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/virtualization/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function clusters($filter, int $limit = 0)
@@ -389,19 +389,19 @@ class Nautobot
 			"tenant" => "tenant",
 			"type" => "cluster_type"
 		);
-		return $this->get_Nautobot("/virtualization/clusters/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_nautobot("/virtualization/clusters/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function clusterGroups($filter, int $limit = 0)
 	{
 		$this->object_type = 'cluster_group';
-		return $this->get_Nautobot("/virtualization/cluster-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/virtualization/cluster-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function clusterTypes($filter, int $limit = 0)
 	{
 		$this->object_type = 'cluster_type';
-		return $this->get_Nautobot("/virtualization/cluster-types/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/virtualization/cluster-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Devices
@@ -414,14 +414,14 @@ class Nautobot
 			"site" => "site",
 			"tenant" => "tenant"
 		);
-		return $this->get_Nautobot("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_nautobot("/dcim/devices/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function deviceRoles($filter, int $limit = 0)
 	{
 		$this->object_type = 'device_role';
 		// Device role is shard between vm and devices but use diffent names, this importer uses 'device_role' to unify them
-		return $this->get_Nautobot("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function deviceTypes($filter, int $limit = 0)
@@ -430,13 +430,13 @@ class Nautobot
 		$this->type_map = array(
 			"manufacturer" => "manufacturer"
 		);
-		return $this->get_Nautobot("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/device-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function manufacturers($filter, int $limit = 0)
 	{
 		$this->object_type = 'manufacturer';
-		return $this->get_Nautobot("/dcim/manufacturers/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/manufacturers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function deviceInterfaces($filter, int $limit = 0)
@@ -447,7 +447,7 @@ class Nautobot
 			"parent" => "device_interface"
 
 		);
-		return $this->get_Nautobot("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// IPAM
@@ -460,13 +460,13 @@ class Nautobot
 			"parent" => "device_interface",
 			"tenant" => "tenant"
 		);
-		return $this->get_Nautobot("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
+		return $this->get_nautobot("/ipam/ip-addresses/?" . $this->default_filter($filter, "assigned_to_interface=True"), $limit);
 	}
 
 	public function ipRanges($filter, int $limit = 0)
 	{
 		$this->object_type = 'ip_range';
-		return $this->get_Nautobot("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Where
@@ -477,7 +477,7 @@ class Nautobot
 			"parent" => "location",
 			"site" => "site"
 		);
-		return $this->get_Nautobot("/dcim/locations/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/locations/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function sites($filter, int $limit = 0)
@@ -487,13 +487,13 @@ class Nautobot
 			"group" => "site_group",
 			"tenant" => "tenant"
 		);
-		return $this->get_Nautobot("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_nautobot("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 	public function siteGroups($filter, int $limit = 0)
 	{
 		$this->object_type = 'site_group';
-		return $this->get_Nautobot("/dcim/site-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/site-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function regions($filter, int $limit = 0)
@@ -502,7 +502,7 @@ class Nautobot
 		$this->type_map = array(
 			"parent" => "region"
 		);
-		return $this->get_Nautobot("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Who
@@ -512,13 +512,13 @@ class Nautobot
 		$this->type_map = array(
 			"group" => "tenant_group"
 		);
-		return $this->get_Nautobot("/tenancy/tenants/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/tenancy/tenants/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function tenantGroups($filter, int $limit = 0)
 	{
 		$this->object_type = 'tenant_group';
-		return $this->get_Nautobot("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contacts($filter, int $limit = 0)
@@ -527,7 +527,7 @@ class Nautobot
 		$this->type_map = array(
 			"group" => "contact_group"
 		);
-		return $this->get_Nautobot("/tenancy/contacts/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/tenancy/contacts/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contactGroups($filter, int $limit = 0)
@@ -536,13 +536,13 @@ class Nautobot
 		$this->type_map = array(
 			"parent" => "contact_group"
 		);
-		return $this->get_Nautobot("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function contactModes($filter, int $limit = 0)
 	{
 		$this->object_type = 'contact_role';
-		return $this->get_Nautobot("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// TODO: contactAssignement
@@ -554,14 +554,14 @@ class Nautobot
 		$this->type_map = array(
 			"manufacturer" => "manufacturer"
 		);
-		return $this->get_Nautobot("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_nautobot("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 
 
 	public function tags($filter, int $limit = 0)
 	{
 		$this->object_type = 'tag';
-		return $this->get_Nautobot("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 
@@ -569,32 +569,32 @@ class Nautobot
 	public function circuits($filter, int $limit = 0)
 	{
 		$this->object_type = 'circuit';
-		return $this->get_Nautobot("/circuits/circuits/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/circuits/circuits/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function circuittypes($filter, int $limit = 0)
 	{
 		$this->object_type = 'circuit_type';
-		return $this->get_Nautobot("/circuits/circuit-types/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/circuits/circuit-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providers($filter, int $limit = 0)
 	{
 		$this->object_type = 'provider';
-		return $this->get_Nautobot("/circuits/providers/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/circuits/providers/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	public function providernetworks($filter, int $limit = 0)
 	{
 		$this->object_type = 'provider_network';
-		return $this->get_Nautobot("/circuits/provider-networks/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/circuits/provider-networks/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Connections
 	public function cables($filter, int $limit = 0)
 	{
 		$this->object_type = 'cable';
-		return $this->get_Nautobot("/dcim/cables/?" . $this->default_filter($filter, ""), $limit);
+		return $this->get_nautobot("/dcim/cables/?" . $this->default_filter($filter, ""), $limit);
 	}
 
 	// Don't exclude inactive services for now, not sure what a inactive service on a active host will do
@@ -605,7 +605,7 @@ class Nautobot
 			"device" => "device",
 			"virtual_machine" => "vm"
 		);
-		return $this->get_Nautobot("/ipam/services/?" . $this->default_filter($filter, "status=active"), $limit);
+		return $this->get_netbox("/ipam/services/?" );
 	}
 
 	private function services(string $device, int $limit = 0)
@@ -615,6 +615,6 @@ class Nautobot
 			"device" => "device",
 			"virtual_machine" => "vm"
 		);
-		return $this->get_Nautobot("/ipam/services/?device=" . urlencode($device), $limit);
+		return $this->get_nautobot("/ipam/services/?device=" . urlencode($device), $limit);
 	}
 }
