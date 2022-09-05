@@ -164,14 +164,15 @@ Strip the subnet suffix:
 
 ![Import source - Modifiers](doc/screenshot/import-modifier-2.png)
 
-## Modifiers
-Some of the data Netbox contains benifits from consistent Director import source modifiers. 
+## Convience Fields for Common Modifiers
+Some of the data Netbox contains benifits from consistent Director import source modifiers, rather than require you to setup these Import Source Property Modifiers for each import the Netbox Import Module creates them for you. 
 These include object names, linked object names, primary ip address and config context data to manage satellite creation.
 
 The Netbox Import Module creates top level keys with default null values with the following paramaters
 
 ### Object names and Linked Object Names
-For the object itself the key `keyid` is added based on the object name. The object name first has characters that aren't in `[^0-9a-zA-Z_\-. ]` with `_` and making the name lowercase then a prefix is added for the type.
+For the object itself the key `keyid` is added for use as Icinga object name. 
+The object name is sanatized, replacing characters that aren't in `[^0-9a-zA-Z_\-. ]` with `_` and making the name lowercase, then a prefix is added for the type.
 
 ---
 **NOTE**
@@ -180,7 +181,7 @@ This format was chosen as Icinga is case insensitive for names where as Netbox i
 
 ---
 
-For linked objects a key is added with the type followed by `_keyid` for key name, the same object name sanitisation occurs.
+For linked objects a key is added with the Netbox object type followed by `_keyid` for key name, the same object name sanitiation occurs. This allows simple linking of hosts and host templates using the linked keyid's when Icinga objects use the keyid for object name.
 
 eg: for a device with the follow name and site info the following is returned
 ```
@@ -192,8 +193,29 @@ site: {
 site_keyid: "vmsite_bar"
 ```
 
+### Device Model and Manufacturer
+The device model and manufacturer names are extracted from `device_type.model` and `device_type.manufacturer.name`.
+```
+device_type: {
+    id: 155,
+    url: "https://netbox.example.com/api/dcim/device-types/155/",
+    display: "AB123c",
+    manufacturer: {
+        id: 35,
+        url: "https://netbox.example.com/api/dcim/manufacturers/35/",
+        display: "ACME",
+        name: "ACME",
+        slug: "acme"
+    },
+    model: "AB123c",
+    slug: "ab123c"
+}
+device_manufacturer: "ACME",
+device_model: "AB123c"
+```
+
 ### Primary IP
-The ip address from `primary_ip.address` is extracted and added to `primary_ip_address`
+The ip address from `primary_ip.address` is extracted and added to `primary_ip_address`.
 ```
 primary_ip :{
   address: "127.0.0.1/32"
@@ -201,7 +223,12 @@ primary_ip :{
 primary_ip_address: "127.0.0.1"
 ```
 
-# Icinga info in config context auto extraction
+### IP Range
+A custom field `icinga_zone` in Netbox on the IP Range objects will be added to device and virtual machine Import Sources `ip_range_zone` if the Primary IP address of the device/vm is in the IP Range.
+
+This has been added to aid in the setup of Satellite, Agent and Host deployment without the need to manually specifify these details on each device. 
+
+### Icinga info in config context auto extraction
 ```			
 // Icinga satellite 
 {
