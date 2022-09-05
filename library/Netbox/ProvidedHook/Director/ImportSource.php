@@ -63,6 +63,44 @@ class ImportSource extends ImportSourceHook
 	// create an array in the import of all the linked ip's and vrf inside the importer 
 	// rather than leaving it to the user to create host templates to link it all together.
 
+	// Add a range keyid if the primary ip for the device/vm is found in a range 
+	// Note: assumes ranges never overlap
+	private function get_ip_range($ranges, $things) 
+	{
+		$output = array();
+		foreach ($things as $thing) {
+			if (property_exists($thing, 'primary_ip_address')) {
+				foreach ($ranges as $range) {
+					if ($this->ip_in_range($range->start_address, $range->end_address, $thing->primary_ip_address)){
+						$thing->ip_range_keyid = $range->keyid;
+						$thing->ip_range_zone = NULL;
+						if (property_exists($range, 'custom_fields')) {
+							if (property_exists($range->custom_fields, 'icinga_zone')) {
+								$thing->ip_range_zone = $range->custom_fields->icinga_zone;
+							}
+						}
+						// $thing->ip_range->url = $range->url;
+						// $thing->ip_range->name = $range->display;
+					}
+				}
+			}
+			$output = array_merge($output, [(object)$thing]);
+		}
+		return $output;
+	}
+
+
+	// We need to be able to check if an ip_address in a particular range
+	private function ip_in_range($lower_range_ip_address, $upper_range_ip_address, $needle_ip_address)
+	{
+		# Get the numeric reprisentation of the IP Address with IP2long
+		$min    = ip2long(explode('/', $lower_range_ip_address)[0]);
+		$max    = ip2long(explode('/', $upper_range_ip_address)[0]);
+		$needle = ip2long(explode('/', $needle_ip_address)[0]);
+
+		return (($needle >= $min) AND ($needle <= $max));
+	}   
+
 	// devices_with_services returns a copy of $devices with any services
 	// from $services belonging to it merged in. Each device has a new field
 	// "services" which contains an array of service objects belonging to the
@@ -248,7 +286,8 @@ class ImportSource extends ImportSourceHook
 			// VM's
 			case self::VMMode:
 				$services = $netbox->allservices("", 0);
-				$devices = $netbox->virtualMachines($filter, $limit);
+				$ranges = $netbox->ipRanges("", 0);
+				$devices = $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit));
 				return $this->devices_with_services($services, $devices);
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
@@ -262,7 +301,8 @@ class ImportSource extends ImportSourceHook
 			// Device
 			case self::DeviceMode:
 				$services = $netbox->allservices("", 0);
-				$devices = $netbox->devices($filter, $limit);
+				$ranges = $netbox->ipRanges("", 0);
+				$devices = $this->get_ip_range($ranges, $netbox->devices($filter, $limit));
 				return $this->devices_with_services($services, $devices, $filter);
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);

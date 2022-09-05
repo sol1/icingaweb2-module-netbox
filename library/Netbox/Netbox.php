@@ -133,9 +133,7 @@ class Netbox
 
 			// IP range is odd in that it doesn't have a name
 			if ($this->object_type == 'ip_range') {
-				if (property_exists($row,'display')) {
-					$row->keyid = $this->keymaker(explode('/', $row->display)[0]);
-				} 
+				$row->keyid = $this->keymaker(explode('/', $row->display)[0]);
 			}
 
 			// Because netbox changed tags and it isn't easy to turn a dict key in an array of dicts into an new array
