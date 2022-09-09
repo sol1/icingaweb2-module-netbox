@@ -276,6 +276,7 @@ class Netbox
 	private function splitRows(array $in, $key) 	{
 		$output = array();
 		foreach ($in as $row) {
+			$row->ip_address = NULL;
 			if (property_exists($row, $key)) {
 				if (property_exists($row, 'description')) {
 					if ($row->description == "") {
@@ -285,7 +286,7 @@ class Netbox
 					}
 				}
 				foreach ($row->{$key} as $ip) {
-					$row->primary_ip_address = $ip;
+					$row->ip_address = $ip;
 					$row->description = $description . " " . $ip;
 					$output = array_merge($output, [(object)clone($row)]);
 				}
