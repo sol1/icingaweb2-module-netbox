@@ -31,6 +31,7 @@ class ImportSource extends ImportSourceHook
 	const IPAddressMode = 30;
 	const IPRangeMode = 32;
 	const FHRPGroupMode = 36;
+	const FHRPGroupSplitMode = 37;
 	
 	// Where
 	const LocationMode = 40;
@@ -221,7 +222,8 @@ class ImportSource extends ImportSourceHook
 				// IPAM
 				self::IPAddressMode => $form->translate('IP Addresses'),
 				self::IPRangeMode => $form->translate('IP Ranges'),
-				self::FHRPGroupMode => $form->translate("FHRP's"),
+				self::FHRPGroupMode => $form->translate("FHRP Groups"),
+				self::FHRPGroupSplitMode => $form->translate("FHRP Groups Split (on IP)"),
 				
 				// Where
 				self::LocationMode => $form->translate('Locations'),
@@ -340,9 +342,11 @@ class ImportSource extends ImportSourceHook
 				return $netbox->ipAddresses($filter, $limit);
 			case self::IPRangeMode:
 				return $netbox->ipRanges($filter, $limit);
-			case self::FHRPGroupMode:
-				return $netbox->fhrpGroups($filter, $limit);
-				
+				case self::FHRPGroupMode:
+			return $netbox->fhrpGroups($filter, $limit);
+				case self::FHRPGroupSplitMode:
+				return $netbox->fhrpGroupsSplit($filter, $limit);
+							
 			// Where			
 			case self::LocationMode:
 				return $netbox->locations($filter, $limit);

@@ -138,7 +138,7 @@ class Netbox
 
 			# FHRP has an array of IP's
 			if (property_exists($row,'ip_addresses')) {
-				$row->ip_addresses_array = [];
+				$row->ip_addresses_array =  array();
 				foreach ($row->ip_addresses as $ip_address) {
 					if(property_exists($ip_address, 'address')) {
 						array_push($row->ip_addresses_array, explode('/', $ip_address->address)[0]);
@@ -271,6 +271,28 @@ class Netbox
 	// forking this repo and writing your own function reduces the number require in complex setups.
 	private function zoneHelper(array $in) 	{
 		return $in;
+	}
+
+	private function splitRows(array $in, $key) 	{
+		$output = array();
+		foreach ($in as $row) {
+			if (property_exists($row, $key)) {
+				foreach ($row->{$key} as $ip) {
+					$row->primary_ip_address = $ip;
+					if (property_exists($row, 'description')) {
+						if ($row->description == "") {
+							$row->description = "VIP " . $ip;
+						} else {
+							$row->description = $row->description . " " . $ip;
+						}
+					}
+					$output = array_merge($output, [(object)$row]);
+				}
+			} else {
+				$output = array_merge($output, [(object)$row]);
+			}
+		}
+		return $output;
 	}
 
 	private function transform(array $in)
@@ -486,6 +508,12 @@ class Netbox
 	{
 		$this->object_type = 'fhrpgroup';
 		return $this->get_netbox("/ipam/fhrp-groups/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function fhrpGroupsSplit($filter, int $limit = 0)
+	{
+		$this->object_type = 'fhrpgroup';
+		return $this->splitRows($this->fhrpGroups($filter, $limit), 'ip_addresses_array');
 	}
 
 	// Where
