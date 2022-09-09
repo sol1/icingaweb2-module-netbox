@@ -467,6 +467,12 @@ class Netbox
 		return $this->get_netbox("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
 	}
 
+	public function fhrpGroups($filter, int $limit = 0)
+	{
+		$this->object_type = 'fhrpgroup';
+		return $this->get_netbox("/ipam/fhrp-groups/?" . $this->default_filter($filter, ""), $limit);
+	}
+
 	// Where
 	public function locations($filter, int $limit = 0)
 	{
