@@ -287,7 +287,7 @@ class Netbox
 				foreach ($row->{$key} as $ip) {
 					$row->primary_ip_address = $ip;
 					$row->description = $description . " " . $ip;
-					$output = array_merge($output, [(object)$row]);
+					$output = array_merge($output, [(object)clone($row)]);
 				}
 			} else {
 				$output = array_merge($output, [(object)$row]);
