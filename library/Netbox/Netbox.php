@@ -139,7 +139,7 @@ class Netbox
 			# FHRP has an array of IP's
 			if (property_exists($row,'ip_addresses')) {
 				$row->ip_addresses_array = [];
-				foreach ($row->ipaddresses as $ip_address) {
+				foreach ($row->ip_addresses as $ip_address) {
 					if(property_exists($ip_address, 'address')) {
 						array_push($row->ip_addresses_array, explode('/', $ip_address->address)[0]);
 					}
