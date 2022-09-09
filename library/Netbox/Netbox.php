@@ -277,15 +277,16 @@ class Netbox
 		$output = array();
 		foreach ($in as $row) {
 			if (property_exists($row, $key)) {
+				if (property_exists($row, 'description')) {
+					if ($row->description == "") {
+						$description = "VIP ";
+					} else {
+						$description = $row->description;
+					}
+				}
 				foreach ($row->{$key} as $ip) {
 					$row->primary_ip_address = $ip;
-					if (property_exists($row, 'description')) {
-						if ($row->description == "") {
-							$row->description = "VIP " . $ip;
-						} else {
-							$row->description = $row->description . " " . $ip;
-						}
-					}
+					$row->description = $description . " " . $ip;
 					$output = array_merge($output, [(object)$row]);
 				}
 			} else {
