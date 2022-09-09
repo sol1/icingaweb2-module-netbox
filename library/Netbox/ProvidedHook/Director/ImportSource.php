@@ -280,17 +280,16 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active is added without a filter selected)')
 		));
 
-		$form->addElement('multiCheckbox', 'associations', array(
-			'label' => $form->translate("Associate additional data"),
-			'required' => false,
-			'description' => $form->translate('Optionally associate deeply linked data with these objects where possible.'),
-			'multiOptions' => array(
-				self::ServiceAssociation => $form->translate('Services'),
-				self::IPRangeAssociation => $form->translate('IP Range'),
-				self::FHRPAssociation => $form->translate('FHRP Groups')
-			)
-
-		));
+		// $form->addElement('multiCheckbox', 'associations', array(
+		// 	'label' => $form->translate("Associate additional data"),
+		// 	'required' => false,
+		// 	'description' => $form->translate('Optionally associate deeply linked data with these objects where possible.'),
+		// 	'multiOptions' => array(
+		// 		self::ServiceAssociation => $form->translate('Services'),
+		// 		self::IPRangeAssociation => $form->translate('IP Range'),
+		// 		self::FHRPAssociation => $form->translate('FHRP Groups')
+		// 	)
+		// ));
 
 	}
 

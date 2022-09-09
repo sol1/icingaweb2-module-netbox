@@ -117,6 +117,11 @@ class Netbox
 				$row->keyid = $this->keymaker($row->model);
 			}
 
+			// The display of the current row, name is a better match but so do this first and overwrite name if name exists
+			if (property_exists($row, 'display')) {
+				$row->keyid = $this->keymaker($row->name);
+			}
+
 			// The name of the current row
 			if (property_exists($row, 'name')) {
 				$row->keyid = $this->keymaker($row->name);
