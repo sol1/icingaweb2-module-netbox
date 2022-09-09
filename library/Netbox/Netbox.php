@@ -136,6 +136,16 @@ class Netbox
 				}
 			} 
 
+			# FHRP has an array of IP's
+			if (property_exists($row,'ip_addresses')) {
+				$row->ip_addresses_array = [];
+				foreach ($row->ipaddresses as $ip_address) {
+					if(property_exists($ip_address, 'address')) {
+						array_push($row->ip_addresses_array, explode('/', $ip_address->address)[0]);
+					}
+				}
+			} 
+
 			// IP range is odd in that it doesn't have a name
 			if ($this->object_type == 'ip_range') {
 				$row->keyid = $this->keymaker(explode('/', $row->display)[0]);

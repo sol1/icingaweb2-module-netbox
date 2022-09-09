@@ -63,10 +63,10 @@ class ImportSource extends ImportSourceHook
 	const TestMode = 600;
 
 
-	// ASSOCIATIONS MULTI SELECT
-	const ServiceAssociation = 10;
-	const IPRangeAssociation = 20;
-	const FHRPAssociation = 30;
+	// // ASSOCIATIONS MULTI SELECT
+	// const ServiceAssociation = 10;
+	// const IPRangeAssociation = 20;
+	// const FHRPAssociation = 30;
 
 
 	// TODO: VRF is linked to devices/vm's through ip's. If we need VRF's then we should
