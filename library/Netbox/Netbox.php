@@ -97,14 +97,17 @@ class Netbox
 	}
 
 
-	private function keymaker(string $s, string $nb_type = NULL) {
-		if (is_null($nb_type)) {
-			$nb_type = $this->object_type;
+	private function keymaker(string $s = NULL, string $nb_type = NULL) {
+		if (is_null($s)) {
+			return NULL;
+		} else {
+			if (is_null($nb_type)) {
+					$nb_type = $this->object_type;
+			}
+			$s = preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $s);
+			$s = preg_replace('/__+/i', '_', $s);
+			return strtolower($this->prefix . $nb_type . " " .  trim($s,"_"));
 		}
-		$s = preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $s);
-		$s = preg_replace('/__+/i', '_', $s);
-		return strtolower($this->prefix . $nb_type . " " .  trim($s,"_"));
-		
 	}
 
 	// Automatically make fields that are likely to be needed so we can skip config in director
