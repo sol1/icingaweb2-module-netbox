@@ -311,8 +311,8 @@ class ImportSource extends ImportSourceHook
 			case self::VMMode:
 				$services = $netbox->allservices("", 0);
 				$ranges = $netbox->ipRanges("", 0);
-				$devices = $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit));
-				return $this->devices_with_services($services, $devices);
+				$vms = $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit));
+				return $this->devices_with_services($services, $vms);
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -345,7 +345,8 @@ class ImportSource extends ImportSourceHook
 				case self::FHRPGroupMode:
 			return $netbox->fhrpGroups($filter, $limit);
 				case self::FHRPGroupSplitMode:
-				return $netbox->fhrpGroupsSplit($filter, $limit);
+				$ranges = $netbox->ipRanges("", 0);
+				return $this->get_ip_range($ranges, $netbox->fhrpGroupsSplit($filter, $limit));
 							
 			// Where			
 			case self::LocationMode:
