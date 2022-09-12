@@ -9,6 +9,8 @@ use Icinga\Module\Netbox\Netbox;
 
 class ImportSource extends ImportSourceHook
 {
+
+	// MODE SELECT
 	// IMPORTANT: Existing installations store this numbers in the config. Changing them means the config needs to be redone. 
 	// 			  I've grouped and left spaces so we don't need to renumber any of these again.
 	// VM
@@ -28,6 +30,8 @@ class ImportSource extends ImportSourceHook
 	// IPAM
 	const IPAddressMode = 30;
 	const IPRangeMode = 32;
+	const FHRPGroupMode = 36;
+	const FHRPGroupSplitMode = 37;
 	
 	// Where
 	const LocationMode = 40;
@@ -58,6 +62,13 @@ class ImportSource extends ImportSourceHook
 
 	// Test mode
 	const TestMode = 600;
+
+
+	// // ASSOCIATIONS MULTI SELECT
+	// const ServiceAssociation = 10;
+	// const IPRangeAssociation = 20;
+	// const FHRPAssociation = 30;
+
 
 	// TODO: VRF is linked to devices/vm's through ip's. If we need VRF's then we should
 	// create an array in the import of all the linked ip's and vrf inside the importer 
@@ -211,6 +222,8 @@ class ImportSource extends ImportSourceHook
 				// IPAM
 				self::IPAddressMode => $form->translate('IP Addresses'),
 				self::IPRangeMode => $form->translate('IP Ranges'),
+				self::FHRPGroupMode => $form->translate("FHRP Groups"),
+				self::FHRPGroupSplitMode => $form->translate("FHRP Groups Split (on IP)"),
 				
 				// Where
 				self::LocationMode => $form->translate('Locations'),
@@ -269,6 +282,17 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active is added without a filter selected)')
 		));
 
+		// $form->addElement('multiCheckbox', 'associations', array(
+		// 	'label' => $form->translate("Associate additional data"),
+		// 	'required' => false,
+		// 	'description' => $form->translate('Optionally associate deeply linked data with these objects where possible.'),
+		// 	'multiOptions' => array(
+		// 		self::ServiceAssociation => $form->translate('Services'),
+		// 		self::IPRangeAssociation => $form->translate('IP Range'),
+		// 		self::FHRPAssociation => $form->translate('FHRP Groups')
+		// 	)
+		// ));
+
 	}
 
 	public function fetchData(int $limit = 0)
@@ -287,8 +311,8 @@ class ImportSource extends ImportSourceHook
 			case self::VMMode:
 				$services = $netbox->allservices("", 0);
 				$ranges = $netbox->ipRanges("", 0);
-				$devices = $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit));
-				return $this->devices_with_services($services, $devices);
+				$vms = $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit));
+				return $this->devices_with_services($services, $vms);
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -318,7 +342,12 @@ class ImportSource extends ImportSourceHook
 				return $netbox->ipAddresses($filter, $limit);
 			case self::IPRangeMode:
 				return $netbox->ipRanges($filter, $limit);
-	
+				case self::FHRPGroupMode:
+			return $netbox->fhrpGroups($filter, $limit);
+				case self::FHRPGroupSplitMode:
+				$ranges = $netbox->ipRanges("", 0);
+				return $this->get_ip_range($ranges, $netbox->fhrpGroupsSplit($filter, $limit));
+							
 			// Where			
 			case self::LocationMode:
 				return $netbox->locations($filter, $limit);
