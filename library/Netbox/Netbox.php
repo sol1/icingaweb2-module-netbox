@@ -120,6 +120,11 @@ class Netbox
 				$row->keyid = $this->keymaker($row->model);
 			}
 
+			// The display of the current row, name is a better match but so do this first and overwrite name if name exists
+			if (property_exists($row, 'display')) {
+				$row->keyid = $this->keymaker($row->display);
+			}
+
 			// The name of the current row
 			if (property_exists($row, 'name')) {
 				$row->keyid = $this->keymaker($row->name);
@@ -131,6 +136,16 @@ class Netbox
 			if (property_exists($row,'primary_ip')) {
 				if (! is_null($row->primary_ip) and property_exists($row->primary_ip, 'address')) {
 					$row->primary_ip_address = explode('/', $row->primary_ip->address)[0];
+				}
+			} 
+
+			# FHRP has an array of IP's
+			if (property_exists($row,'ip_addresses')) {
+				$row->ip_addresses_array =  array();
+				foreach ($row->ip_addresses as $ip_address) {
+					if(property_exists($ip_address, 'address')) {
+						array_push($row->ip_addresses_array, explode('/', $ip_address->address)[0]);
+					}
 				}
 			} 
 
@@ -234,8 +249,8 @@ class Netbox
 					}
 					if (property_exists($icinga, 'host')) {
 						foreach ($host_keys as $h) {
-							if (property_exists($icinga->satellite, $h)) {
-								$row->{'icinga_host_' . $h} = $icinga->satellite->{$h};
+							if (property_exists($icinga->host, $h)) {
+								$row->{'icinga_host_' . $h} = $icinga->host->{$h};
 							}
 						}
 					}
@@ -259,6 +274,30 @@ class Netbox
 	// forking this repo and writing your own function reduces the number require in complex setups.
 	private function zoneHelper(array $in) 	{
 		return $in;
+	}
+
+	private function splitRows(array $in, $key) 	{
+		$output = array();
+		foreach ($in as $row) {
+			$row->primary_ip_address = NULL;
+			if (property_exists($row, $key)) {
+				if (property_exists($row, 'description')) {
+					if ($row->description == "") {
+						$description = "VIP ";
+					} else {
+						$description = $row->description;
+					}
+				}
+				foreach ($row->{$key} as $ip) {
+					$row->primary_ip_address = $ip;
+					$row->description = $description . " " . $ip;
+					$output = array_merge($output, [(object)clone($row)]);
+				}
+			} else {
+				$output = array_merge($output, [(object)$row]);
+			}
+		}
+		return $output;
 	}
 
 	private function transform(array $in)
@@ -468,6 +507,18 @@ class Netbox
 	{
 		$this->object_type = 'ip_range';
 		return $this->get_netbox("/ipam/ip-ranges/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function fhrpGroups($filter, int $limit = 0)
+	{
+		$this->object_type = 'fhrpgroup';
+		return $this->get_netbox("/ipam/fhrp-groups/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function fhrpGroupsSplit($filter, int $limit = 0)
+	{
+		$this->object_type = 'fhrpgroup';
+		return $this->splitRows($this->fhrpGroups($filter, $limit), 'ip_addresses_array');
 	}
 
 	// Where

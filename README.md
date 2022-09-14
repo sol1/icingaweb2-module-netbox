@@ -21,11 +21,11 @@ rm -r /usr/share/icingaweb2/modules/netbox
 
 Download and extract the new release, then
 move the module into the icingaweb2 modules path.
-For example for version 3.1.16.5:
+For example for version 3.1.16.6:
 
 ```
-curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v3.1.16.5.tar.gz | tar xz
-mv icingaweb2-module-netbox-3.1.16.5 /usr/share/icingaweb2/modules/netbox
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v3.1.16.6.tar.gz | tar xz
+mv icingaweb2-module-netbox-3.1.16.6 /usr/share/icingaweb2/modules/netbox
 icingacli module enable netbox
 ```
 
@@ -57,6 +57,9 @@ Netbox api token
 
 #### Object type to import
 Netbox object set to be imported
+
+_Import types `Devices` and `Virtual Machines` also import linked Services and IP Ranges from Netbox_
+_Import type `FHRP Groups Split (on IP)` also import linked IP Ranges from Netbox_
 
 #### Flatten seperator
 This will take nested data (`{ "foo": { "bar": "123 }, "bar": "321" }`) and use the seperator specified to flatten it (`{ foo__bar: 123, "bar": 321" }`)
@@ -215,7 +218,7 @@ device_model: "AB123c"
 ```
 
 ### Primary IP
-The ip address from `primary_ip.address` is extracted and added to `primary_ip_address`.
+The ip address from `primary_ip.address` or FHRP Group IP address in split mode is extracted and added to `primary_ip_address`.
 ```
 primary_ip :{
   address: "127.0.0.1/32"
