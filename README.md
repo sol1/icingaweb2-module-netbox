@@ -21,11 +21,11 @@ rm -r /usr/share/icingaweb2/modules/netbox
 
 Download and extract the new release, then
 move the module into the icingaweb2 modules path.
-For example for version 3.1.16.6:
+For example for version 3.1.16.7:
 
 ```
-curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v3.1.16.6.tar.gz | tar xz
-mv icingaweb2-module-netbox-3.1.16.6 /usr/share/icingaweb2/modules/netbox
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v3.1.16.7.tar.gz | tar xz
+mv icingaweb2-module-netbox-3.1.16.7 /usr/share/icingaweb2/modules/netbox
 icingacli module enable netbox
 ```
 
