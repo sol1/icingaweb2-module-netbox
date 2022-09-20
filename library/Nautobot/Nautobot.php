@@ -605,7 +605,7 @@ class Nautobot
 			"device" => "device",
 			"virtual_machine" => "vm"
 		);
-		return $this->get_netbox("/ipam/services/?" );
+		return $this->get_nautobot("/ipam/services/?" );
 	}
 
 	private function services(string $device, int $limit = 0)
