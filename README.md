@@ -4,7 +4,7 @@ Icingaweb2 module to which, for now, just import objects from
 [Netbox](https://github.com/netbox-community/netbox) into Icinga
 Director.
 
-Note: Tags from 2.10.3 onwards match the major netbox version, the 4th version number is for this module only.
+Note: Tags from 2.10.3 onward match the major netbox version, the 4th version number is for this module only.
 
 ## Install
 
@@ -167,11 +167,11 @@ Strip the subnet suffix:
 
 ![Import source - Modifiers](doc/screenshot/import-modifier-2.png)
 
-## Convience Fields for Common Modifiers
-Some of the data Netbox contains benifits from consistent Director import source modifiers, rather than require you to setup these Import Source Property Modifiers for each import the Netbox Import Module creates them for you. 
+## Convenience Fields for Common Modifiers
+Some of the data Netbox contains benefits from consistent Director import source modifiers, rather than require you to setup these Import Source Property Modifiers for each import the Netbox Import Module creates them for you. 
 These include object names, linked object names, primary ip address and config context data to manage satellite creation.
 
-The Netbox Import Module creates top level keys with default null values with the following paramaters
+The Netbox Import Module creates top level keys with default null values with the following parameters
 
 ### Object names and Linked Object Names
 For the object itself the key `keyid` is added for use as Icinga object name. 
@@ -186,7 +186,7 @@ This format was chosen as Icinga is case insensitive for names where as Netbox i
 
 For linked objects a key is added with the Netbox object type followed by `_keyid` for key name, the same object name sanitiation occurs. This allows simple linking of hosts and host templates using the linked keyid's when Icinga objects use the keyid for object name.
 
-eg: for a device with the follow name and site info the following is returned
+eg: for a device with this name and site info the following is returned:
 ```
 name: "Foo (123)"
 keyid: "vmdevice_foo_123"
@@ -229,7 +229,7 @@ primary_ip_address: "127.0.0.1"
 ### IP Range
 A custom field `icinga_zone` in Netbox on the IP Range objects will be added to device and virtual machine Import Sources `ip_range_zone` if the Primary IP address of the device/vm is in the IP Range.
 
-This has been added to aid in the setup of Satellite, Agent and Host deployment without the need to manually specifify these details on each device. 
+This has been added to aid in the setup of Satellite, Agent and Host deployment without the need to manually specify these details on each device. 
 
 ### Icinga info in config context auto extraction
 ```			
