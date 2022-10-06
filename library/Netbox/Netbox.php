@@ -185,8 +185,11 @@ class Netbox
 						}
 						$row->{$key . '_keyid'} = $this->keymaker($v->name, $key);
 					}
-				}
+				} elseif (is_null($v) and array_key_exists($k, $this->type_map)) {
+					$key = $this->type_map[$k];
+					$row->{$key . '_keyid'} = NULL;
 
+				}
 			}
 
 			// Custom fields for Netbox
@@ -451,6 +454,10 @@ class Netbox
 		$this->type_map = array(
 			"device_role" => "device_role",
 			"parent_device" => "device",
+			"platform" => "platform",
+			"location" => "location",
+			"rack" => "rack",
+			"cluster" => "cluster",
 			"site" => "site",
 			"tenant" => "tenant"
 		);
