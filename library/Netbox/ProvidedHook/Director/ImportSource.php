@@ -45,6 +45,7 @@ class ImportSource extends ImportSourceHook
 	const ContactMode = 54;
 	const ContactGroupMode = 56;
 	const ContactRoleMode = 58;
+	const ContactAssignmentMode = 59;
 
 	// Other
 	const PlatformMode = 60;
@@ -238,6 +239,7 @@ class ImportSource extends ImportSourceHook
 				self::ContactMode => $form->translate('Contacts'),
 				self::ContactGroupMode => $form->translate('Contact Groups'),
 				self::ContactRoleMode => $form->translate('Contact Roles'),
+				self::ContactAssignmentMode => $form->translate('Contact Assignments'),
 			
 				// Other
 				self::PlatformMode => $form->translate('Platforms'),
@@ -371,8 +373,10 @@ class ImportSource extends ImportSourceHook
 			case self::ContactGroupMode:
 				return $netbox->contactGroups($filter, $limit);
 			case self::ContactRoleMode:
-				return $netbox->contactModes($filter, $limit);
-		
+				return $netbox->contactRoles($filter, $limit);
+			case self::ContactAssignmentMode:
+				return $netbox->contactAssignments($filter, $limit);
+					
 			// Other
 			case self::PlatformMode:
 				return $netbox->platforms($filter, $limit);

@@ -598,13 +598,18 @@ class Netbox
 		return $this->get_netbox("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	public function contactModes($filter, int $limit = 0)
+	public function contactRoles($filter, int $limit = 0)
 	{
 		$this->object_type = 'contact_role';
 		return $this->get_netbox("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	// TODO: contactAssignement
+	public function contactAssignments($filter, int $limit = 0)
+	{
+		$this->object_type = 'contact_assignment';
+		return $this->get_netbox("/tenancy/contact-assignments/?" . $this->default_filter($filter, ""), $limit);
+	}
+
 
 	// Other
 	public function platforms($filter, int $limit = 0)
