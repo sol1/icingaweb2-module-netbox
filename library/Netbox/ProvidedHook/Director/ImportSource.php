@@ -71,6 +71,26 @@ class ImportSource extends ImportSourceHook
 	// const FHRPAssociation = 30;
 
 
+
+	// Assume the list of contacts assignments passed in are all the same type
+	// as the things passed in.
+	private function get_contact_assignments($contact_assignments, $things) {
+		$output = array();
+		foreach ($things as $thing) {
+			// make an array here for a list of contacts
+			$thing->contacts = array();
+			$thing->contact_keyids = array();
+			foreach ($contact_assignments as $contact_assignment) {
+				if ($contact_assignment->object->id == $thing->id) {
+					array_push($thing->contacts, $contact_assignment->contact->name);
+					array_push($thing->contact_keyids, $contact_assignment->object_keyid);
+				}
+			}
+			$output = array_merge($output, [(object)$thing]);
+		}
+		return $output;
+	}
+
 	// TODO: VRF is linked to devices/vm's through ip's. If we need VRF's then we should
 	// create an array in the import of all the linked ip's and vrf inside the importer 
 	// rather than leaving it to the user to create host templates to link it all together.
@@ -315,8 +335,8 @@ class ImportSource extends ImportSourceHook
 				$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
 				$services = $netboxLinked->allservices("", 0);
 				$ranges = $netboxLinked->ipRanges("", 0);
-				$vms = $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit));
-				return $this->devices_with_services($services, $vms);
+				$contact_assignments = $netboxLinked->contactAssignments("content_type=virtualization.virtualmachine", 0);
+				return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit))));
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -331,8 +351,8 @@ class ImportSource extends ImportSourceHook
 				$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
 				$services = $netboxLinked->allservices("", 0);
 				$ranges = $netboxLinked->ipRanges("", 0);
-				$devices = $this->get_ip_range($ranges, $netbox->devices($filter, $limit));
-				return $this->devices_with_services($services, $devices, $filter);
+				$contact_assignments = $netboxLinked->contactAssignments("content_type=dcim.device", 0);
+				return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $netbox->devices($filter, $limit))));
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
