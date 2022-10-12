@@ -2,6 +2,8 @@
 
 namespace Icinga\Module\Netbox;
 
+use Icinga\Module\Director\Daemon\Logger;
+
 class Netbox
 {
 	public $object_type;
