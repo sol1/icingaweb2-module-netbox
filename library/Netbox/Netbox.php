@@ -26,7 +26,6 @@ class Netbox
 		$this->flattenseperator = $flattenseparator;
 		$this->flattenkeys = $flattenkeys;
 		$this->munge = $munge;
-
 	}
 
 	private function httpget(string $url)
@@ -211,7 +210,7 @@ class Netbox
 			}
 
 			// This turns a linked object into it's proper key id if we know how to match that.
-			if (property_exists($row, 'object') and property_exists($row, 'content_type') and in_array($row->content_type, $this->netbox_object_map)) {
+			if (property_exists($row, 'object') and property_exists($row, 'content_type') and array_key_exists($row->content_type, $this->netbox_object_map)) {
 				if (property_exists($row->object, 'name')) {
 					$row->object_keyid = $this->keymaker($row->object->name, $this->netbox_object_map[$row->content_type]);
 				}
