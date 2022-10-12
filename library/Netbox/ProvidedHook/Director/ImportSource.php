@@ -79,11 +79,9 @@ class ImportSource extends ImportSourceHook
 		foreach ($things as $thing) {
 			// make an array here for a list of contacts
 			$thing->contacts = array();
-			$thing->contact_keyids = array();
 			foreach ($contact_assignments as $contact_assignment) {
 				if ($contact_assignment->object->id == $thing->id) {
 					array_push($thing->contacts, $contact_assignment->contact->name);
-					array_push($thing->contact_keyids, $contact_assignment->object_keyid);
 				}
 			}
 			$output = array_merge($output, [(object)$thing]);
