@@ -83,7 +83,7 @@ class ImportSource extends ImportSourceHook
 			foreach ($contact_assignments as $contact_assignment) {
 				if ($contact_assignment->object->id == $thing->id) {
 					array_push($thing->contacts, $contact_assignment->contact->name);
-					array_push($thing->contact_keyids, "nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $contact_assignment->contact->name)));
+					array_push($thing->contact_keyids, strtolower("nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $contact_assignment->contact->name))));
 				}
 			}
 			$output = array_merge($output, [(object)$thing]);
