@@ -2,11 +2,21 @@
 
 namespace Icinga\Module\Netbox;
 
+// use Icinga\Module\Director\Daemon\Logger;
+
 class Netbox
 {
 	public $object_type;
 	public $type_map = array();
 	public $prefix = 'nb';
+
+	// Netbox now stores some linked object in a generic 'object' which then has a type to say 
+	// what kind of object it is, this maps those values to the $object types used in this module
+	public $netbox_object_map = array(
+		"virtualization.virtualmachine" => "vm",
+		"dcim.device" => "device",
+		"dcim.site" => "site"
+	);
 
 	function __construct($baseurl, $token, $proxy, $flattenseparator, $flattenkeys, $munge)
 	{
@@ -17,8 +27,6 @@ class Netbox
 		$this->flattenkeys = $flattenkeys;
 		$this->munge = $munge;
 	}
-
-
 
 	private function httpget(string $url)
 	{
@@ -130,6 +138,15 @@ class Netbox
 				$row->keyid = $this->keymaker($row->name);
 			}
 
+			// Contact assignment uses linked object, build a key id from the contact and object names
+			if ($this->object_type == 'contact_assignment')  {
+				if (property_exists($row, 'object') and property_exists($row, 'contact')) {
+					if (property_exists($row->contact, 'name') and property_exists($row->object, 'name')) {
+						$row->keyid = $this->keymaker($row->contact->name .  ' ' . $row->object->name);
+					}
+				}
+			}
+			
 			// Extract the address for the primary ip
 			// TODO: ipv6 ??
 			$row->primary_ip_address = NULL;	// Make empty field for column headings if no values exist
@@ -189,6 +206,13 @@ class Netbox
 					$key = $this->type_map[$k];
 					$row->{$key . '_keyid'} = NULL;
 
+				}
+			}
+
+			// This turns a linked object into it's proper key id if we know how to match that.
+			if (property_exists($row, 'object') and property_exists($row, 'content_type') and array_key_exists($row->content_type, $this->netbox_object_map)) {
+				if (property_exists($row->object, 'name')) {
+					$row->object_keyid = $this->keymaker($row->object->name, $this->netbox_object_map[$row->content_type]);
 				}
 			}
 
@@ -598,13 +622,18 @@ class Netbox
 		return $this->get_netbox("/tenancy/contact-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	public function contactModes($filter, int $limit = 0)
+	public function contactRoles($filter, int $limit = 0)
 	{
 		$this->object_type = 'contact_role';
 		return $this->get_netbox("/tenancy/contact-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	// TODO: contactAssignement
+	public function contactAssignments($filter, int $limit = 0)
+	{
+		$this->object_type = 'contact_assignment';
+		return $this->get_netbox("/tenancy/contact-assignments/?" . $this->default_filter($filter, ""), $limit);
+	}
+
 
 	// Other
 	public function platforms($filter, int $limit = 0)
