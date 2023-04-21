@@ -2,7 +2,7 @@
 
 namespace Icinga\Module\Netbox;
 
-use Icinga\Module\Director\Daemon\Logger;
+// use Icinga\Module\Director\Daemon\Logger;
 
 class Netbox
 {
