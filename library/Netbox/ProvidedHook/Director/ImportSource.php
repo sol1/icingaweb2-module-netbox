@@ -305,6 +305,19 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Optional search filter to the url to limit netbox data returned (Default: status=active is added without a filter selected)')
 		));
 
+		$form->addElement('checkbox', 'linked_services', array(
+			'label' => $form->translate('Link Services'),
+			'required' => false,
+			'value' => true,
+			'description' => $form->translate('Checking this box will link Service objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of services.')
+		));
+
+		$form->addElement('checkbox', 'linked_contacts', array(
+			'label' => $form->translate('Link Contacts'),
+			'required' => false,
+			'description' => $form->translate('Checking this box will link Contact objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of contact assignements.')
+		));
+
 		// $form->addElement('multiCheckbox', 'associations', array(
 		// 	'label' => $form->translate("Associate additional data"),
 		// 	'required' => false,
@@ -318,6 +331,22 @@ class ImportSource extends ImportSourceHook
 
 	}
 
+	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $content_type, $things)
+	{
+		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
+		$services = array();
+		if ($linkservices) {
+			$services = $netboxLinked->allservices("", 0);
+		}
+		$contact_assignments = array();
+		if ($linkcontacts) {
+			$contact_assignments = $netboxLinked->contactAssignments("content_type=" . $content_type, 0);
+		}
+		$ranges = $netboxLinked->ipRanges("", 0);
+		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $things)));
+
+	}
+
 	public function fetchData(int $limit = 0)
 	{
 		$baseurl = $this->getSetting('baseurl');
@@ -328,15 +357,13 @@ class ImportSource extends ImportSourceHook
 		$flatten = (string)$this->getSetting('flatten');
 		$flattenkeys = ((string)$this->getSetting('flattenkeys') == '') ? array() : explode(",", (string)$this->getSetting('flattenkeys'));
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
+		$linkcontacts = $this->getSetting('linked_contacts');
+		$linkservices = $this->getSetting('linked_services');
 		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
 		switch ($mode) {
 			// VM's
 			case self::VMMode:
-				$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
-				$services = $netboxLinked->allservices("", 0);
-				$ranges = $netboxLinked->ipRanges("", 0);
-				$contact_assignments = $netboxLinked->contactAssignments("content_type=virtualization.virtualmachine", 0);
-				return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $netbox->virtualMachines($filter, $limit))));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -348,11 +375,7 @@ class ImportSource extends ImportSourceHook
 							
 			// Device
 			case self::DeviceMode:
-				$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
-				$services = $netboxLinked->allservices("", 0);
-				$ranges = $netboxLinked->ipRanges("", 0);
-				$contact_assignments = $netboxLinked->contactAssignments("content_type=dcim.device", 0);
-				return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $netbox->devices($filter, $limit))));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, "dcim.device", $netbox->devices($filter, $limit));
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
