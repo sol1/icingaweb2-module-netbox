@@ -308,7 +308,6 @@ class ImportSource extends ImportSourceHook
 		$form->addElement('checkbox', 'linked_services', array(
 			'label' => $form->translate('Link Services'),
 			'required' => false,
-			'value' => true,
 			'description' => $form->translate('Checking this box will link Service objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of services.')
 		));
 
