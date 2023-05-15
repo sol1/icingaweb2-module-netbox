@@ -82,6 +82,9 @@ Adds the filter string to the api call. The default filter is `status=active`, i
 #### Proxy
 Proxy server ip, hostname, port combo in the format `proxy.example.com:1234`
 
+#### Link Services/Contacts
+For Object that link to Services and Contacts toggle the linking.
+
 ### Example sync of devices to hosts
 
 1. Add an "Import Source" with an API token, with name "Netbox devices".
