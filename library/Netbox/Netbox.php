@@ -92,7 +92,7 @@ class Netbox
 	{
 		$devices = $this->get("/dcim/devices/?name=" . urlencode($name));
 		if (count($devices) > 1) {
-			throw new Exception("more than 1 device matching name" . $name);
+			throw new \Exception("more than 1 device matching name" . $name);
 		}
 		return $devices[0];
 	}
