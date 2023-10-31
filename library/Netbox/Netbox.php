@@ -9,6 +9,13 @@ class Netbox
 	public $object_type;
 	public $type_map = array();
 	public $prefix = 'nb';
+	public $baseurl = '';
+	public $token = '';
+	public $proxy = '';
+	public $flattenseparator = '';
+	public $flattenkeys = '';
+	public $munge = '';
+
 
 	// Netbox now stores some linked object in a generic 'object' which then has a type to say 
 	// what kind of object it is, this maps those values to the $object types used in this module
