@@ -9,6 +9,13 @@ class Netbox
 	public $object_type;
 	public $type_map = array();
 	public $prefix = 'nb';
+	public $baseurl = '';
+	public $token = '';
+	public $proxy = '';
+	public $flattenseparator = '';
+	public $flattenkeys = '';
+	public $munge = '';
+
 
 	// Netbox now stores some linked object in a generic 'object' which then has a type to say 
 	// what kind of object it is, this maps those values to the $object types used in this module
@@ -23,7 +30,7 @@ class Netbox
 		$this->baseurl = $baseurl;
 		$this->token = $token;
 		$this->proxy = $proxy;
-		$this->flattenseperator = $flattenseparator;
+		$this->flattenseparator = $flattenseparator;
 		$this->flattenkeys = $flattenkeys;
 		$this->munge = $munge;
 	}
@@ -85,7 +92,7 @@ class Netbox
 	{
 		$devices = $this->get("/dcim/devices/?name=" . urlencode($name));
 		if (count($devices) > 1) {
-			throw new Exception("more than 1 device matching name" . $name);
+			throw new \Exception("more than 1 device matching name" . $name);
 		}
 		return $devices[0];
 	}
@@ -335,7 +342,7 @@ class Netbox
 		$output = $this->zoneHelper($this->makeHelperKeys($in));
 
 		// Flatten the returned data here if we have a flatten seperator
-		if (strlen($this->flattenseperator) > 0) {
+		if (strlen($this->flattenseparator) > 0) {
 			$fnew = array();
 			foreach ($output as $row) {
 				$in = array();
@@ -353,7 +360,7 @@ class Netbox
 						}
 					}
 				}
-				$this->flattenRecursive($out, '', $in, $this->flattenseperator);
+				$this->flattenRecursive($out, '', $in, $this->flattenseparator);
 				$fnew = array_merge($fnew, [(object)$out]);
 			}
 			$output = $fnew;
