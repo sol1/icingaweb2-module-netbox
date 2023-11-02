@@ -38,6 +38,7 @@ class ImportSource extends ImportSourceHook
 	const RegionMode = 42;
 	const SiteGroupMode = 44;
 	const SiteMode = 46;
+    const RackMode = 48;
 
 	// Who
 	const TenantGroupMode = 50;
@@ -251,7 +252,8 @@ class ImportSource extends ImportSourceHook
 				self::LocationMode => $form->translate('Locations'),
 				self::SiteMode => $form->translate('Sites'),
 				self::SiteGroupMode => $form->translate('Site Groups'),
-				self::RegionMode => $form->translate('Region'),
+				self::RackMode => $form->translate('Racks'),
+				self::RegionMode => $form->translate('Regions'),
 			
 				// Who
 				self::TenantMode => $form->translate('Tenants'),
@@ -402,9 +404,11 @@ class ImportSource extends ImportSourceHook
 				return $netbox->sites($filter, $limit);
 			case self::SiteGroupMode:
 				return $netbox->siteGroups($filter, $limit);
-			case self::RegionMode:
+            case self::RackMode:
+                return $netbox->racks($filter, $limit);
+            case self::RegionMode:
 				return $netbox->regions($filter, $limit);
-
+    
 			// Who
 			case self::TenantMode:
 				return $netbox->tenants($filter, $limit);

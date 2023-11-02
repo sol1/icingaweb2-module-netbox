@@ -579,6 +579,15 @@ class Netbox
 		return $this->get_netbox("/dcim/site-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
+    public function racks($filter, int $limit = 0)
+	{
+		$this->object_type = 'racks';
+		$this->type_map = array(
+			"parent" => "racks"
+		);
+		return $this->get_netbox("/dcim/racks/?" . $this->default_filter($filter, "status=active"), $limit);
+	}
+
 	public function regions($filter, int $limit = 0)
 	{
 		$this->object_type = 'region';
