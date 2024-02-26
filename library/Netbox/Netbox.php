@@ -334,6 +334,28 @@ class Netbox
 		return $output;
 	}
 
+    private function normalize(array $data)
+    {
+        // Step 3: Identify all unique keys
+        $allKeys = [];
+        foreach ($data as $row) {
+            $allKeys = array_merge($allKeys, array_keys($row));
+        }
+        $allKeys = array_unique($allKeys);
+
+        // Step 4: Normalize each row to have the same keys
+        $normalizedData = [];
+        foreach ($data as $row) {
+            $normalizedRow = [];
+            foreach ($allKeys as $key) {
+                $normalizedRow[$key] = array_key_exists($key, $row) ? $row[$key] : null;
+            }
+            $normalizedData[] = $normalizedRow;
+        }
+
+        return $normalizedData;
+    }
+
 	private function transform(array $in)
 	{
 		// Makes Helper Keys then
@@ -363,7 +385,7 @@ class Netbox
 				$this->flattenRecursive($out, '', $in, $this->flattenseparator);
 				$fnew = array_merge($fnew, [(object)$out]);
 			}
-			$output = $fnew;
+			$output = $this->normalize($fnew);
 		}
 
 		// Create new column from munge
@@ -397,7 +419,6 @@ class Netbox
 		// 	$tnew = array_merge($tnew, [(object)$row]);
 		// }
 		// $output = $tnew;
-
 		return $output;
 	}
 
