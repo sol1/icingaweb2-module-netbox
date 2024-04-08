@@ -617,6 +617,9 @@ class Netbox
 	public function tenantGroups($filter, int $limit = 0)
 	{
 		$this->object_type = 'tenant_group';
+		$this->type_map = array(
+			"parent" => "tenant_group"
+		);
 		return $this->get_netbox("/tenancy/tenant-groups/?" . $this->default_filter($filter, ""), $limit);
 	}
 
