@@ -155,7 +155,6 @@ class Netbox
 			}
 			
 			// Extract the address for the primary ip
-			// TODO: ipv6 ??
 			$row->primary_ip_address = NULL;	// Make empty field for column headings if no values exist
 			if (property_exists($row,'primary_ip')) {
 				if (! is_null($row->primary_ip) and property_exists($row->primary_ip, 'address')) {
@@ -163,7 +162,21 @@ class Netbox
 				}
 			} 
 
-			# FHRP has an array of IP's
+			$row->primary_ip4_address = NULL;	// Make empty field for column headings if no values exist
+			if (property_exists($row,'primary_ip4')) {
+				if (! is_null($row->primary_ip4) and property_exists($row->primary_ip4, 'address')) {
+					$row->primary_ip4_address = explode('/', $row->primary_ip4->address)[0];
+				}
+			} 
+
+			$row->primary_ip6_address = NULL;	// Make empty field for column headings if no values exist
+			if (property_exists($row,'primary_ip6')) {
+				if (! is_null($row->primary_ip6) and property_exists($row->primary_ip6, 'address')) {
+					$row->primary_ip6_address = explode('/', $row->primary_ip6->address)[0];
+				}
+			} 
+
+            # FHRP has an array of IP's
 			if (property_exists($row,'ip_addresses')) {
 				$row->ip_addresses_array =  array();
 				foreach ($row->ip_addresses as $ip_address) {
