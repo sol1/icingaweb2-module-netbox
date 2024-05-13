@@ -588,6 +588,7 @@ class Netbox
 		$this->object_type = 'site';
 		$this->type_map = array(
 			"group" => "site_group",
+			"region" => "region",
 			"tenant" => "tenant"
 		);
 		return $this->get_netbox("/dcim/sites/?" . $this->default_filter($filter, "status=active"), $limit);
@@ -612,6 +613,7 @@ class Netbox
 	{
 		$this->object_type = 'region';
 		$this->type_map = array(
+			"parent" => "parent",
 			"parent" => "region"
 		);
 		return $this->get_netbox("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
