@@ -613,7 +613,6 @@ class Netbox
 	{
 		$this->object_type = 'region';
 		$this->type_map = array(
-			"parent" => "parent",
 			"parent" => "region"
 		);
 		return $this->get_netbox("/dcim/regions/?" . $this->default_filter($filter, ""), $limit);
