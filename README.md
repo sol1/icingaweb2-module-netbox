@@ -21,15 +21,15 @@ rm -r /usr/share/icingaweb2/modules/netbox
 
 Download and extract the new release, then
 move the module into the icingaweb2 modules path.
-For example for version 3.6.1.0:
+For example for version 3.6.1.2:
 
 ```
-curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v3.6.1.0.tar.gz | tar xz
-mv icingaweb2-module-netbox-3.6.1.0 /usr/share/icingaweb2/modules/netbox
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v3.6.1.2.tar.gz | tar xz
+mv icingaweb2-module-netbox-3.6.1.2 /usr/share/icingaweb2/modules/netbox
 icingacli module enable netbox
 ```
 
-To run current:
+You can also use git:
 
 ```
 git clone https://github.com/sol1/icingaweb2-module-netbox.git netbox
@@ -45,7 +45,7 @@ of Icinga Director, [official documentation](https://www.icinga.com/docs/directo
 ### Module specific options
 
 #### Key column name
-This is used by director and icingaweb2 to find objects before sync rules are parsed, your object names should use the key column name to avoid issues.
+This is used by director and icingaweb2 to find objects before sync rules are parsed, your Icinga object names should use the key column name to avoid issues.
 
 #### Base URL
 Url to netbox install api with no trailing slash (/).
@@ -58,7 +58,7 @@ Netbox api token
 #### Object type to import
 Netbox object set to be imported
 
-_Import types `Devices` and `Virtual Machines` also import linked Services and IP Ranges from Netbox_
+_Import types `Devices` and `Virtual Machines` also import linked Services, Linked Contacts and IP Ranges from Netbox_
 _Import type `FHRP Groups Split (on IP)` also import linked IP Ranges from Netbox_
 
 #### Flatten seperator
@@ -74,7 +74,7 @@ Examples of this are
 * combining `name` and `id` into a new field `name_id`, syntax: `name,id`
 * adding a identifier `netbox` to `slug` to create a new field `netbox_slug` so all objects are prefixed with `netbox_<device slug>`, syntax: `s=netbox,slug`
 
-In a complex setup you may like to show where icinga objects come from using a prefix showing the source, eg: `nbsite_`, `nb<projectname>_`.
+_Note `keyid` and `*_keyid` is a built in munge of the object type and Icinga safe object name_
 
 #### Search filter
 Adds the filter string to the api call. The default filter is `status=active`, if you add your own filter it overwrites the default filter value.
@@ -88,27 +88,28 @@ For Object that link to Services and Contacts toggle the linking.
 ### Example sync of devices to hosts
 
 1. Add an "Import Source" with an API token, with name "Netbox devices".
-2. Select "Devices" from Object type to import, then "Store" to save it.
-3. Read and perform steps in the "Property Modifiers" section below.
-4. Select the new import source "Netbox devices", then "Trigger import run".
-5. Select the "Sync rule" tab and create a rule with the fields filled out as follows:
-  * Rule name: Devices
+2. Set the "Key column name" value to "keyid" 
+3. Select "Devices" from Object type to import, then "Store" to save it.
+4. Read and perform steps in the "Property Modifiers" section below.
+5. Select the new import source "Netbox devices", then "Trigger import run".
+6. Select the "Sync rule" tab and create a rule with the fields filled out as follows:
+  * Rule name: Netbox Devices -> Hosts
   * Object Type: Hosts
   * Update Policy: Replace
   * Purge: Yes
-6. Select the new "Devices" rule and select the "Properties" tab.
-7. Add a sync property rule with the following fields set:
-  * Source Name: "Netbox devices"
-  * Destination field: "object_name"
-  * Source Column: "name"
-  * Set based on filter: "No"
-8. Add another sync property with the following fields set:
-  * Source Name: "Netbox devices"
-  * Destination field: "address"
-  * Source Column: "ipv4_address"
-  * Set based on filter: "No"
-9. Select the sync rule "Devices" again, then click "Trigger this sync".
-10. Select "Activity log" on the left, then "Deploy pending changes".
+7. Select the new "Netbox Devices -> Hosts" rule and select the "Properties" tab.
+8. Add a sync property rule with the following fields set:
+  * Source Name: Netbox devices
+  * Destination field: object_name
+  * Source Column: keyid
+  * Set based on filter: No
+9. Add another sync property with the following fields set:
+  * Source Name: Netbox devices
+  * Destination field: address
+  * Source Column: ipv4_address
+  * Set based on filter: No
+10. Select the sync rule "Netbox Devices -> Hosts" again, then click "Trigger this sync".
+11. Select "Activity log" on the left, then "Deploy pending changes".
 
 What did we do? We created an import source "Netbox devices" which
 imports Netbox devices from the Netbox API into the Director database.
@@ -122,10 +123,10 @@ create a Import Source for the site and a sync rule that creates a Icinga hosts 
 with all the site details based on the site slug.
 
 Then in the device host object you will be able to import this site host template using
-the site slug that exists on the netbox device.
+the site that exists on the netbox device.
 
-Netbox site -> Icinga site host template (netbox site.slug object name)
-Netbox device -> Icinga device host with import for site host template (netbox device.site.slug)
+Netbox site -> Icinga site host template (Icinga object uses the Netbox site `keyid` value for it's name)
+Netbox device -> Icinga device host with import for site host template (Icinga object uses the Netbox device `site_keyid` to match the site template name)
 
 ## Property Modifiers
 
@@ -177,8 +178,8 @@ These include object names, linked object names, primary ip address and config c
 The Netbox Import Module creates top level keys with default null values with the following parameters
 
 ### Object names and Linked Object Names
-For the object itself the key `keyid` is added for use as Icinga object name. 
-The object name is sanatized, replacing characters that aren't in `[^0-9a-zA-Z_\-. ]` with `_` and making the name lowercase, then a prefix is added for the type.
+For the object themselves a field `keyid` is added for use as Icinga object name. 
+The `keyid` is a sanatized Netbox object name, replacing characters that aren't in `[^0-9a-zA-Z_\-. ]` with `_` and making the name lowercase, then a prefix is added for the Netbox object type.
 
 ---
 **NOTE**
@@ -187,16 +188,22 @@ This format was chosen as Icinga is case insensitive for names where as Netbox i
 
 ---
 
-For linked objects a key is added with the Netbox object type followed by `_keyid` for key name, the same object name sanitiation occurs. This allows simple linking of hosts and host templates using the linked keyid's when Icinga objects use the keyid for object name.
+For linked objects a field is added with the Netbox object type followed by `_keyid` for the field name, the same object name sanitiation occurs for these `_keyid` as above. This allows simple linking of hosts and host templates using the linked keyid's when Icinga objects use the keyid for object name.
 
-eg: for a device with this name and site info the following is returned:
+eg: a Netbox device `Foo (123)` would contain import source fields below:
 ```
 name: "Foo (123)"
 keyid: "vmdevice_foo_123"
 site: {
-  name: "bar"
+  name: "Bar"
 }
-site_keyid: "vmsite_bar"
+site_keyid: "site_bar"
+```
+
+and the site `Bar` would contain import source fields below:
+```
+name: "bar"
+keyid: "site_bar"
 ```
 
 ### Device Model and Manufacturer
@@ -220,8 +227,8 @@ device_manufacturer: "ACME",
 device_model: "AB123c"
 ```
 
-### Primary IP
-The ip address from `primary_ip.address` or FHRP Group IP address in split mode is extracted and added to `primary_ip_address`.
+### Primary IP, Primary IPv4 and Primary IPv6
+The ip address from `primary_ip.address`, `primary_ip4.address`, `primary_ip6.address` or FHRP Group IP address in split mode is extracted and added to `primary_ip_address`, `primary_ip4_address` and `primary_ip6_address`.
 ```
 primary_ip :{
   address: "127.0.0.1/32"
@@ -230,9 +237,12 @@ primary_ip_address: "127.0.0.1"
 ```
 
 ### IP Range
-A custom field `icinga_zone` in Netbox on the IP Range objects will be added to device and virtual machine Import Sources `ip_range_zone` if the Primary IP address of the device/vm is in the IP Range.
+If the custom field `icinga_zone` in Netbox on the IP Range objects exists the value will be added to device and virtual machine Import Sources `ip_range_zone` if the Primary IP address of the device/vm is in the IP Range.
 
 This has been added to aid in the setup of Satellite, Agent and Host deployment without the need to manually specify these details on each device. 
+
+### Tags
+Netbox tags are a list of dictionaries. The slug values from these dictionaries are extracted to `tag_slugs` which is a list of strings. This can be then used in Icinga Apply Rules when seeing if a list contains a value. 
 
 ### Icinga info in config context auto extraction
 ```			
@@ -269,11 +279,32 @@ If any of the above is found in `config_context` for devices or vm's the importe
 
 This allows the easy configuration of host and satellites from Netbox with accuration zone and endpoint information. It also allows vars or service vars to be placed on the host for easy parsing.
 
-This structure is useful in automated satellite deployment using tools such as ansible as these are the same values required to setup a satellite.
+This structure useful outside of the Netbox Import Module in automated satellite deployment tools like ansible which can use the same values to install and configure a satellites.
+
+## Best Practices
+- Use `keyid` for object names.
+- For Icinga `host` objects set the `display name` to Netbox object name.
+- Icinga can link back to Netbox through Shared Navigation with the url `https://netbox.example.com/search/?q=$host.display_name$` if you make the display name the Netbox object name.
+- If filtering Import Sources from Netbox, single selection fields work best as they ensure each Netbox object is only imported once for all Import Sources. Examples of this are `Device Roles` or custom fields of type `Selection`.
+- Filtering Import Sources is prefered to using Import Source Modifiers or Sync Rule Filter Expression's.
+- A dedicated import source custom field in Netbox is helpful for Netbox users to easily see if a object is part of monitoring. 
+  - This custom field should be of type `Selection`, have a `Choice Set` and be `Required`. 
+  - The `Choice Set` should have a option `Do not monitor`, typically this is the default value.
+  - If setting this up after data has been added to Netbox use Netbox Bulk Update to ensure all objects contain a value.
+  - If you forget to use Netbox Bulk Update and now have a mix of `Choice Set` and null values the Netbox api can help.
+- Breaking up Import Sources for Hosts can be useful for the following reasons, just don't get carried away
+  - Reducing the number of sync rule filters needed by grouping host types together
+  - Reducing the splash area of user induced automation errors
+  - Making Import Source imports and their sync rules less monolithic
+- Automated Region and Tenant templates with no vars and a Sync Rule Update Policy of Merge are useful for managing shared settings. eg: Adding ping vars to a `nbregion australia` Template so all hosts in that region get their own ping values.
+- You can nest Netbox data that has a parent child relationship such as Region into a Icinga host template inheritance tree. eg: `Region` (manually created host template) -> `nbregion australia` -> `nbregion new south wales` -> `nbregion sydney` -> `nbsite sol1`.
+- Lists to groups can be done using a Sync Rule Property `assign_filter`'s. eg: To make Icinga Groups from Netbox tags create Icinga Host Group objects from a Netbox `tags` Import Source and set the `assign_filter` value to `%22${name}%22=host.vars.tags`, the `host.vars.tags` is the list set on host objects from the value `tag_slugs`, the Netbox Tag object `name` is the value in this list. 
+
+
 
 ## Acknowledgements
 
 This module was initially based on a module by Uberspace:
 https://github.com/Uberspace/icingaweb2-module-netboximport
 
-It was rewritten by Oliver at [Sol1](https://www.sol1.com.au) and is maintained by Matt at [Sol1](https://www.sol1.com.au)
+It was rewritten by Oliver and Matt at [Sol1](https://www.sol1.com.au) and is maintained by Matt at [Sol1](https://www.sol1.com.au)
