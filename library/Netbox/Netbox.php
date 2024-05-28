@@ -281,6 +281,7 @@ class Netbox
 				}
 				foreach ($other_keys as $o) {
 					$row->{'icinga_' . $o} = NULL;
+					$row->{'icinga_' . $o . '_type'} = NULL;
 				}
 
 				if (property_exists($row->config_context, 'icinga')) {
@@ -304,6 +305,7 @@ class Netbox
 					foreach ($other_keys as $okey) {
 						if (property_exists($icinga, $okey)) {
 							$row->{"icinga_" . $okey} = $icinga->{$okey};
+							$row->{"icinga_" . $okey . '_type'} = gettype($icinga->{$okey});
 						}
 					}	
 
