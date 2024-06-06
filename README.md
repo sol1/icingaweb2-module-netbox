@@ -275,7 +275,8 @@ Netbox tags are a list of dictionaries. The slug values from these dictionaries 
   }
 }
 ```
-If any of the above is found in `config_context` for devices or vm's the importer will automatically create `icinga_satellite_<key>`, `icinga_host_<key>`, `icinga_service` or `icinga_var`.
+If any of the above is found in `config_context` for devices or vm's the importer will automatically create `icinga_satellite_<key>`, `icinga_host_<key>`, `icinga_service`, `icinga_var`, `icinga_service_type` or `icinga_var_type`. 
+The `icinga_service_type` and `icinga_var_type` are string values of `icinga_service` and `icinga_var`, the `_type` vars can be used in filters to determine if the values have been set (filters can't test dicts/objects).
 
 This allows the easy configuration of host and satellites from Netbox with accuration zone and endpoint information. It also allows vars or service vars to be placed on the host for easy parsing.
 
@@ -298,7 +299,8 @@ This structure useful outside of the Netbox Import Module in automated satellite
   - Making Import Source imports and their sync rules less monolithic
 - Automated Region and Tenant templates with no vars and a Sync Rule Update Policy of Merge are useful for managing shared settings. eg: Adding ping vars to a `nbregion australia` Template so all hosts in that region get their own ping values.
 - You can nest Netbox data that has a parent child relationship such as Region into a Icinga host template inheritance tree. eg: `Region` (manually created host template) -> `nbregion australia` -> `nbregion new south wales` -> `nbregion sydney` -> `nbsite sol1`.
-- Lists to groups can be done using a Sync Rule Property `assign_filter`'s. eg: To make Icinga Groups from Netbox tags create Icinga Host Group objects from a Netbox `tags` Import Source and set the `assign_filter` value to `%22${name}%22=host.vars.tags`, the `host.vars.tags` is the list set on host objects from the value `tag_slugs`, the Netbox Tag object `name` is the value in this list. 
+- Lists to groups can be done using a Sync Rule Property `assign_filter`'s. eg: To make Icinga Groups from Netbox tags create Icinga Host Group objects from a Netbox `tags` Import Source and set the `assign_filter` value to `%22${name}%22=host.vars.tags`, the `host.vars.tags` is the list set on host objects from the value `tag_slugs`, the Netbox Tag object `name` is the value in this list.
+- You can push large nested dicts in `icinga_service` or `icinga_var`, eg: `icinga_var = {"arrive": "hello", "leave": "goodbye"}` to `host.vars.arrive = "hello"` and `host.vars.leave = "goodbye"`using a single Sync Rule Property with All Custom Vars. When doing this All Custom Vars should be the first var based property and it should use a filter `icinga_var_type=object` so it is only added if Netbox config context has dict values for these vars. If All Custom Vars isn't first is can remove previously set vars, if All Custom Vars isn't filtered it can remove preveiously set vars regardless of order, both the filter and order are needed.
 
 
 
