@@ -128,9 +128,10 @@ class ImportSource extends ImportSourceHook
 	private function ip_in_range($lower_range_ip_address, $upper_range_ip_address, $needle_ip_address)
 	{
 		# Get the numeric reprisentation of the IP Address with IP2long
-		$min    = ip2long(explode('/', (string)$lower_range_ip_address)[0]);
-		$max    = ip2long(explode('/', (string)$upper_range_ip_address)[0]);
-		$needle = ip2long(explode('/', (string)$needle_ip_address)[0]);
+                $min    = ip2long(explode('/', $lower_range_ip_address ?? '')[0]);
+                $max    = ip2long(explode('/', $upper_range_ip_address ?? '')[0]);
+                $needle = ip2long(explode('/', $needle_ip_address ?? '')[0]);
+
 
 		return (($needle >= $min) AND ($needle <= $max));
 	}   
