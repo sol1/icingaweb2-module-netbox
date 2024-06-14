@@ -1,0 +1,366 @@
+{
+    "ImportSource": {
+        "Netbox Sites": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${device_count}${virtualmachine_count}"
+                    },
+                    "target_property": "total_count"
+                },
+                {
+                    "priority": "3",
+                    "property_name": "total_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "4",
+                    "property_name": "latitude",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${latitude},${longitude}"
+                    },
+                    "target_property": "var_geolocation"
+                }
+
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "46",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Sites"
+        },
+        "Netbox Regions": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "site_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "0",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "42",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Regions"
+        }
+    },
+    "HostTemplate": {
+        "Netbox Sites": {
+            "fields": [],
+            "object_name": "Netbox Sites",
+            "object_type": "template"
+        },
+        "Netbox Regions": {
+            "fields": [],
+            "object_name": "Netbox Regions",
+            "object_type": "template"
+        }
+    },
+    "SyncRule": {
+        "Netbox Site -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Sites",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Sites",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Sites",
+                    "source_expression": "Netbox Sites"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Sites",
+                    "source_expression": "${region_keyid}"
+                },
+                {
+                    "destination_field": "vars.geolocation",
+                    "filter_expression": "latitude!=&longitude!=",
+                    "merge_policy": "override",
+                    "priority": "5",
+                    "source": "Netbox Sites",
+                    "source_expression": "${var_geolocation}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Site -> Host Templates",
+            "description": "Netbox Site Icinga Host Templates inheriting a common Host Template.",
+            "update_policy": "override"
+        },
+        "Netbox Regions -> Host Templates (parent 0)": {
+            "filter_expression": "_depth=0",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Regions",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Regions",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Regions",
+                    "source_expression": "Netbox Regions"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Regions -> Host Templates (parent 0)",
+            "description": "Top level Netbox Region Icinga Host Templates inheriting a common Host Template. Levels are used so regions are created in a top down order.",
+            "update_policy": "merge"
+        },
+        "Netbox Regions -> Host Templates (parent 1)": {
+            "filter_expression": "_depth=1",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Regions",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Regions",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Regions",
+                    "source_expression": "${region_keyid}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Regions -> Host Templates (parent 1)",
+            "description": "Level 1 Netbox Region Icinga Host Templates inheriting a top level parent Regions. Levels are used so regions are created in a top down order.",
+            "update_policy": "merge"
+        },
+        "Netbox Regions -> Host Templates (parent 2)": {
+            "filter_expression": "_depth=2",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Regions",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Regions",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Regions",
+                    "source_expression": "${region_keyid}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Regions -> Host Templates (parent 2)",
+            "description": "Level 2 Netbox Region Icinga Host Templates inheriting a level 1 parent Regions. Levels are used so regions are created in a top down order.",
+            "update_policy": "merge"
+        },
+        "Netbox Regions -> Host Templates (parent not 0)": {
+            "filter_expression": "_depth!=0",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Regions",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Regions",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Regions",
+                    "source_expression": "${region_keyid}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Regions -> Host Templates (parent not 0)",
+            "description": "Catch all everything but top level Netbox Region Icinga Host Templates inheriting parent Regions. Levels are used so regions are created in a top down order.",
+            "update_policy": "merge"
+        },
+        "Netbox Sites -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Sites",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Sites",
+                    "source_expression": "Site: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Sites",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Sites -> Host Groups",
+            "description": "Netbox Site Icinga Host Groups populated using an assign_filter that matches the Site Template.",
+            "update_policy": "override"
+        },
+        "Netbox Regions -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Regions",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Regions",
+                    "source_expression": "Region: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Regions",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Regions -> Host Groups",
+            "description": "Netbox Regions Icinga Host Groups populated using an assign_filter that matches the Regions Template.",
+            "update_policy": "override"
+        }
+
+    }
+}

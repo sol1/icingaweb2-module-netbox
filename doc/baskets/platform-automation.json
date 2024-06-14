@@ -1,0 +1,369 @@
+{
+    "ImportSource": {
+        "Netbox Platform Families": {
+            "key_column": "nb_platform_family_custom_fields_platform_family",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "virtualmachine_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${virtualmachine_count}${device_count}"
+                    },
+                    "target_property": "virtualmachine_count_device_count"
+                },
+                {
+                    "priority": "2",
+                    "property_name": "virtualmachine_count_device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "3",
+                    "property_name": "custom_fields_platform_family",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "is_null",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "4",
+                    "property_name": "custom_fields_platform_family",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "_",
+                "flattenkeys": "custom_fields",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "60",
+                "munge": "s=nb_platform_family,custom_fields_platform_family",
+                "proxy": ""
+            },
+            "source_name": "Netbox Platform Families",
+            "description": "This depends on a custom field named platform_family existing Netbox Platforms"
+        },
+        "Netbox Platform Types": {
+            "key_column": "nb_platform_type_custom_fields_platform_type",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "virtualmachine_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${virtualmachine_count}${device_count}"
+                    },
+                    "target_property": "virtualmachine_count_device_count"
+                },
+                {
+                    "priority": "2",
+                    "property_name": "virtualmachine_count_device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "3",
+                    "property_name": "custom_fields_platform_type",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "is_null",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "4",
+                    "property_name": "custom_fields_platform_type",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "_",
+                "flattenkeys": "custom_fields",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "60",
+                "munge": "s=nb_platform_type,custom_fields_platform_type",
+                "proxy": ""
+            },
+            "source_name": "Netbox Platform Types",
+            "description": "This depends on a custom field named platform_family existing Netbox Platforms"
+        },
+        "Netbox Platform Versions": {
+            "key_column": "nb_platform_version_custom_fields_platform_version",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "virtualmachine_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${virtualmachine_count}${device_count}"
+                    },
+                    "target_property": "virtualmachine_count_device_count"
+                },
+                {
+                    "priority": "2",
+                    "property_name": "virtualmachine_count_device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "3",
+                    "property_name": "custom_fields_platform_version",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "is_null",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "4",
+                    "property_name": "custom_fields_platform_version",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "_",
+                "flattenkeys": "custom_fields",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "60",
+                "munge": "s=nb_platform_version,custom_fields_platform_version",
+                "proxy": ""
+            },
+            "source_name": "Netbox Platform Versions",
+            "description": "This depends on a custom field named platform_family existing Netbox Platforms"
+        },
+        "Netbox Platforms": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "virtualmachine_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${virtualmachine_count}${device_count}"
+                    },
+                    "target_property": "virtualmachine_count_device_count"
+                },
+                {
+                    "priority": "2",
+                    "property_name": "virtualmachine_count_device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "_",
+                "flattenkeys": "custom_fields",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "60",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Platforms"
+        }
+    },
+    "HostTemplate": {
+        "Netbox Platforms": {
+            "fields": [],
+            "object_name": "Netbox Platforms",
+            "object_type": "template"
+        }
+    },
+    "SyncRule": {
+        "Netbox Platforms -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platforms",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Platforms",
+                    "source_expression": "Platform"
+                },
+                {
+                    "destination_field": "vars.platform_type",
+                    "filter_expression": "custom_fields_platform_type!=",
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${custom_fields_platform_type}"
+                },
+                {
+                    "destination_field": "vars.platform_version",
+                    "filter_expression": "custom_fields_platform_version!=",
+                    "merge_policy": "override",
+                    "priority": "5",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${custom_fields_platform_version}"
+                },
+                {
+                    "destination_field": "vars.platform_family",
+                    "filter_expression": "custom_fields_platform_family!=",
+                    "merge_policy": "override",
+                    "priority": "6",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${custom_fields_platform_family}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": "y",
+            "rule_name": "Netbox Platforms -> Host Templates",
+            "update_policy": "override"
+        },
+        "Netbox Platform Families -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platform Families",
+                    "source_expression": "${nb_platform_family_custom_fields_platform_family}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platform Families",
+                    "source_expression": "Platform Family: ${custom_fields_platform_family}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platform Families",
+                    "source_expression": "host.vars.platform_family=%22${custom_fields_platform_family}%22"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": "y",
+            "rule_name": "Netbox Platform Families -> Host Groups",
+            "update_policy": "override"
+        },
+        "Netbox Platform Types -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platform Types",
+                    "source_expression": "${nb_platform_type_custom_fields_platform_type}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platform Types",
+                    "source_expression": "Platform Type: ${custom_fields_platform_type}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platform Types",
+                    "source_expression": "host.vars.platform_type=%22${custom_fields_platform_type}%22"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": "y",
+            "rule_name": "Netbox Platform Types -> Host Groups",
+            "update_policy": "override"
+        },
+        "Netbox Platform Versions -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platform Versions",
+                    "source_expression": "${nb_platform_version_custom_fields_platform_version}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platform Versions",
+                    "source_expression": "Platform Version: ${custom_fields_platform_version}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platform Versions",
+                    "source_expression": "host.vars.platform_version=%22${custom_fields_platform_version}%22"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": "y",
+            "rule_name": "Netbox Platform Versions -> Host Groups",
+            "update_policy": "override"
+        }
+    }
+}
