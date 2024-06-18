@@ -303,7 +303,7 @@ This structure useful outside of the Netbox Import Module in automated satellite
 - You can push large nested dicts in `icinga_service` or `icinga_var`, eg: `icinga_var = {"arrive": "hello", "leave": "goodbye"}` to `host.vars.arrive = "hello"` and `host.vars.leave = "goodbye"`using a single Sync Rule Property with All Custom Vars. When doing this All Custom Vars should be the first var based property and it should use a filter `icinga_var_type=object` so it is only added if Netbox config context has dict values for these vars. If All Custom Vars isn't first is can remove previously set vars, if All Custom Vars isn't filtered it can remove preveiously set vars regardless of order, both the filter and order are needed.
 
 ## Baskets
-This repository contains baskets to help you configure your host automation, they have been broken up so you can import the bits you want. 
+This repository contains baskets in `docs/baskets` directory to help you configure your host automation, they have been broken up so you can import the bits you want. 
 It is recommeneded that after you import the baskets you require and modify them to suit your needs you then save them again. 
 
 The baskets follow a series of patterns to make managing your infrastructure easier. This includes 
