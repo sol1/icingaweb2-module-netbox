@@ -212,7 +212,7 @@
                     "merge_policy": "override",
                     "priority": "2",
                     "source": "Netbox Tenant Groups",
-                    "source_expression": "Tenant: ${display}"
+                    "source_expression": "Tenant Group: ${display}"
                 },
                 {
                     "destination_field": "assign_filter",
