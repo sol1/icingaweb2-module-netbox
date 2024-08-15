@@ -153,7 +153,7 @@ class ImportSource extends ImportSourceHook
 			$thing->interfaces_down_dict = array();
 			$thing->interfaces_up_dict = array();
 			foreach ($interfaces as $interface) {
-				if ($interface->{$content_name}->id == $thing->id) {
+				if ($interface->{$content_name}->id == $thing->id && (!isset($interface->custom_fields->icinga_monitored) || $interface->custom_fields->icinga_monitored === true)) {
 					$icinga_var = isset($interface->custom_fields->icinga_var) ? $interface->custom_fields->icinga_var : (object)[];
 					if ($interface->enabled) {
 						array_push($thing->interfaces_up, $interface->name);
@@ -391,7 +391,7 @@ class ImportSource extends ImportSourceHook
 			}
 			if ($content_type == "dcim.device") {
 				// TODO: Get only required interfaces
-				$interfaces = $netboxLinked->virtualMachineInterfaces("" . $content_type, 0);
+				$interfaces = $netboxLinked->deviceInterfaces("" . $content_type, 0);
 			}
 		}
 		$ranges = $netboxLinked->ipRanges("", 0);
