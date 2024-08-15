@@ -154,7 +154,7 @@ class ImportSource extends ImportSourceHook
 			$thing->interfaces_up_dict = array();
 			foreach ($interfaces as $interface) {
 				if ($interface->{$content_name}->id == $thing->id) {
-					$icinga_var = isset($interface->custom_fields->icinga_var) ? $interface->custom_fields->icinga_var : [];
+					$icinga_var = isset($interface->custom_fields->icinga_var) ? $interface->custom_fields->icinga_var : (object)[];
 					if ($interface->enabled) {
 						array_push($thing->interfaces_up, $interface->name);
 						$thing->interfaces_up_dict[] = [$interface->name => $icinga_var];
