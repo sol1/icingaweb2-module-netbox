@@ -150,8 +150,8 @@ class ImportSource extends ImportSourceHook
 			// make an array here for a list of contacts
 			$thing->interfaces_down = array();
 			$thing->interfaces_up = array();
-			$thing->interfaces_down_dict = array();
-			$thing->interfaces_up_dict = array();
+			$thing->interfaces_down_dict = (object)[];
+			$thing->interfaces_up_dict = (object)[];
 			foreach ($interfaces as $interface) {
 				if ($interface->{$content_name}->id == $thing->id && (!isset($interface->custom_fields->icinga_monitored) || $interface->custom_fields->icinga_monitored === true)) {
 					$icinga_var = isset($interface->custom_fields->icinga_var) ? $interface->custom_fields->icinga_var : (object)[];
