@@ -141,6 +141,9 @@ class ImportSource extends ImportSourceHook
 	// 2 lists are lists of interface names and the value of the custom field `icinga_var` if it exists
 	private function get_interfaces($interfaces, $things, $content_type)
 	{
+		if (empty($interfaces)) {
+			return $things;
+		}
 		$output = array();
 		$content_name = (strpos($content_type, 'virtualmachine') !== false) ? 'virtual_machine' : 'device';
 		foreach ($things as $thing) {
