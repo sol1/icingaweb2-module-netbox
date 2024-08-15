@@ -159,6 +159,22 @@
                     "priority": "3",
                     "source": "Netbox Clusters",
                     "source_expression": "Netbox Clusters"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Clusters",
+                    "source_expression": "${cluster_group_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Clusters",
+                    "source_expression": "${cluster_type_keyid}"
                 }
             ],
             "purge_action": "delete",
