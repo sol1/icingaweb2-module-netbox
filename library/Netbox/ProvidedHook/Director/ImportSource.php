@@ -136,7 +136,37 @@ class ImportSource extends ImportSourceHook
 		return (($needle >= $min) AND ($needle <= $max));
 	}   
 
-	// devices_with_services returns a copy of $devices with any services
+	// Makes 4 lists of interfaces for use a host.vars
+	// 2 lists are lists of interface names as string
+	// 2 lists are lists of interface names and the value of the custom field `icinga_var` if it exists
+	private function get_interfaces($interfaces, $things, $content_type)
+	{
+		$output = array();
+		$content_name = (strpos($content_type, 'virtualmachine') !== false) ? 'virtual_machine' : 'device';
+		foreach ($things as $thing) {
+			// make an array here for a list of contacts
+			$thing->interfaces_down = array();
+			$thing->interfaces_up = array();
+			$thing->interfaces_down_dict = array();
+			$thing->interfaces_up_dict = array();
+			foreach ($interfaces as $interface) {
+				if ($interface->{$content_name}->id == $thing->id) {
+					$icinga_var = isset($interface->custom_fields->icinga_var) ? $interface->custom_fields->icinga_var : [];
+					if ($interface->enabled) {
+						array_push($thing->interfaces_up, $interface->name);
+						$thing->interfaces_up_dict[] = [$interface->name => $icinga_var];
+					} else {
+						array_push($thing->interfaces_down, $interface->name);
+						$thing->interfaces_down_dict[] = [$interface->name => $icinga_var];
+					}
+				}
+			}
+			$output = array_merge($output, [(object)$thing]);
+		}
+		return $output;
+	}
+
+		// devices_with_services returns a copy of $devices with any services
 	// from $services belonging to it merged in. Each device has a new field
 	// "services" which contains an array of service objects belonging to the
 	// device. For example:
@@ -320,6 +350,12 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Checking this box will link Contact objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of contact assignements.')
 		));
 
+		$form->addElement('checkbox', 'linked_interfaces', array(
+			'label' => $form->translate('Link Interfaces'),
+			'required' => false,
+			'description' => $form->translate('Checking this box will link Interface objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of interfaces.')
+		));
+
 		// $form->addElement('multiCheckbox', 'associations', array(
 		// 	'label' => $form->translate("Associate additional data"),
 		// 	'required' => false,
@@ -333,7 +369,7 @@ class ImportSource extends ImportSourceHook
 
 	}
 
-	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $content_type, $things)
+	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
 	{
 		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
 		$services = array();
@@ -344,8 +380,19 @@ class ImportSource extends ImportSourceHook
 		if ($linkcontacts) {
 			$contact_assignments = $netboxLinked->contactAssignments("content_type=" . $content_type, 0);
 		}
+		$interfaces = array();
+		if ($linkinterfaces) {
+			if ($content_type == "virtualization.virtualmachine") {
+				// TODO: Get only required interfaces
+				$interfaces = $netboxLinked->virtualMachineInterfaces("" . $content_type, 0);
+			}
+			if ($content_type == "dcim.device") {
+				// TODO: Get only required interfaces
+				$interfaces = $netboxLinked->virtualMachineInterfaces("" . $content_type, 0);
+			}
+		}
 		$ranges = $netboxLinked->ipRanges("", 0);
-		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $things)));
+		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $this->get_interfaces($interfaces ,$things))));
 
 	}
 
@@ -361,11 +408,12 @@ class ImportSource extends ImportSourceHook
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
 		$linkcontacts = $this->getSetting('linked_contacts');
 		$linkservices = $this->getSetting('linked_services');
+		$linkinterfaces = $this->getSetting('linked_interfaces');
 		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
 		switch ($mode) {
 			// VM's
 			case self::VMMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -377,7 +425,7 @@ class ImportSource extends ImportSourceHook
 							
 			// Device
 			case self::DeviceMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, "dcim.device", $netbox->devices($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, "dcim.device", $netbox->devices($filter, $limit));
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
