@@ -1,0 +1,233 @@
+{
+    "ImportSource": {
+        "Netbox Tenants": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${device_count}${virtualmachine_count}"
+                    },
+                    "target_property": "total_count"
+                },
+                {
+                    "priority": "3",
+                    "property_name": "total_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "52",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Tenants"
+        },
+        "Netbox Tenant Groups": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "tenant_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "0",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "50",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Tenant Groups"
+        }
+    },
+    "HostTemplate": {
+        "Netbox Tenants": {
+            "fields": [],
+            "object_name": "Netbox Tenants",
+            "object_type": "template"
+        },
+        "Netbox Tenant Groups": {
+            "fields": [],
+            "object_name": "Netbox Tenant Groups",
+            "object_type": "template"
+        }
+    },
+    "SyncRule": {
+        "Netbox Tenants -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Tenants",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Tenants",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Tenants",
+                    "source_expression": "Netbox Tenants"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Tenants -> Host Templates",
+            "description": "Netbox Tenant Icinga Host Templates inheriting a common Host Template.",
+            "update_policy": "override"
+        },
+        "Netbox Tenant Groups -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Tenant Groups",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Tenant Groups",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Tenant Groups",
+                    "source_expression": "Netbox Tenant Groups"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Tenant Groups -> Host Templates",
+            "description": "Netbox Tenant Group Icinga Host Templates inheriting a common Host Template.",
+            "update_policy": "override"
+        },
+        "Netbox Tenants -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Tenants",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Tenants",
+                    "source_expression": "Tenant: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Tenants",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Tenants -> Host Groups",
+            "description": "Netbox Tenant Icinga Host Groups populated using an assign_filter that matches the Tenant Template.",
+            "update_policy": "override"
+        },
+        "Netbox Tenant Groups -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Tenant Groups",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Tenant Groups",
+                    "source_expression": "Tenant: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Tenant Groups",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Tenant Groups -> Host Groups",
+            "description": "Netbox Tenant Group Icinga Host Groups populated using an assign_filter that matches the Tenant Group Template.",
+            "update_policy": "override"
+        }
+    }
+}
