@@ -388,7 +388,7 @@ class ImportSource extends ImportSourceHook
 			if ($content_type == "virtualization.virtualmachine") {
 				$vm_filter = "";
 				foreach ($things as $vm) {
-					$vm_filter += "&virtual_machine_id=" . $vm->id;
+					$vm_filter .= "&virtual_machine_id=" . $vm->id;
 					if (strlen($vm_filter) > 1500) {
 						$interfaces = array_merge($interfaces, $netboxLinked->virtualMachineInterfaces($vm_filter, 0));
 						$vm_filter = "";
@@ -399,7 +399,7 @@ class ImportSource extends ImportSourceHook
 			if ($content_type == "dcim.device") {
 				$device_filter = "";
 				foreach ($things as $device) {
-					$device_filter += "&device_id=" . $device->id;
+					$device_filter .= "&device_id=" . $device->id;
 					if (strlen($device_filter) > 1500) {
 						$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
 						$device_filter = "";
