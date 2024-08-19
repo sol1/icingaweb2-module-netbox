@@ -386,12 +386,26 @@ class ImportSource extends ImportSourceHook
 		$interfaces = array();
 		if ($linkinterfaces) {
 			if ($content_type == "virtualization.virtualmachine") {
-				// TODO: Get only required interfaces
-				$interfaces = $netboxLinked->virtualMachineInterfaces("" . $content_type, 0);
+				$vm_filter = "";
+				foreach ($things as $vm) {
+					$vm_filter += "&virtual_machine_id=" . $vm->id;
+					if (strlen($vm_filter) > 1500) {
+						$interfaces = array_merge($interfaces, $netboxLinked->virtualMachineInterfaces($vm_filter, 0));
+						$vm_filter = "";
+					}
+				}
+				$interfaces = array_merge($interfaces, $netboxLinked->virtualMachineInterfaces($vm_filter, 0));
 			}
 			if ($content_type == "dcim.device") {
-				// TODO: Get only required interfaces
-				$interfaces = $netboxLinked->deviceInterfaces("" . $content_type, 0);
+				$device_filter = "";
+				foreach ($things as $device) {
+					$device_filter += "&device_id=" . $device->id;
+					if (strlen($device_filter) > 1500) {
+						$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
+						$device_filter = "";
+					}
+				}
+				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
 			}
 		}
 		$ranges = $netboxLinked->ipRanges("", 0);
