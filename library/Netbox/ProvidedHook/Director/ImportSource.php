@@ -204,6 +204,7 @@ class ImportSource extends ImportSourceHook
                 		$device->service_dict->{$k} = $icinga_var;
 					}
 				}
+				array_push($device->service_names, $k);
 			}
 		}
 		return $devices;
