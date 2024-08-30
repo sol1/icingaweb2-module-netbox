@@ -188,10 +188,21 @@ class ImportSource extends ImportSourceHook
 			$device->service_names = array(); 
             $device->service_dict = (object)[]; 
 			foreach ($service_array as $k => $v) {
-				// TODO: icinga_var_type
-				if (!isset($v['custom_fields']['icinga_monitored']) || $v['custom_fields']['icinga_monitored'] === true) {
-                	$icinga_var = isset($v['custom_fields']['icinga_var']) ? $v['custom_fields']['icinga_var'] : (object)[];
-                	$device->service_dict->{$k} = $icinga_var;
+				// Add the service if icinga_monitored isn't false
+				if (!isset($v->custom_fields->icinga_monitored) || $v->custom_fields->icinga_monitored === true) {
+					// if we have a icinga_var_type then manage which dict services get added too
+					if (isset($v->custom_fields->icinga_var_type) && !$v->custom_fields->icinga_var_type === "") {
+						$icinga_var_type_dict_name = 'service_dict_' . $v->custom_fields->icinga_var_type;
+						// If the icinga_var_type holder hasn't been created before create it
+						if (!isset($device->{$icinga_var_type_dict_name})) {
+							$device->{$icinga_var_type_dict_name} = (object)[]; 
+						}
+                		$icinga_var = isset($v->custom_fields->icinga_var) ? $v->custom_fields->icinga_var : (object)[];
+                		$device->{$icinga_var_type_dict_name}->{$k} = $icinga_var;
+					} else {
+                		$icinga_var = isset($v->custom_fields->icinga_var) ? $v->custom_fields->icinga_var : (object)[];
+                		$device->service_dict->{$k} = $icinga_var;
+					}
 				}
 			}
 		}
