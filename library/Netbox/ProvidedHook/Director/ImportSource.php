@@ -191,7 +191,7 @@ class ImportSource extends ImportSourceHook
 				// Add the service if icinga_monitored isn't false
 				if (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true) {
 					// if we have a icinga_var_type then manage which dict services get added too
-					if (isset($v['custom_fields']->icinga_var_type) && !$v['custom_fields']->icinga_var_type === "") {
+					if (isset($v['custom_fields']->icinga_var_type) && !$v['custom_fields']->icinga_var_type == "") {
 						$icinga_var_type_dict_name = 'service_dict_' . $v['custom_fields']->icinga_var_type;
 						// If the icinga_var_type holder hasn't been created before create it
 						if (!isset($device->{$icinga_var_type_dict_name})) {
