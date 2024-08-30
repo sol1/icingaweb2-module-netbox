@@ -200,6 +200,8 @@ class ImportSource extends ImportSourceHook
 								$icinga_var_types = explode(',', $icinga_var_types);
 							} elseif (!is_array($icinga_var_types)) {
 								die;
+							} else {
+								$icinga_var_types = ['default'];	
 							}
 						} else {
 							$icinga_var_types = ['default'];
