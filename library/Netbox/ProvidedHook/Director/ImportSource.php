@@ -194,13 +194,18 @@ class ImportSource extends ImportSourceHook
 					if (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true) {
 						
 						// if we have a icinga_var_type then make a list of type to make
-						$var_types = ['all'];
+						$var_types = ['default'];
 						if (isset($v['custom_fields']->icinga_var_type)) {
-							if (is_string($v['custom_fields']->icinga_var_type) && !$v['custom_fields']->icinga_var_type == '') {
-								$var_types = array_merge($var_types, explode(',', $v['custom_fields']->icinga_var_type));
-							} elseif (is_array($v['custom_fields']->icinga_var_type) and !empty($v['custom_fields']->icinga_var_type)) {
-								$var_types = array_merge($var_types, $v['custom_fields']->icinga_var_type);
+							if (is_string($v['custom_fields']->icinga_var_type)) {
+								if (!$v['custom_fields']->icinga_var_type == '') {
+									$var_types = explode(',', $v['custom_fields']->icinga_var_type);
+								}
+							} elseif (is_array($v['custom_fields']->icinga_var_type)) {
+								if (!empty($v['custom_fields']->icinga_var_type)) {
+									$var_types = $v['custom_fields']->icinga_var_type;
+								}
 							} else {
+								// TODO: this isn't right, it needs to throw a error to director
 								die;
 							}
 						}
