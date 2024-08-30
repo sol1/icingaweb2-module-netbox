@@ -183,11 +183,16 @@ class ImportSource extends ImportSourceHook
 	private function devices_with_services($services, $devices)
 	{
 		foreach ($devices as &$device) {
-			$a = $this->servicearray($device, $services);
-			$device->services = (object) $a;
+			$service_array = $this->servicearray($device, $services);
+			$device->services = (object) $service_array;
 			$device->service_names = array(); 
-			foreach ($a as $k => $v) {
-				array_push($device->service_names, $k);
+            $device->service_dict = (object)[]; 
+			foreach ($service_array as $k => $v) {
+				// TODO: icinga_var_type
+				if (!isset($v['custom_fields']['icinga_monitored']) || $v['custom_fields']['icinga_monitored'] === true) {
+                	$icinga_var = isset($v['custom_fields']['icinga_var']) ? $v['custom_fields']['icinga_var'] : (object)[];
+                	$device->service_dict->{$k} = $icinga_var;
+				}
 			}
 		}
 		return $devices;
