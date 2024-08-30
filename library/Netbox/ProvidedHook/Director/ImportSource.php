@@ -189,7 +189,7 @@ class ImportSource extends ImportSourceHook
 			foreach ($service_array as $k => $v) {
 				array_push($device->service_names, $k);
 
-				if (property_exists('icinga_vars', $v['custom_fields']) || property_exists('icinga_var_type', $v['custom_fields'])) {
+				if (property_exists($v['custom_fields'], 'icinga_vars') || property_exists($v['custom_fields'], 'icinga_var_type')) {
 					// Add the service if icinga_monitored isn't false
 					if (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true) {
 						
