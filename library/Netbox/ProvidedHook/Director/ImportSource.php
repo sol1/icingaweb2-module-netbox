@@ -196,11 +196,10 @@ class ImportSource extends ImportSourceHook
 						// if we have a icinga_var_type then make a list of type to make
 						$var_types = ['default'];
 						if (isset($v['custom_fields']->icinga_var_type)) {
-							$icinga_var_types = $v['custom_fields']->icinga_var_type;
-							if (is_string($icinga_var_types)) {
-								$var_types = explode(',', $icinga_var_types);
-							} elseif (is_array($icinga_var_types)) {
-								$var_types = $icinga_var_types;
+							if (is_string($v['custom_fields']->icinga_var_type) && !$v['custom_fields']->icinga_var_type == '') {
+								$var_types = explode(',', $v['custom_fields']->icinga_var_type);
+							} elseif (is_array($v['custom_fields']->icinga_var_type) and !empty($v['custom_fields']->icinga_var_type)) {
+								$var_types = $v['custom_fields']->icinga_var_type;
 							} else {
 								die;
 							}
