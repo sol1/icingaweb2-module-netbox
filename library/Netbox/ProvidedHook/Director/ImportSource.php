@@ -198,7 +198,7 @@ class ImportSource extends ImportSourceHook
 						if (isset($v['custom_fields']->icinga_var_type)) {
 							$icinga_var_types = $v['custom_fields']->icinga_var_type;
 							if (is_string($icinga_var_types)) {
-								$icinga_var_types = explode(',', $icinga_var_types);
+								$var_types = explode(',', $icinga_var_types);
 							} elseif (is_array($icinga_var_types)) {
 								$var_types = $icinga_var_types;
 							} else {
