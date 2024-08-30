@@ -194,21 +194,20 @@ class ImportSource extends ImportSourceHook
 					if (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true) {
 						
 						// if we have a icinga_var_type then make a list of type to make
-						if (isset($v['custom_fields']->icinga_var_type) && !($v['custom_fields']->icinga_var_type == '' || (is_array($v['custom_fields']->icinga_var_type) && empty($v['custom_fields']->icinga_var_type)))) {
+						$var_types = ['default'];
+						if (isset($v['custom_fields']->icinga_var_type)) {
 							$icinga_var_types = $v['custom_fields']->icinga_var_type;
 							if (is_string($icinga_var_types)) {
 								$icinga_var_types = explode(',', $icinga_var_types);
-							} elseif (!is_array($icinga_var_types)) {
-								die;
+							} elseif (is_array($icinga_var_types)) {
+								$var_types = $icinga_var_types;
 							} else {
-								$icinga_var_types = ['default'];	
+								die;
 							}
-						} else {
-							$icinga_var_types = ['default'];
 						}
 
-						foreach ($icinga_var_types as $icinga_var_type) {
-							$icinga_var_type_dict_name = 'service_dict_' . $icinga_var_type;
+						foreach ($var_types as $var_type) {
+							$icinga_var_type_dict_name = 'service_dict_' . $var_type;
 							// If the icinga_var_type holder hasn't been created before create it
 							if (!isset($device->{$icinga_var_type_dict_name})) {
 								$device->{$icinga_var_type_dict_name} = (object)[]; 
