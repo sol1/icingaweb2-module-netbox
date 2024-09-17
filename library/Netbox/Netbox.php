@@ -687,6 +687,11 @@ class Netbox
 		return $this->get_netbox("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
 	}
 
+	public function customfieldchoices($filter, int $limit = 0)
+	{
+		$this->object_type = 'custom_field_choices';
+		return $this->get_netbox("/extras/custom-field-choice-sets/?" . $this->default_filter($filter, ""), $limit);
+	}
 
 	// Circuits
 	public function circuits($filter, int $limit = 0)
