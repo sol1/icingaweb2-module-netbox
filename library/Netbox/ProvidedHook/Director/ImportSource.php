@@ -209,7 +209,6 @@ class ImportSource extends ImportSourceHook
 			$service_array = $this->servicearray($device, $services);
 			$device->services = (object) $service_array;
 			$device->service_names = array(); 
-			if ($linkservicesdicts) {
 			// setting empty values at the device level
 			foreach ($icinga_var_type_keys as $var_type) {
 				$icinga_var_type_dict_name = 'service_dict_' . $var_type;
