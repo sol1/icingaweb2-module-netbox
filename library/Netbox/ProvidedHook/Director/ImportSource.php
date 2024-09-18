@@ -180,24 +180,28 @@ class ImportSource extends ImportSourceHook
 	//
 	// The services are cast to objects from arrays because Director requires the
 	// data as a stdClass.
-	private function devices_with_services($services, $devices)
+	private function devices_with_services($services, $devices, $linkservicesdicts)
 	{
 		# first pass is for getting the list of columns for service dicts as these columns are dynamic
-		$icinga_var_type_keys = ['default'];
-		foreach ($devices as &$device) {
-			$service_array = $this->servicearray($device, $services);
-			foreach ($service_array as $k => $v) {
-				if (property_exists($v['custom_fields'], 'icinga_var_type') && isset($v['custom_fields']->icinga_var_type)) {
-					if (is_string($v['custom_fields']->icinga_var_type) && !$v['custom_fields']->icinga_var_type == '') {
-							$icinga_var_type_keys = array_unique(array_merge($icinga_var_type_keys, explode(',', $v['custom_fields']->icinga_var_type)));
-					} elseif (is_array($v['custom_fields']->icinga_var_type) && !empty($v['custom_fields']->icinga_var_type)) {
-							$icinga_var_type_keys = array_unique(array_merge($icinga_var_type_keys, $v['custom_fields']->icinga_var_type));
-					} else {
-						// TODO: this isn't right, it needs to throw a error to director
-						die;
+		if ($linkservicesdicts) {
+			$icinga_var_type_keys = ['default'];
+			foreach ($devices as &$device) {
+				$service_array = $this->servicearray($device, $services);
+				foreach ($service_array as $k => $v) {
+					if (property_exists($v['custom_fields'], 'icinga_var_type') && isset($v['custom_fields']->icinga_var_type)) {
+						if (is_string($v['custom_fields']->icinga_var_type) && !$v['custom_fields']->icinga_var_type == '') {
+								$icinga_var_type_keys = array_unique(array_merge($icinga_var_type_keys, explode(',', $v['custom_fields']->icinga_var_type)));
+						} elseif (is_array($v['custom_fields']->icinga_var_type) && !empty($v['custom_fields']->icinga_var_type)) {
+								$icinga_var_type_keys = array_unique(array_merge($icinga_var_type_keys, $v['custom_fields']->icinga_var_type));
+						} else {
+							// TODO: this isn't right, it needs to throw a error to director
+							die;
+						}
 					}
 				}
 			}
+		} else {
+			$icinga_var_type_keys = [];
 		}
 
 		# second pass is for the values for columns
@@ -205,6 +209,7 @@ class ImportSource extends ImportSourceHook
 			$service_array = $this->servicearray($device, $services);
 			$device->services = (object) $service_array;
 			$device->service_names = array(); 
+			if ($linkservicesdicts) {
 			// setting empty values at the device level
 			foreach ($icinga_var_type_keys as $var_type) {
 				$icinga_var_type_dict_name = 'service_dict_' . $var_type;
@@ -386,6 +391,12 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Checking this box will link Service objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of services.')
 		));
 
+		$form->addElement('checkbox', 'linked_services_dicts', array(
+			'label' => $form->translate('Link Services Dictionaries'),
+			'required' => false,
+			'description' => $form->translate('Checking this box will cause link Service objects for devices and virtual machines during their import to look for the `icinga_var_type` custom field to build service dictionaries. WARNING: This doubles API load to Netbox as we need to load and parse the data twice.')
+		));
+
 		$form->addElement('checkbox', 'linked_contacts', array(
 			'label' => $form->translate('Link Contacts'),
 			'required' => false,
@@ -411,7 +422,7 @@ class ImportSource extends ImportSourceHook
 
 	}
 
-	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
+	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkservicesdicts, $linkcontacts, $linkinterfaces, $content_type, $things)
 	{
 		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
 		$services = array();
@@ -448,7 +459,7 @@ class ImportSource extends ImportSourceHook
 			}
 		}
 		$ranges = $netboxLinked->ipRanges("", 0);
-		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $this->get_interfaces($interfaces ,$things, $content_type))));
+		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $this->get_interfaces($interfaces ,$things, $content_type))), $linkservicesdicts);
 
 	}
 
@@ -464,12 +475,18 @@ class ImportSource extends ImportSourceHook
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
 		$linkcontacts = $this->getSetting('linked_contacts');
 		$linkservices = $this->getSetting('linked_services');
+		$linkservicesdicts = $this->getSetting('linked_services_dicts');
 		$linkinterfaces = $this->getSetting('linked_interfaces');
 		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
+
+		if ($linkservicesdicts && $limit = 1) {
+			$limit = 0;
+		}
+
 		switch ($mode) {
 			// VM's
 			case self::VMMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkservicesdicts, $linkcontacts, $linkinterfaces, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
