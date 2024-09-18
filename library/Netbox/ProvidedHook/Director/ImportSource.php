@@ -182,11 +182,9 @@ class ImportSource extends ImportSourceHook
 	// data as a stdClass.
 	private function devices_with_services($services, $devices)
 	{
+		# first pass is for the list of columns for service dicts as these columns are dynamic
 		foreach ($devices as &$device) {
 			$service_array = $this->servicearray($device, $services);
-			$device->services = (object) $service_array;
-			$device->service_names = array(); 
-			# we need the list of columns for service dicts first
 			$service_dict_type_vars = ['default'];
 			foreach ($service_array as $k => $v) {
 				if (property_exists($v['custom_fields'], 'icinga_var_type') && isset($v['custom_fields']->icinga_var_type)) {
@@ -204,7 +202,13 @@ class ImportSource extends ImportSourceHook
 					}
 				}
 			}
+		}
 
+		# second pass is for the values for columns
+		foreach ($devices as &$device) {
+			$service_array = $this->servicearray($device, $services);
+			$device->services = (object) $service_array;
+			$device->service_names = array(); 
 			foreach ($service_array as $k => $v) {
 				array_push($device->service_names, $k);
 
