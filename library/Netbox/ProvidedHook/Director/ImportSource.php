@@ -235,9 +235,9 @@ class ImportSource extends ImportSourceHook
 				foreach ($v['custom_fields'] as $field_name => $field_value) {
 					if (strpos($field_name, 'icinga_list_') === 0) {
 						$key_name = str_replace('icinga_', 'service_' . $k . '_', $field_name);
-						if (is_string($v['custom_fields']->icinga_dict_type) && !$v['custom_fields']->icinga_dict_type == '') {
+						if (is_string($field_value) && !$field_value == '') {
 							$device->{$key_name} = explode(',', $field_value);
-						} elseif (is_array($v['custom_fields']->icinga_dict_type) && !empty($v['custom_fields']->icinga_dict_type)) {
+						} elseif (is_array($field_value) && !empty($field_value)) {
 							$device->{$key_name} = $field_value;
 						}
 					}
