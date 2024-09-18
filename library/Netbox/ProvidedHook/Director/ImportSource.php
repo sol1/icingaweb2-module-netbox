@@ -183,7 +183,7 @@ class ImportSource extends ImportSourceHook
 	private function devices_with_services($services, $devices)
 	{
 		# first pass is for the list of columns for service dicts as these columns are dynamic
-		$service_dict_type_vars = [];
+		$service_dict_type_vars = ['default'];
 		foreach ($devices as &$device) {
 			$service_array = $this->servicearray($device, $services);
 			foreach ($service_array as $k => $v) {
@@ -202,10 +202,6 @@ class ImportSource extends ImportSourceHook
 					}
 				}
 			}
-		}
-		// Add a default column if the vars exist at all
-		if (property_exists($v['custom_fields'], 'icinga_vars') || property_exists($v['custom_fields'], 'icinga_var_type')) {
-			$service_dict_type_vars = array_unique(array_merge($service_dict_type_vars, ['default']));
 		}
 
 		# second pass is for the values for columns
