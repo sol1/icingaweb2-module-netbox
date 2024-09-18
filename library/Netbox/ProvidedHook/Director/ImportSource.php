@@ -478,8 +478,13 @@ class ImportSource extends ImportSourceHook
 		$linkinterfaces = $this->getSetting('linked_interfaces');
 		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
 
-		if ($linkservicesdicts && $limit = 1) {
-			$limit = 0;
+		if ($linkservicesdicts) {
+			// Linked services dictionaries implies you want linked services
+			$linkservices = true;
+			// We need to set the limit to 0 to parse the data from Netbox and create column headings 
+			if ($limit = 1) {
+				$limit = 0;
+			}
 		}
 
 		switch ($mode) {
