@@ -186,39 +186,43 @@ class ImportSource extends ImportSourceHook
 			$service_array = $this->servicearray($device, $services);
 			$device->services = (object) $service_array;
 			$device->service_names = array(); 
+			# we need the list of columns for service dicts first
+			$service_dict_type_vars = ['default'];
+			foreach ($service_array as $k => $v) {
+				if (property_exists($v['custom_fields'], 'icinga_var_type') && isset($v['custom_fields']->icinga_var_type)) {
+					if (is_string($v['custom_fields']->icinga_var_type)) {
+						if (!$v['custom_fields']->icinga_var_type == '') {
+							$service_dict_type_vars = array_merge($service_dict_type_vars, explode(',', $v['custom_fields']->icinga_var_type));
+						}
+					} elseif (is_array($v['custom_fields']->icinga_var_type)) {
+						if (!empty($v['custom_fields']->icinga_var_type)) {
+							$service_dict_type_vars = array_merge($service_dict_type_vars, $v['custom_fields']->icinga_var_type);
+						}
+					} else {
+						// TODO: this isn't right, it needs to throw a error to director
+						die;
+					}
+				}
+			}
+
 			foreach ($service_array as $k => $v) {
 				array_push($device->service_names, $k);
 
+				// If the vars exist then we want to set coloumns
 				if (property_exists($v['custom_fields'], 'icinga_vars') || property_exists($v['custom_fields'], 'icinga_var_type')) {
-					// Add the service if icinga_monitored isn't false
-					if (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true) {
-						
-						// if we have a icinga_var_type then make a list of type to make
-						$var_types = ['default'];
-						if (isset($v['custom_fields']->icinga_var_type)) {
-							if (is_string($v['custom_fields']->icinga_var_type)) {
-								if (!$v['custom_fields']->icinga_var_type == '') {
-									$var_types = explode(',', $v['custom_fields']->icinga_var_type);
-								}
-							} elseif (is_array($v['custom_fields']->icinga_var_type)) {
-								if (!empty($v['custom_fields']->icinga_var_type)) {
-									$var_types = $v['custom_fields']->icinga_var_type;
-								}
-							} else {
-								// TODO: this isn't right, it needs to throw a error to director
-								die;
-							}
+					foreach ($service_dict_type_vars as $var_type) {
+						$icinga_var_type_dict_name = 'service_dict_' . $var_type;
+						// If the icinga_var_type holder hasn't been created before create the empty one
+						if (!isset($device->{$icinga_var_type_dict_name})) {
+							$device->{$icinga_var_type_dict_name} = (object)[]; 
 						}
 
-						foreach ($var_types as $var_type) {
-							$icinga_var_type_dict_name = 'service_dict_' . $var_type;
-							// If the icinga_var_type holder hasn't been created before create it
-							if (!isset($device->{$icinga_var_type_dict_name})) {
-								$device->{$icinga_var_type_dict_name} = (object)[]; 
-							}
+						// Add the service if icinga_monitored isn't false
+						if (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true) {
 							$icinga_var = isset($v['custom_fields']->icinga_var) ? $v['custom_fields']->icinga_var : (object)[];
 							$device->{$icinga_var_type_dict_name}->{$k} = $icinga_var;
 						}
+
 					}
 				}
 			}
