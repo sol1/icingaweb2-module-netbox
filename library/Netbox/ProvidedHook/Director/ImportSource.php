@@ -183,18 +183,18 @@ class ImportSource extends ImportSourceHook
 	private function devices_with_services($services, $devices)
 	{
 		# first pass is for the list of columns for service dicts as these columns are dynamic
+		$service_dict_type_vars = [];
 		foreach ($devices as &$device) {
 			$service_array = $this->servicearray($device, $services);
-			$service_dict_type_vars = ['default'];
 			foreach ($service_array as $k => $v) {
 				if (property_exists($v['custom_fields'], 'icinga_var_type') && isset($v['custom_fields']->icinga_var_type)) {
 					if (is_string($v['custom_fields']->icinga_var_type)) {
 						if (!$v['custom_fields']->icinga_var_type == '') {
-							$service_dict_type_vars = array_merge($service_dict_type_vars, explode(',', $v['custom_fields']->icinga_var_type));
+							$service_dict_type_vars = array_unique(array_merge($service_dict_type_vars, explode(',', $v['custom_fields']->icinga_var_type)));
 						}
 					} elseif (is_array($v['custom_fields']->icinga_var_type)) {
 						if (!empty($v['custom_fields']->icinga_var_type)) {
-							$service_dict_type_vars = array_merge($service_dict_type_vars, $v['custom_fields']->icinga_var_type);
+							$service_dict_type_vars = array_unique(array_merge($service_dict_type_vars, $v['custom_fields']->icinga_var_type));
 						}
 					} else {
 						// TODO: this isn't right, it needs to throw a error to director
@@ -202,6 +202,10 @@ class ImportSource extends ImportSourceHook
 					}
 				}
 			}
+		}
+		// Add a default column if the vars exist at all
+		if (property_exists($v['custom_fields'], 'icinga_vars') || property_exists($v['custom_fields'], 'icinga_var_type')) {
+			$service_dict_type_vars = array_unique(array_merge($service_dict_type_vars, ['default']));
 		}
 
 		# second pass is for the values for columns
