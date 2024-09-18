@@ -111,7 +111,7 @@ Creates the vars `interfaces_down`, `interfaces_up`, `interfaces_down_dict` and 
 
 Interfaces monitoring management can be enhanced by the creation of 2 custom fields in Netbox on Interface objects.
 - If `icinga_monitored` is created as a boolean custom field and it set to `true` the import module will add the interface to the lists above, if the custom field doesn't exist or is set to `false` the interface will be excluded from the lists above.
-- If `icinga_var` is created as a json custom field it's values will be added to the dicts for each interface.
+- If `icinga_dict` is created as a json custom field it's values will be added to the dicts for each interface.
 
 eg: for a host with  
 - 8 interfaces

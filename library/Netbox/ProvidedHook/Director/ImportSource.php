@@ -138,7 +138,7 @@ class ImportSource extends ImportSourceHook
 
 	// Makes 4 lists of interfaces for use a host.vars
 	// 2 lists are lists of interface names as string
-	// 2 lists are lists of interface names and the value of the custom field `icinga_var` if it exists
+	// 2 lists are lists of interface names and the value of the custom field `icinga_dict` if it exists
 	private function get_interfaces($interfaces, $things, $content_type)
 	{
 		if (empty($interfaces)) {
@@ -154,13 +154,13 @@ class ImportSource extends ImportSourceHook
 			$thing->interfaces_up_dict = (object)[];
 			foreach ($interfaces as $interface) {
 				if ((isset($interface->{$content_name}->id) && $interface->{$content_name}->id == $thing->id) && (!isset($interface->custom_fields->icinga_monitored) || $interface->custom_fields->icinga_monitored === true)) {
-					$icinga_var = isset($interface->custom_fields->icinga_var) ? $interface->custom_fields->icinga_var : (object)[];
+					$icinga_dict = isset($interface->custom_fields->icinga_dict) ? $interface->custom_fields->icinga_dict : (object)[];
 					if ($interface->enabled) {
 						array_push($thing->interfaces_up, $interface->name);
-						$thing->interfaces_up_dict->{$interface->name} = $icinga_var;
+						$thing->interfaces_up_dict->{$interface->name} = $icinga_dict;
 					} else {
 						array_push($thing->interfaces_down, $interface->name);
-						$thing->interfaces_down_dict->{$interface->name} = $icinga_var;
+						$thing->interfaces_down_dict->{$interface->name} = $icinga_dict;
 					}
 				}
 			}
@@ -184,15 +184,15 @@ class ImportSource extends ImportSourceHook
 	{
 		# first pass is for getting the list of columns for service dicts as these columns are dynamic
 		if ($linkservicesdicts) {
-			$icinga_var_type_keys = ['default'];
+			$icinga_dict_type_keys = ['default'];
 			foreach ($devices as &$device) {
 				$service_array = $this->servicearray($device, $services);
 				foreach ($service_array as $k => $v) {
-					if (property_exists($v['custom_fields'], 'icinga_var_type') && isset($v['custom_fields']->icinga_var_type)) {
-						if (is_string($v['custom_fields']->icinga_var_type) && !$v['custom_fields']->icinga_var_type == '') {
-								$icinga_var_type_keys = array_unique(array_merge($icinga_var_type_keys, explode(',', $v['custom_fields']->icinga_var_type)));
-						} elseif (is_array($v['custom_fields']->icinga_var_type) && !empty($v['custom_fields']->icinga_var_type)) {
-								$icinga_var_type_keys = array_unique(array_merge($icinga_var_type_keys, $v['custom_fields']->icinga_var_type));
+					if (property_exists($v['custom_fields'], 'icinga_dict_type') && isset($v['custom_fields']->icinga_dict_type)) {
+						if (is_string($v['custom_fields']->icinga_dict_type) && !$v['custom_fields']->icinga_dict_type == '') {
+								$icinga_dict_type_keys = array_unique(array_merge($icinga_dict_type_keys, explode(',', $v['custom_fields']->icinga_dict_type)));
+						} elseif (is_array($v['custom_fields']->icinga_dict_type) && !empty($v['custom_fields']->icinga_dict_type)) {
+								$icinga_dict_type_keys = array_unique(array_merge($icinga_dict_type_keys, $v['custom_fields']->icinga_dict_type));
 						} else {
 							// TODO: this isn't right, it needs to throw a error to director
 							die;
@@ -201,7 +201,7 @@ class ImportSource extends ImportSourceHook
 				}
 			}
 		} else {
-			$icinga_var_type_keys = [];
+			$icinga_dict_type_keys = [];
 		}
 
 		# second pass is for the values for columns
@@ -210,25 +210,31 @@ class ImportSource extends ImportSourceHook
 			$device->services = (object) $service_array;
 			$device->service_names = array(); 
 			// setting empty values at the device level
-			foreach ($icinga_var_type_keys as $var_type) {
-				$icinga_var_type_dict_name = 'service_dict_' . $var_type;
-				// If the icinga_var_type holder hasn't been created before create the empty one
-				if (!isset($device->{$icinga_var_type_dict_name})) {
-					$device->{$icinga_var_type_dict_name} = (object)[]; 
+			foreach ($icinga_dict_type_keys as $var_type) {
+				$icinga_dict_type_dict_name = 'service_dict_' . $var_type;
+				// If the icinga_dict_type holder hasn't been created before create the empty one
+				if (!isset($device->{$icinga_dict_type_dict_name})) {
+					$device->{$icinga_dict_type_dict_name} = (object)[]; 
 				}
 			}
 
 			foreach ($service_array as $k => $v) {
 				array_push($device->service_names, $k);
 				// If the vars exist then we want to set coloumns
-				if (property_exists($v['custom_fields'], 'icinga_vars') || property_exists($v['custom_fields'], 'icinga_var_type')) {
-					foreach ($icinga_var_type_keys as $var_type) {
-						$icinga_var_type_dict_name = 'service_dict_' . $var_type;
+				if (property_exists($v['custom_fields'], 'icinga_dict') || property_exists($v['custom_fields'], 'icinga_dict_type')) {
+					foreach ($icinga_dict_type_keys as $var_type) {
+						$icinga_dict_type_dict_name = 'service_dict_' . $var_type;
 						// Add the service if icinga_monitored isn't false
 						if (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true) {
-							$icinga_var = isset($v['custom_fields']->icinga_var) ? $v['custom_fields']->icinga_var : (object)[];
-							$device->{$icinga_var_type_dict_name}->{$k} = $icinga_var;
+							$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
+							$device->{$icinga_dict_type_dict_name}->{$k} = $icinga_dict;
 						}
+					}
+				}
+
+				foreach ($v['custom_fields'] as $field_name => $field_value) {
+					if (strpos($field_name, 'icinga_list_') === 0) {
+						$device->{$field_name} = $field_value;
 					}
 				}
 			}
@@ -393,7 +399,7 @@ class ImportSource extends ImportSourceHook
 		$form->addElement('checkbox', 'linked_services_dicts', array(
 			'label' => $form->translate('Link Services Dictionaries'),
 			'required' => false,
-			'description' => $form->translate('Checking this box will cause link Service objects for devices and virtual machines during their import to look for the `icinga_var_type` custom field to build service dictionaries. WARNING: This doubles API load to Netbox as we need to load and parse the data twice.')
+			'description' => $form->translate('Checking this box will cause link Service objects for devices and virtual machines during their import to look for the `icinga_dict_type` custom field to build service dictionaries. WARNING: This doubles API load to Netbox as we need to load and parse the data twice.')
 		));
 
 		$form->addElement('checkbox', 'linked_contacts', array(
