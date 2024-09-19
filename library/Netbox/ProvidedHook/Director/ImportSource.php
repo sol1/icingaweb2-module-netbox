@@ -245,7 +245,7 @@ class ImportSource extends ImportSourceHook
 
 				// if icinga_dict_<name> exists then add to service_dict_<name>
 				foreach ($v['custom_fields'] as $field_name => $field_value) {
-					if (strpos($field_name, 'icinga_dict_') === 0) {
+					if (strpos($field_name, 'icinga_dict_') === 0 && $field_name != 'icinga_dict_type') {
 						$key_name = str_replace('icinga_dict_', 'service_dict_', $field_name);
 						if (!isset($device->{$key_name})) {
 							$device->{$key_name} = (object)[]; 
@@ -273,7 +273,7 @@ class ImportSource extends ImportSourceHook
 
 				// if icinga_list_<name> exists then add to service_list_<name>
 				foreach ($v['custom_fields'] as $field_name => $field_value) {
-					if (strpos($field_name, 'icinga_list_') === 0) {
+					if (strpos($field_name, 'icinga_list_') === 0 && $field_name != 'icinga_list_type') {
 						$key_name = str_replace('icinga_list_', 'service_list_', $field_name);
 						$device->{$key_name} = $this->valuetolist($field_value);
 					}
