@@ -235,9 +235,9 @@ class ImportSource extends ImportSourceHook
 				}
 
 				// if icinga_dict_type is set and icinga_dict exists then add to service_dict_<typename>
-				if (property_exists($v['custom_fields'], 'icinga_dict') || property_exists($v['custom_fields'], 'icinga_dict_type')) {
+				if (property_exists($v['custom_fields'], 'icinga_dict') && property_exists($v['custom_fields'], 'icinga_dict_type')) {
 					foreach ($icinga_dict_type_keys as $var_type) {
-						if (strpos($v['custom_fields']->icinga_dict_type, $var_type) !== false) {
+						if ($this->contains($v['custom_fields']->icinga_dict_type, $var_type)) {
 							$key_name = 'service_dict_' . $var_type;
 							$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
 							$device->{$key_name}->{$k} = $icinga_dict;
@@ -264,9 +264,9 @@ class ImportSource extends ImportSourceHook
 				}
 
 				// if icinga_list_type is set and icinga_list exists then add to service_list_<typename>
-				if (property_exists($v['custom_fields'], 'icinga_list') || property_exists($v['custom_fields'], 'icinga_list_type')) {
+				if (property_exists($v['custom_fields'], 'icinga_list') && property_exists($v['custom_fields'], 'icinga_list_type')) {
 					foreach ($icinga_list_type_keys as $var_type) {
-						if (strpos($v['custom_fields']->icinga_list_type, $var_type) !== false) {
+						if ($this->contains($v['custom_fields']->icinga_list_type, $var_type)) {
 							$key_name = 'service_list_' . $var_type;
 							// TODO: IS THIS PER DEVICE PER SERVICE PER TYPE or PER DEVICE PER TYPE
 							$device->{$key_name} = array_merge($device->{$key_name}, $this->valuetolist($v['custom_fields']->icinga_list));
@@ -286,6 +286,18 @@ class ImportSource extends ImportSourceHook
 		}
 		return $devices;
 	}
+
+	function contains($haystack, $needle) {
+		if (is_array($haystack)) {
+			return in_array($needle, $haystack); // Use in_array for arrays
+		}
+		if (is_string($haystack)) {
+			return strpos($haystack, $needle) !== false; // Use strpos for strings
+		}
+		// Return false if haystack is neither a string nor an array
+		return false;
+	}
+	
 
 	// Takes a comma seperated string or list and returns a list
 	private function valuetolist($value) {
