@@ -227,6 +227,9 @@ class ImportSource extends ImportSourceHook
 				// if icinga_dict exists and icinga_monitored is not false then add to default service_dict_default
 				if ((property_exists($v['custom_fields'], 'icinga_dict')) && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
 					$key_name = 'service_dict_default';
+					if (!isset($device->{$key_name})) {
+						$device->{$key_name} = (object)[]; 
+					}
 					$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
 					$device->{$key_name}->{$k} = $icinga_dict;
 				}
@@ -244,6 +247,9 @@ class ImportSource extends ImportSourceHook
 				foreach ($v['custom_fields'] as $field_name => $field_value) {
 					if (strpos($field_name, 'icinga_dict_') === 0) {
 						$key_name = str_replace('icinga_dict_', 'service_dict_', $field_name);
+						if (!isset($device->{$key_name})) {
+							$device->{$key_name} = (object)[]; 
+						}
 						$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
 						$device->{$key_name}->{$k} = $icinga_dict;
 					}
@@ -252,7 +258,7 @@ class ImportSource extends ImportSourceHook
 				// if icinga_list exists and icinga_monitored is not false then add to default service_dict_<service name>
 				if ((property_exists($v['custom_fields'], 'icinga_list')) && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
 					$key_name = 'service_list_' . $k;
-					$device->{$key_name}->{$k} = array_merge($device->{$key_name}->{$k}, $this->valuetolist($v['custom_fields']->icinga_list));
+					$device->{$key_name} = array_merge($device->{$key_name}, $this->valuetolist($v['custom_fields']->icinga_list));
 				}
 
 				// if icinga_list_type is set and icinga_list exists then add to service_list_<typename>
@@ -260,7 +266,7 @@ class ImportSource extends ImportSourceHook
 					foreach ($icinga_dict_type_keys as $var_type) {
 						$key_name = 'service_list_' . $var_type;
 						// TODO: IS THIS PER DEVICE PER SERVICE PER TYPE or PER DEVICE PER TYPE
-						$device->{$key_name}->{$k} = array_merge($device->{$key_name}->{$k}, $this->valuetolist($v['custom_fields']->icinga_list));
+						$device->{$key_name} = array_merge($device->{$key_name}, $this->valuetolist($v['custom_fields']->icinga_list));
 					}
 				}
 
