@@ -358,9 +358,21 @@ class Netbox
 					list($value, $label) = $choice;
 
 					$newRow = clone $row;
+					// Remove all choices, we have that on each row
 					unset($newRow->extra_choices);
+					
+					// Make the sets name parent name and remove the name
+					$newRow->parent = $row->name;
+					$newRow->parent_display = $row->name;
+					unset($newRow->name);
+
+					// Set the values and label for the extra choices
 					$newRow->extra_choice_value = $value;
 					$newRow->extra_choice_label = $label;
+
+					// Make keyid
+					$row->keyid = $this->keymaker($newRow->extra_choice_value);					
+
 					$output[] = $newRow;
 				}
 			} else {
