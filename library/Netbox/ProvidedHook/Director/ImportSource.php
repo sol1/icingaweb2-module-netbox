@@ -245,17 +245,17 @@ class ImportSource extends ImportSourceHook
 					}
 				}
 
-				// if icinga_dict_<name> exists then add to service_dict_<name>
-				foreach ($v['custom_fields'] as $field_name => $field_value) {
-					if (strpos($field_name, 'icinga_dict_') === 0 && $field_name != 'icinga_dict_type') {
-						$key_name = str_replace('icinga_dict_', 'service_dict_', $field_name);
-						if (!isset($device->{$key_name})) {
-							$device->{$key_name} = (object)[]; 
-						}
-						$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
-						$device->{$key_name}->{$k} = $icinga_dict;
-					}
-				}
+				// // if icinga_dict_<name> exists then add to service_dict_<name>
+				// foreach ($v['custom_fields'] as $field_name => $field_value) {
+				// 	if (strpos($field_name, 'icinga_dict_') === 0 && $field_name != 'icinga_dict_type') {
+				// 		$key_name = str_replace('icinga_dict_', 'service_dict_', $field_name);
+				// 		if (!isset($device->{$key_name})) {
+				// 			$device->{$key_name} = (object)[]; 
+				// 		}
+				// 		$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
+				// 		$device->{$key_name}->{$k} = $icinga_dict;
+				// 	}
+				// }
 
 				// if icinga_list exists and icinga_monitored is not false then add to default service_dict_<service name>
 				if ((property_exists($v['custom_fields'], 'icinga_list')) && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
@@ -275,13 +275,13 @@ class ImportSource extends ImportSourceHook
 				}
 
 
-				// if icinga_list_<name> exists then add to service_list_<name>
-				foreach ($v['custom_fields'] as $field_name => $field_value) {
-					if (strpos($field_name, 'icinga_list_') === 0 && $field_name != 'icinga_list_type') {
-						$key_name = str_replace('icinga_list_', 'service_list_', $field_name);
-						$device->{$key_name} = $this->valuetolist($field_value);
-					}
-				}
+				// // if icinga_list_<name> exists then add to service_list_<name>
+				// foreach ($v['custom_fields'] as $field_name => $field_value) {
+				// 	if (strpos($field_name, 'icinga_list_') === 0 && $field_name != 'icinga_list_type') {
+				// 		$key_name = str_replace('icinga_list_', 'service_list_', $field_name);
+				// 		$device->{$key_name} = $this->valuetolist($field_value);
+				// 	}
+				// }
 			}
 		}
 		return $devices;
