@@ -265,15 +265,8 @@ class ImportSource extends ImportSourceHook
 		return $devices;
 	}
 
-	function contains($haystack, $needle) {
-		if (is_array($haystack)) {
-			return in_array($needle, $haystack); // Use in_array for arrays
-		}
-		if (is_string($haystack)) {
-			return strpos($haystack, $needle) !== false; // Use strpos for strings
-		}
-		// Return false if haystack is neither a string nor an array
-		return false;
+	function contains($haystack, $needle) {	
+		return in_array($needle, $this->valuetolist($haystack)); // Use in_array for arrays
 	}
 	
 
