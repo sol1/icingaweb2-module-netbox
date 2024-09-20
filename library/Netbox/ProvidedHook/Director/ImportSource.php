@@ -185,14 +185,22 @@ class ImportSource extends ImportSourceHook
 		# first pass is for getting the list of columns for service dicts as these columns are dynamic
 		$icinga_list_type_keys = [];
 		$icinga_dict_type_keys = [];
+		$has_dict_type = false;
+		$has_list_type = false;
 		foreach ($devices as &$device) {
 			$service_array = $this->servicearray($device, $services);
 			foreach ($service_array as $k => $v) {
 				// dict
+				if (property_exists($v['custom_fields'], 'icinga_dict_type')) {
+					$has_dict_type = true;
+				}
 				if (property_exists($v['custom_fields'], 'icinga_dict_type') && isset($v['custom_fields']->icinga_dict_type)) {
 					$icinga_dict_type_keys = array_unique(array_merge($icinga_dict_type_keys, $this->valuetolist($v['custom_fields']->icinga_dict_type)));
 				}
 				// list
+				if (property_exists($v['custom_fields'], 'icinga_list_type')) {
+					$has_list_type = true;
+				}
 				if (property_exists($v['custom_fields'], 'icinga_list_type') && isset($v['custom_fields']->icinga_list_type)) {
 					$icinga_list_type_keys = array_unique(array_merge($icinga_list_type_keys, $this->valuetolist($v['custom_fields']->icinga_list_type)));
 				}
@@ -213,10 +221,6 @@ class ImportSource extends ImportSourceHook
 					$device->{$icinga_dict_type_name} = (object)[]; 
 				}
 			}
-			// we set the default every time in case the first item has no services
-			if (!isset($device->service_dict_default)) {
-				$device->service_dict_default = (object)[]; 
-			}			
 			// list
 			foreach ($icinga_list_type_keys as $var_type) {
 				$icinga_list_type_name = 'service_dict_' . $var_type;
@@ -228,9 +232,9 @@ class ImportSource extends ImportSourceHook
 
 			foreach ($service_array as $k => $v) {
 				array_push($device->service_names, $k);
-				// if icinga_dict exists and icinga_monitored is not false then add to default service_dict_default
-				if ((property_exists($v['custom_fields'], 'icinga_dict')) && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
-					$key_name = 'service_dict_default';
+				// if icinga_dict exists and icinga_monitored is not false and icinga_dict_type doesn't exist then make default service_dict_'s by service name
+				if (property_exists($v['custom_fields'], 'icinga_dict') && !property_exists($v['custom_fields'], 'icinga_dict_type') && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
+					$key_name = 'service_dict_' . $k;
 					$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
 					$device->{$key_name}->{$k} = $icinga_dict;
 				}
@@ -246,20 +250,8 @@ class ImportSource extends ImportSourceHook
 					}
 				}
 
-				// // if icinga_dict_<name> exists then add to service_dict_<name>
-				// foreach ($v['custom_fields'] as $field_name => $field_value) {
-				// 	if (strpos($field_name, 'icinga_dict_') === 0 && $field_name != 'icinga_dict_type') {
-				// 		$key_name = str_replace('icinga_dict_', 'service_dict_', $field_name);
-				// 		if (!isset($device->{$key_name})) {
-				// 			$device->{$key_name} = (object)[]; 
-				// 		}
-				// 		$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
-				// 		$device->{$key_name}->{$k} = $icinga_dict;
-				// 	}
-				// }
-
-				// if icinga_list exists and icinga_monitored is not false then add to default service_dict_<service name>
-				if ((property_exists($v['custom_fields'], 'icinga_list')) && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
+				// if icinga_list exists and icinga_monitored is not false and icinga_list_type doesn't exist then add to default service_dict_<service name>
+				if (property_exists($v['custom_fields'], 'icinga_list') && !property_exists($v['custom_fields'], 'icinga_list_type') && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
 					$key_name = 'service_list_' . $k;
 					if (!isset($device->{$key_name})) {
 						$device->{$key_name} = []; 
@@ -277,15 +269,6 @@ class ImportSource extends ImportSourceHook
 						}
 					}
 				}
-
-
-				// // if icinga_list_<name> exists then add to service_list_<name>
-				// foreach ($v['custom_fields'] as $field_name => $field_value) {
-				// 	if (strpos($field_name, 'icinga_list_') === 0 && $field_name != 'icinga_list_type') {
-				// 		$key_name = str_replace('icinga_list_', 'service_list_', $field_name);
-				// 		$device->{$key_name} = $this->valuetolist($field_value);
-				// 	}
-				// }
 			}
 		}
 		return $devices;
