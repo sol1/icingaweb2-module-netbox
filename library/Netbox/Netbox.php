@@ -349,8 +349,34 @@ class Netbox
 		return $output;
 	}
 
+	private function transform_customfieldchoiceextrachoices(array $in) 
+	{
+		$output = array();
+		foreach ($in as $row) {
+			if (property_exists($row, 'extra_choices')){
+				foreach ($row->extra_choices as $choice){
+					list($value, $label) = $choice;
+
+					$newRow = clone $row;
+					unset($newRow->extra_choices);
+					$newRow->extra_choice_value = $value;
+					$newRow->extra_choice_label = $label;
+					$output[] = $newRow;
+				}
+			} else {
+				$output[] = $row;
+			}
+		}
+		
+		return $output;
+	}
+
 	private function transform(array $in)
 	{
+
+		if ($this->object_type == 'custom_field_choice_choices')  {
+			$in = $this->transform_customfieldchoiceextrachoices($in);
+		}
 		// Makes Helper Keys then
 		// runs any custom zone helper with the result
 		// which is the default transform data
@@ -415,7 +441,6 @@ class Netbox
 
 		return $output;
 	}
-
 
 	private function get_netbox(string $api_path, int $limit = 0)
 	{
@@ -687,9 +712,9 @@ class Netbox
 		return $this->get_netbox("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	public function customfieldchoices($filter, int $limit = 0)
+	public function customfieldchoiceextrachoices($filter, int $limit = 0)
 	{
-		$this->object_type = 'custom_field_choices';
+		$this->object_type = 'custom_field_choice_choices';
 		return $this->get_netbox("/extras/custom-field-choice-sets/?" . $this->default_filter($filter, ""), $limit);
 	}
 
