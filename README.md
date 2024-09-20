@@ -58,7 +58,7 @@ Netbox api token
 #### Object type to import
 Netbox object set to be imported
 
-_Import types `Devices` and `Virtual Machines` also import linked Services, Linked Contacts and IP Ranges from Netbox_
+_Import types `Devices` and `Virtual Machines` also import linked Services, linked Contacts, linked interfaces  and IP Ranges from Netbox_
 _Import type `FHRP Groups Split (on IP)` also import linked IP Ranges from Netbox_
 
 #### Flatten seperator
@@ -82,8 +82,64 @@ Adds the filter string to the api call. The default filter is `status=active`, i
 #### Proxy
 Proxy server ip, hostname, port combo in the format `proxy.example.com:1234`
 
-#### Link Services/Contacts
-For Object that link to Services and Contacts toggle the linking.
+#### Link Services/Contacts/Interfaces
+For Objects that link to Services, Contacts or Interfaces toggle the creation of useful values from the linked objects on targeted objects.
+
+##### Services
+Creates the vars `service_names` and `services`.
+
+- `service_names` is a list of service names that are linked to the parent object
+- `services` is a list of netbox service objects that are linked to the parent object
+
+There are additional service vars that can be generated based on the existance of Netbox vars on services
+_IMPORTANT: These vars rely the option "Parse all data for list columns" to function correctly._
+- The Netbox vars `icinga_dict` and `icinga_dict_type` will generate a dict of dicts called `service_dict_<key>` that are linked to the parent object. The values in `icinga_dict_type` are used as the key in the name. 
+- The Netbox vars `icinga_list` will generate list of strings called `service_list_<service name>` that are linked to the parent object. _This isn't generated if `icinga_list_type` exists, it is either not both.
+- The Netbox vars `icinga_list` and `icinga_list_type` will generate list of strings called `service_list_<key>` that are linked to the parent object. The values in `icinga_dict_list` are used as the key in the name. 
+
+Services monitoring can be enhanced by the creation of 3 custom fields in Netbox on Service objects.
+- If `icinga_monitored` is created as a boolean custom field and it set to `false` the import module will exclude the service from all dicts
+
+##### Contacts
+Creates the vars `contact_keyids` and `contacts`.
+
+- `contact_keyids` is a list of contact names in keyid format that are linked to the parent object, this is useful in apply rules when keyid is used as the Icinga contact object name
+- `contacts` is a list of contact name that are linked to the parent object
+
+##### Interfaces
+Creates the vars `interfaces_down`, `interfaces_up`, `interfaces_down_dict` and `interfaces_up_dict`.
+
+- `interfaces_down` is a list of interface names that are disabled. Useful in Icinga Service `apply` rules.
+- `interfaces_up` is a list of interface names that are enabled. Useful in Icinga Service `apply` rules.
+- `interfaces_down_dict` is a dictionary of interface names that are disabled as keys and a dict var read from the custom field `icinga_var`. Useful in Icinga Service `apply for` rules.
+- `interfaces_up_dict` is a dictionary of interface names that are enabled as keys and a dict var read from the custom field `icinga_var`. Useful in Icinga Service `apply for` rules.
+
+Interfaces monitoring management can be enhanced by the creation of 2 custom fields in Netbox on Interface objects.
+- If `icinga_monitored` is created as a boolean custom field and it set to `true` the import module will add the interface to the lists above, if the custom field doesn't exist or is set to `false` the interface will be excluded from the lists above.
+- If `icinga_dict` is created as a json custom field it's values will be added to the dicts for each interface.
+
+eg: for a host with  
+- 8 interfaces
+- `GigabitEthernet1/4` being disabled
+- interfaces `GigabitEthernet1/[7-8]` with `icinga_monitored` set to `false`
+- interface `GigabitEthernet1/1` with a `icinga_var` json custom field containing `warning` and `critical` values 
+and added to a host as a var you'd end up with
+```
+    vars.interfaces_down = [ "GigabitEthernet1/4" ]
+    vars.interfaces_up = {
+        "GigabitEthernet1/1" = {
+          "warning" = 5,
+          "critical" = 10 
+        }
+        "GigabitEthernet1/2" = {}
+        "GigabitEthernet1/3" = {}
+        "GigabitEthernet1/5" = {}
+        "GigabitEthernet1/6" = {}
+    }
+
+```
+
+
 
 ### Example sync of devices to hosts
 
