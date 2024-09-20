@@ -226,7 +226,7 @@ class ImportSource extends ImportSourceHook
 				$icinga_list_type_name = 'service_list_' . $var_type;
 				// If the icinga_dict_type holder hasn't been created before create the empty one
 				if (!isset($device->{$icinga_list_type_name})) {
-					$device->{$icinga_list_type_name} = (object)[]; 
+					$device->{$icinga_list_type_name} = []; 
 				}
 			}
 
