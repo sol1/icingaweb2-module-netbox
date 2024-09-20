@@ -372,7 +372,7 @@ class Netbox
 					$newRow->extra_choice_label = $label;
 
 					// Make keyid
-					$row->keyid = $this->keymaker($newRow->extra_choice_value);					
+					$newRow->keyid = $this->keymaker($newRow->extra_choice_value);					
 
 					$output[] = $newRow;
 				}
