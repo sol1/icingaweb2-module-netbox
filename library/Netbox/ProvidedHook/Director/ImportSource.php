@@ -185,22 +185,14 @@ class ImportSource extends ImportSourceHook
 		# first pass is for getting the list of columns for service dicts as these columns are dynamic
 		$icinga_list_type_keys = [];
 		$icinga_dict_type_keys = [];
-		$has_dict_type = false;
-		$has_list_type = false;
 		foreach ($devices as &$device) {
 			$service_array = $this->servicearray($device, $services);
 			foreach ($service_array as $k => $v) {
 				// dict
-				if (property_exists($v['custom_fields'], 'icinga_dict_type')) {
-					$has_dict_type = true;
-				}
 				if (property_exists($v['custom_fields'], 'icinga_dict_type') && isset($v['custom_fields']->icinga_dict_type)) {
 					$icinga_dict_type_keys = array_unique(array_merge($icinga_dict_type_keys, $this->valuetolist($v['custom_fields']->icinga_dict_type)));
 				}
 				// list
-				if (property_exists($v['custom_fields'], 'icinga_list_type')) {
-					$has_list_type = true;
-				}
 				if (property_exists($v['custom_fields'], 'icinga_list_type') && isset($v['custom_fields']->icinga_list_type)) {
 					$icinga_list_type_keys = array_unique(array_merge($icinga_list_type_keys, $this->valuetolist($v['custom_fields']->icinga_list_type)));
 				}
@@ -264,7 +256,6 @@ class ImportSource extends ImportSourceHook
 					foreach ($icinga_list_type_keys as $var_type) {
 						if ($this->contains($v['custom_fields']->icinga_list_type, $var_type)) {
 							$key_name = 'service_list_' . $var_type;
-							// TODO: IS THIS PER DEVICE PER SERVICE PER TYPE or PER DEVICE PER TYPE
 							$device->{$key_name} = array_merge($device->{$key_name}, $this->valuetolist($v['custom_fields']->icinga_list));
 						}
 					}
