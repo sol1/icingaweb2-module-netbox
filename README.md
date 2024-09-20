@@ -90,7 +90,12 @@ Creates the vars `service_names` and `services`.
 
 - `service_names` is a list of service names that are linked to the parent object
 - `services` is a list of netbox service objects that are linked to the parent object
-- (optional) `service_dict` and `service_dict_<value>` is a dict of dicts that are linked to the parent object. 
+
+There are additional service vars that can be generated based on the existance of Netbox vars on services
+_IMPORTANT: These vars rely the option "Parse all data for list columns" to function correctly._
+- The Netbox vars `icinga_dict` and `icinga_dict_type` will generate a dict of dicts called `service_dict_<key>` that are linked to the parent object. The values in `icinga_dict_type` are used as the key in the name. 
+- The Netbox vars `icinga_list` will generate list of strings called `service_list_<service name>` that are linked to the parent object. _This isn't generated if `icinga_list_type` exists, it is either not both.
+- The Netbox vars `icinga_list` and `icinga_list_type` will generate list of strings called `service_list_<key>` that are linked to the parent object. The values in `icinga_dict_list` are used as the key in the name. 
 
 Services monitoring can be enhanced by the creation of 3 custom fields in Netbox on Service objects.
 - If `icinga_monitored` is created as a boolean custom field and it set to `false` the import module will exclude the service from all dicts

@@ -224,12 +224,6 @@ class ImportSource extends ImportSourceHook
 
 			foreach ($service_array as $k => $v) {
 				array_push($device->service_names, $k);
-				// if icinga_dict exists and icinga_monitored is not false and icinga_dict_type doesn't exist then make default service_dict_'s by service name
-				if (property_exists($v['custom_fields'], 'icinga_dict') && !property_exists($v['custom_fields'], 'icinga_dict_type') && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
-					$key_name = 'service_dict_' . $k;
-					$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
-					$device->{$key_name}->{$k} = $icinga_dict;
-				}
 
 				// if icinga_dict_type is set and icinga_dict exists then add to service_dict_<typename>
 				if (property_exists($v['custom_fields'], 'icinga_dict') && property_exists($v['custom_fields'], 'icinga_dict_type')) {
