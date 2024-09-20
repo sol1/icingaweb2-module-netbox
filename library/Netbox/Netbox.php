@@ -363,8 +363,9 @@ class Netbox
 					
 					// Make the sets name parent name and remove the name
 					$newRow->parent = $row->name;
-					$newRow->parent_display = $row->name;
+					$newRow->parent_display = $row->display;
 					unset($newRow->name);
+					unset($newRow->display);
 
 					// Set the values and label for the extra choices
 					$newRow->extra_choice_value = $value;
