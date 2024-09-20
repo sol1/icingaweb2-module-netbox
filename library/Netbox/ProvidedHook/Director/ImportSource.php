@@ -288,7 +288,7 @@ class ImportSource extends ImportSourceHook
 			// TODO: this isn't right, it needs to throw a error to director
 		}
 
-		return $list;
+		return array_map('trim', $list);
 	}
 
 	// servicearray returns an array of services belonging to $device from $services.
