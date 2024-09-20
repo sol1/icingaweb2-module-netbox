@@ -213,6 +213,10 @@ class ImportSource extends ImportSourceHook
 					$device->{$icinga_dict_type_name} = (object)[]; 
 				}
 			}
+			// we set the default every time in case the first item has no services
+			if (!isset($device->service_dict_default)) {
+				$device->service_dict_default = (object)[]; 
+			}			
 			// list
 			foreach ($icinga_list_type_keys as $var_type) {
 				$icinga_list_type_name = 'service_dict_' . $var_type;
@@ -227,9 +231,6 @@ class ImportSource extends ImportSourceHook
 				// if icinga_dict exists and icinga_monitored is not false then add to default service_dict_default
 				if ((property_exists($v['custom_fields'], 'icinga_dict')) && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
 					$key_name = 'service_dict_default';
-					if (!isset($device->{$key_name})) {
-						$device->{$key_name} = (object)[]; 
-					}
 					$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
 					$device->{$key_name}->{$k} = $icinga_dict;
 				}
