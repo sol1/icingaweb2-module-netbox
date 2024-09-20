@@ -261,6 +261,9 @@ class ImportSource extends ImportSourceHook
 				// if icinga_list exists and icinga_monitored is not false then add to default service_dict_<service name>
 				if ((property_exists($v['custom_fields'], 'icinga_list')) && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
 					$key_name = 'service_list_' . $k;
+					if (!isset($device->{$key_name})) {
+						$device->{$key_name} = []; 
+					}
 					$device->{$key_name} = array_merge($device->{$key_name}, $this->valuetolist($v['custom_fields']->icinga_list));
 				}
 
