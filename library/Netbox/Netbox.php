@@ -176,6 +176,13 @@ class Netbox
 				}
 			} 
 
+			$row->primary_oob_address = NULL;	// Make empty field for column headings if no values exist
+			if (property_exists($row,'oob_ip')) {
+				if (! is_null($row->oob_ip) and property_exists($row->oob_ip, 'address')) {
+					$row->primary_oob_address = explode('/', $row->oob_ip->address)[0];
+				}
+			} 
+
             # FHRP has an array of IP's
 			if (property_exists($row,'ip_addresses')) {
 				$row->ip_addresses_array =  array();
