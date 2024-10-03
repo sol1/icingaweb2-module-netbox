@@ -505,7 +505,7 @@ class Netbox
 	{
 		$this->object_type = 'device';
 		$this->type_map = array(
-			"device_role" => "device_role",
+			"role" => "device_role",
 			"parent_device" => "device",
 			"platform" => "platform",
 			"location" => "location",
