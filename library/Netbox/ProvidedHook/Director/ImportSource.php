@@ -38,7 +38,7 @@ class ImportSource extends ImportSourceHook
 	const RegionMode = 42;
 	const SiteGroupMode = 44;
 	const SiteMode = 46;
-    const RackMode = 48;
+	const RackMode = 48;
 
 	// Who
 	const TenantGroupMode = 50;
@@ -52,6 +52,7 @@ class ImportSource extends ImportSourceHook
 	const PlatformMode = 60;
 	const ServiceMode = 62;
 	const TagMode = 64;
+	const CustomFieldChoiceExtraChoices = 66;
 
 	// Circuits
 	const CircuitMode = 70;
@@ -386,6 +387,7 @@ class ImportSource extends ImportSourceHook
 				self::PlatformMode => $form->translate('Platforms'),
 				self::ServiceMode => $form->translate('Services'),
 				self::TagMode => $form->translate('Tags'),
+				self::CustomFieldChoiceExtraChoices => $form->translate('Custom Field Choice Choices'),
 
 				// Circuits
 				self::CircuitMode => $form->translate('Circuits'),
@@ -596,6 +598,8 @@ class ImportSource extends ImportSourceHook
 				return $netbox->allservices($filter, $limit);
 			case self::TagMode:
 				return $netbox->tags($filter, $limit);
+			case self::CustomFieldChoiceExtraChoices:
+				return $netbox->customfieldchoiceextrachoices($filter, $limit);
 
 			// Circuits
 			case self::CircuitMode:
