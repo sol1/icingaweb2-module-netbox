@@ -520,7 +520,8 @@ class Netbox
 	public function deviceRoles($filter, int $limit = 0)
 	{
 		$this->object_type = 'device_role';
-		// Device role is shard between vm and devices but use diffent names, this importer uses 'device_role' to unify them
+		// Device role in Netbox 4.0.8 now uses role in both vm and devices, this importer converts this to 'device_role' as this is where roles come from.
+		// This also means that no changes to existing config is required
 		return $this->get_netbox("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
