@@ -176,6 +176,13 @@ class Netbox
 				}
 			} 
 
+			$row->primary_oob_address = NULL;	// Make empty field for column headings if no values exist
+			if (property_exists($row,'oob_ip')) {
+				if (! is_null($row->oob_ip) and property_exists($row->oob_ip, 'address')) {
+					$row->primary_oob_address = explode('/', $row->oob_ip->address)[0];
+				}
+			} 
+
             # FHRP has an array of IP's
 			if (property_exists($row,'ip_addresses')) {
 				$row->ip_addresses_array =  array();
@@ -349,8 +356,47 @@ class Netbox
 		return $output;
 	}
 
+	private function transform_customfieldchoiceextrachoices(array $in) 
+	{
+		$output = array();
+		foreach ($in as $row) {
+			if (property_exists($row, 'extra_choices')){
+				foreach ($row->extra_choices as $choice){
+					list($value, $label) = $choice;
+
+					$newRow = clone $row;
+					// Remove all choices, we have that on each row
+					unset($newRow->extra_choices);
+					
+					// Make the sets name parent name and remove the name
+					$newRow->parent = $row->name;
+					$newRow->parent_display = $row->display;
+					unset($newRow->name);
+					unset($newRow->display);
+
+					// Set the values and label for the extra choices
+					$newRow->extra_choice_value = $value;
+					$newRow->extra_choice_label = $label;
+
+					// Make keyid
+					$newRow->keyid = $this->keymaker($newRow->extra_choice_value);					
+
+					$output[] = $newRow;
+				}
+			} else {
+				$output[] = $row;
+			}
+		}
+		
+		return $output;
+	}
+
 	private function transform(array $in)
 	{
+
+		if ($this->object_type == 'custom_field_choice_choices')  {
+			$in = $this->transform_customfieldchoiceextrachoices($in);
+		}
 		// Makes Helper Keys then
 		// runs any custom zone helper with the result
 		// which is the default transform data
@@ -415,7 +461,6 @@ class Netbox
 
 		return $output;
 	}
-
 
 	private function get_netbox(string $api_path, int $limit = 0)
 	{
@@ -498,7 +543,7 @@ class Netbox
 	{
 		$this->object_type = 'device';
 		$this->type_map = array(
-			"device_role" => "device_role",
+			"role" => "device_role",
 			"parent_device" => "device",
 			"platform" => "platform",
 			"location" => "location",
@@ -513,7 +558,8 @@ class Netbox
 	public function deviceRoles($filter, int $limit = 0)
 	{
 		$this->object_type = 'device_role';
-		// Device role is shard between vm and devices but use diffent names, this importer uses 'device_role' to unify them
+		// Device role in Netbox 4.0.8 now uses role in both vm and devices, this importer converts this to 'device_role' as this is where roles come from.
+		// This also means that no changes to existing config is required
 		return $this->get_netbox("/dcim/device-roles/?" . $this->default_filter($filter, ""), $limit);
 	}
 
@@ -687,6 +733,11 @@ class Netbox
 		return $this->get_netbox("/extras/tags/?" . $this->default_filter($filter, ""), $limit);
 	}
 
+	public function customfieldchoiceextrachoices($filter, int $limit = 0)
+	{
+		$this->object_type = 'custom_field_choice_choices';
+		return $this->get_netbox("/extras/custom-field-choice-sets/?" . $this->default_filter($filter, ""), $limit);
+	}
 
 	// Circuits
 	public function circuits($filter, int $limit = 0)
