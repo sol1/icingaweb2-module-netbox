@@ -1,0 +1,415 @@
+{
+    "HostTemplate": {
+        "HostAlive": {
+            "fields": [],
+            "object_name": "Object Type",
+            "object_type": "template"
+        },
+        "hstt_alive_hostalive": {
+            "check_command": "hostalive",
+            "fields": [],
+            "groups": [],
+            "imports": [
+                "HostAlive"
+            ],
+            "object_name": "hstt_alive_hostalive",
+            "object_type": "template"
+        },
+        "Object Type": {
+            "fields": [],
+            "object_name": "Object Type",
+            "object_type": "template"
+        },
+        "hstt type device": {
+            "fields": [],
+            "groups": [
+                "hstg_type_device"
+            ],
+            "imports": [
+                "Object Type"
+            ],
+            "object_name": "hstt type device",
+            "object_type": "template"
+        },
+        "hstt type virtual machine": {
+            "fields": [],
+            "groups": [
+                "hstg_type_virtual_machine"
+            ],
+            "imports": [
+                "Object Type"
+            ],
+            "object_name": "hstt type virtual machine",
+            "object_type": "template"
+        },
+        "Netbox Source": {
+            "fields": [],
+            "object_name": "Netbox Source",
+            "object_type": "template"
+
+        },
+        "hstt import source default": {
+            "fields": [],
+            "groups": [
+                "hstg_source_sol1_servers"
+            ],
+            "imports": [
+                "Netbox Source"
+            ],
+            "notes": "Imported from Netbox using filter icinga_import_source = default",
+            "object_name": "hstt import source default",
+            "object_type": "template"
+
+        }
+    },
+    "HostGroup": {
+        "hstg_type_device": {
+            "assign_filter": "\"Device\"=host.templates",
+            "display_name": "Type: Devices",
+            "object_name": "hstg_type_device",
+            "object_type": "object"
+        },
+        "hstg_type_virtual_machine": {
+            "assign_filter": "\"Virtual Machine\"=host.templates",
+            "display_name": "Type: Virtual Machine",
+            "object_name": "hstg_type_virtual_machine",
+            "object_type": "object"
+        },
+        "hstg_source_default": {
+            "assign_filter": "\"Import Source - Default\"=host.templates",
+            "display_name": "Source: Default",
+            "object_name": "hstg_source_default",
+            "object_type": "object"
+        }
+    },
+    "ImportSource": {
+        "Netbox Default Virtual Machines": {
+            "key_column": "keyid",
+            "modifiers": [],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "status=active&cf_icinga_import_source=default",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "1",
+                "linked_interfaces": "0",
+                "linked_services": "1",
+                "mode": "16",
+                "munge": "",
+                "parse_all_data_for_listcolumns": "1",
+                "proxy": ""
+            },
+            "source_name": "Netbox Default Virtual Machines"
+        },
+        "Netbox Default Devices": {
+            "key_column": "keyid",
+            "modifiers": [],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "status=active&cf_icinga_import_source=default",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "1",
+                "linked_services": "1",
+                "mode": "20",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Default Devices"
+        }
+    },
+    "SyncRule": {
+        "Netbox Default Virtual Machines -> Hosts": {
+            "object_type": "host",
+            "properties": [{
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "hostalive"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${tenant_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${site_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "5",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${cluster_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "6",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${platform_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "7",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${device_role_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "8",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "hstt import source default"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "9",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "hstt type virtual machine"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": "ip_range_zone!=&icinga_satellite_client_zone=&icinga_host_zone=",
+                    "merge_policy": "override",
+                    "priority": "10",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${ip_range_zone}"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": "icinga_satellite_client_zone=&icinga_host_zone!=",
+                    "merge_policy": "override",
+                    "priority": "11",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${icinga_host_zone}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": "icinga_satellite_client_zone!=",
+                    "merge_policy": "override",
+                    "priority": "12",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "13",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${name}"
+                },
+                {
+                    "destination_field": "address",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "14",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${name}"
+                },
+                {
+                    "destination_field": "address",
+                    "filter_expression": "primary_ip_address!=",
+                    "merge_policy": "override",
+                    "priority": "15",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${primary_ip_address}"
+                },
+                {
+                    "destination_field": "vars.tags",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "23",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${tag_slugs}"
+                },
+                {
+                    "destination_field": "vars.services",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "24",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${service_names}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Default Virtual Machines -> Hosts",
+            "update_policy": "override"
+        },
+        "Netbox Default Devices -> Hosts": {
+            "object_type": "host",
+            "properties": [{
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "hostalive"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${tenant_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${site_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "5",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${cluster_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "6",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${platform_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "7",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${device_role_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "8",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "hstt import source default"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "9",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "hstt type virtual machine"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": "ip_range_zone!=&icinga_satellite_client_zone=&icinga_host_zone=",
+                    "merge_policy": "override",
+                    "priority": "10",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${ip_range_zone}"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": "icinga_satellite_client_zone=&icinga_host_zone!=",
+                    "merge_policy": "override",
+                    "priority": "11",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${icinga_host_zone}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": "icinga_satellite_client_zone!=",
+                    "merge_policy": "override",
+                    "priority": "12",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "13",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${name}"
+                },
+                {
+                    "destination_field": "address",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "14",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${name}"
+                },
+                {
+                    "destination_field": "address",
+                    "filter_expression": "primary_ip_address!=",
+                    "merge_policy": "override",
+                    "priority": "15",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${primary_ip_address}"
+                },
+                {
+                    "destination_field": "vars.tags",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "23",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${tag_slugs}"
+                },
+                {
+                    "destination_field": "vars.services",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "24",
+                    "source": "Netbox Default Devices",
+                    "source_expression": "${service_names}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Default Devices -> Hosts",
+            "update_policy": "override"
+        }
+    }
+}
