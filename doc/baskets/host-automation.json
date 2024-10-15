@@ -2,7 +2,7 @@
     "HostTemplate": {
         "HostAlive": {
             "fields": [],
-            "object_name": "Object Type",
+            "object_name": "HostAlive",
             "object_type": "template"
         },
         "hstt_alive_hostalive": {
@@ -15,9 +15,9 @@
             "object_name": "hstt_alive_hostalive",
             "object_type": "template"
         },
-        "Object Type": {
+        "Netbox Object Type": {
             "fields": [],
-            "object_name": "Object Type",
+            "object_name": "Netbox Object Type",
             "object_type": "template"
         },
         "hstt type device": {
@@ -26,7 +26,7 @@
                 "hstg_type_device"
             ],
             "imports": [
-                "Object Type"
+                "Netbox Object Type"
             ],
             "object_name": "hstt type device",
             "object_type": "template"
@@ -37,7 +37,7 @@
                 "hstg_type_virtual_machine"
             ],
             "imports": [
-                "Object Type"
+                "Netbox Object Type"
             ],
             "object_name": "hstt type virtual machine",
             "object_type": "template"
@@ -51,7 +51,7 @@
         "hstt import source default": {
             "fields": [],
             "groups": [
-                "hstg_source_sol1_servers"
+                "hstg_source_default"
             ],
             "imports": [
                 "Netbox Source"
@@ -139,7 +139,7 @@
                     "merge_policy": "override",
                     "priority": "2",
                     "source": "Netbox Default Virtual Machines",
-                    "source_expression": "hostalive"
+                    "source_expression": "hstt_alive_hostalive"
                 },
                 {
                     "destination_field": "import",
@@ -283,7 +283,7 @@
                     "merge_policy": "override",
                     "priority": "2",
                     "source": "Netbox Default Devices",
-                    "source_expression": "hostalive"
+                    "source_expression": "hstt_alive_hostalive"
                 },
                 {
                     "destination_field": "import",
