@@ -251,7 +251,7 @@
                     "destination_field": "vars.tags",
                     "filter_expression": null,
                     "merge_policy": "override",
-                    "priority": "23",
+                    "priority": "16",
                     "source": "Netbox Default Virtual Machines",
                     "source_expression": "${tag_slugs}"
                 },
@@ -259,9 +259,17 @@
                     "destination_field": "vars.services",
                     "filter_expression": null,
                     "merge_policy": "override",
-                    "priority": "24",
+                    "priority": "17",
                     "source": "Netbox Default Virtual Machines",
                     "source_expression": "${service_names}"
+                },
+                {
+                    "destination_field": "vars.contacts",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "18",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${contacts}"
                 }
             ],
             "purge_action": "delete",
@@ -395,7 +403,7 @@
                     "destination_field": "vars.tags",
                     "filter_expression": null,
                     "merge_policy": "override",
-                    "priority": "23",
+                    "priority": "16",
                     "source": "Netbox Default Devices",
                     "source_expression": "${tag_slugs}"
                 },
@@ -403,9 +411,17 @@
                     "destination_field": "vars.services",
                     "filter_expression": null,
                     "merge_policy": "override",
-                    "priority": "24",
+                    "priority": "17",
                     "source": "Netbox Default Devices",
                     "source_expression": "${service_names}"
+                },
+                {
+                    "destination_field": "vars.contacts",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "18",
+                    "source": "Netbox Default Virtual Machines",
+                    "source_expression": "${contacts}"
                 }
             ],
             "purge_action": "delete",
