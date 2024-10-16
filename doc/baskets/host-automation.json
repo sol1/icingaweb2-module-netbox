@@ -94,11 +94,11 @@
                 "flatten": "",
                 "flattenkeys": "",
                 "linked_contacts": "1",
-                "linked_interfaces": "0",
+                "linked_interfaces": "1",
                 "linked_services": "1",
                 "mode": "16",
                 "munge": "",
-                "parse_all_data_for_listcolumns": "1",
+                "parse_all_data_for_listcolumns": "0",
                 "proxy": ""
             },
             "source_name": "Netbox Default Virtual Machines"
@@ -114,9 +114,11 @@
                 "flatten": "",
                 "flattenkeys": "",
                 "linked_contacts": "1",
+                "linked_interfaces": "1",
                 "linked_services": "1",
                 "mode": "20",
                 "munge": "",
+                "parse_all_data_for_listcolumns": "0",
                 "proxy": ""
             },
             "source_name": "Netbox Default Devices"
