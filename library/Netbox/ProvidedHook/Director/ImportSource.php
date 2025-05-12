@@ -82,10 +82,20 @@ class ImportSource extends ImportSourceHook
 			// make an array here for a list of contacts
 			$thing->contacts = array();
 			$thing->contact_keyids = array();
+			$thing->contact_dicts = array();
 			foreach ($contact_assignments as $contact_assignment) {
 				if ($contact_assignment->object->id == $thing->id) {
-					array_push($thing->contacts, $contact_assignment->contact->name);
-					array_push($thing->contact_keyids, strtolower("nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $contact_assignment->contact->name))));
+					$name = $contact_assignment->contact->name;
+					$keyid = strtolower("nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $name)));
+					$role_name = isset($contact_assignment->role) ? $contact_assignment->role->name : null;
+
+					$thing->contacts[] = $name;
+					$thing->contact_keyids[] = $keyid;
+					$thing->contact_dicts[] = array(
+						"name" => $name,
+						"keyid" => $keyid,
+						"role" => $role_name
+					);
 				}
 			}
 			$output = array_merge($output, [(object)$thing]);
