@@ -111,8 +111,8 @@ Creates the vars `interfaces_down`, `interfaces_up`, `interfaces_down_dict` and 
 
 - `interfaces_down` is a list of interface names that are disabled. Useful in Icinga Service `apply` rules.
 - `interfaces_up` is a list of interface names that are enabled. Useful in Icinga Service `apply` rules.
-- `interfaces_down_dict` is a dictionary of interface names that are disabled as keys and a dict var read from the custom field `icinga_var`. Useful in Icinga Service `apply for` rules.
-- `interfaces_up_dict` is a dictionary of interface names that are enabled as keys and a dict var read from the custom field `icinga_var`. Useful in Icinga Service `apply for` rules.
+- `interfaces_down_dict` is a dictionary of interface names that are disabled as keys and a dict var read from the custom field `icinga_dict`. Useful in Icinga Service `apply for` rules.
+- `interfaces_up_dict` is a dictionary of interface names that are enabled as keys and a dict var read from the custom field `icinga_dict`. Useful in Icinga Service `apply for` rules.
 
 Interfaces monitoring management can be enhanced by the creation of 2 custom fields in Netbox on Interface objects.
 - If `icinga_monitored` is created as a boolean custom field and it set to `true` the import module will add the interface to the lists above, if the custom field doesn't exist or is set to `false` the interface will be excluded from the lists above.
@@ -122,7 +122,7 @@ eg: for a host with
 - 8 interfaces
 - `GigabitEthernet1/4` being disabled
 - interfaces `GigabitEthernet1/[7-8]` with `icinga_monitored` set to `false`
-- interface `GigabitEthernet1/1` with a `icinga_var` json custom field containing `warning` and `critical` values 
+- interface `GigabitEthernet1/1` with a `icinga_dict` json custom field containing `warning` and `critical` values 
 and added to a host as a var you'd end up with
 ```
     vars.interfaces_down = [ "GigabitEthernet1/4" ]
@@ -370,6 +370,8 @@ The baskets follow a series of patterns to make managing your infrastructure eas
 - Netbox objects with a count of 0 are removed to reduce, but not eliminate, unecessary Icinga groups and templates that won't be referenced by a host. 
 
 These imported director Import Sources and Sync Rules should be altered, or parts removed, to suit your needs. These baskets represent a good starting point based on our experience. 
+
+There is a more detailed [baskets README](doc/baskets/README.md) in the `doc/baskets` directory.
 
 ### Import Source Filtering
 While this automation doesn't include many filters it is likely that some filtering will be added specific to your setup. The typical filter sets we use are a *dedicated import source custom field in Netbox* as outlined in Best Practices above along with tags to identify Icinga cluster elements, eg: `icinga-headend`, `icinga-satellite` and `icinga-agent`.
