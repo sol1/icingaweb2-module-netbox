@@ -101,10 +101,11 @@ Services monitoring can be enhanced by the creation of 3 custom fields in Netbox
 - If `icinga_monitored` is created as a boolean custom field and it set to `false` the import module will exclude the service from all dicts
 
 ##### Contacts
-Creates the vars `contact_keyids` and `contacts`.
+Creates the vars `contact_keyids`, `contacts` and `contact_role_dicts`.
 
 - `contact_keyids` is a list of contact names in keyid format that are linked to the parent object, this is useful in apply rules when keyid is used as the Icinga contact object name
 - `contacts` is a list of contact name that are linked to the parent object
+- `contact_role_dicts` is a dict with role names as key and a list as value containing the role contacts assigned on the device
 
 ##### Interfaces
 Creates the vars `interfaces_down`, `interfaces_up`, `interfaces_down_dict` and `interfaces_up_dict`.
