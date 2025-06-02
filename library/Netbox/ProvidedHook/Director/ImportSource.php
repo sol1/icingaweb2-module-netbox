@@ -82,10 +82,26 @@ class ImportSource extends ImportSourceHook
 			// make an array here for a list of contacts
 			$thing->contacts = array();
 			$thing->contact_keyids = array();
+			$thing->contact_dicts = array();
+			$thing->contact_role_dicts = array();
 			foreach ($contact_assignments as $contact_assignment) {
 				if ($contact_assignment->object->id == $thing->id) {
-					array_push($thing->contacts, $contact_assignment->contact->name);
-					array_push($thing->contact_keyids, strtolower("nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $contact_assignment->contact->name))));
+					$name = $contact_assignment->contact->name;
+					$keyid = strtolower("nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $name)));
+					$role_name = isset($contact_assignment->role) ? $contact_assignment->role->name : null;
+
+					$thing->contacts[] = $name;
+					$thing->contact_keyids[] = $keyid;
+
+					if (!isset($thing->contact_role_dicts[$role_name])) {
+            $thing->contact_role_dicts[$role_name] = array();
+          }
+          array_push($thing->contact_role_dicts[$role_name], $name);
+
+					if (!isset($thing->contact_role_dicts[$role_name . "_keyids"])) {
+            $thing->contact_role_dicts[$role_name . "_keyids"] = array();
+          }
+					array_push($thing->contact_role_dicts[$role_name . "_keyids"], $keyid);
 				}
 			}
 			$output = array_merge($output, [(object)$thing]);
