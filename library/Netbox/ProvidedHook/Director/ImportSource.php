@@ -94,13 +94,13 @@ class ImportSource extends ImportSourceHook
 					$thing->contact_keyids[] = $keyid;
 
 					if (!isset($thing->contact_role_dicts[$role_name])) {
-            $thing->contact_role_dicts[$role_name] = array();
-          }
-          array_push($thing->contact_role_dicts[$role_name], $name);
+						$thing->contact_role_dicts[$role_name] = array();
+					}
+					array_push($thing->contact_role_dicts[$role_name], $name);
 
 					if (!isset($thing->contact_role_dicts[$role_name . "_keyids"])) {
-            $thing->contact_role_dicts[$role_name . "_keyids"] = array();
-          }
+						$thing->contact_role_dicts[$role_name . "_keyids"] = array();
+					}
 					array_push($thing->contact_role_dicts[$role_name . "_keyids"], $keyid);
 				}
 			}
