@@ -83,7 +83,7 @@ class ImportSource extends ImportSourceHook
 			$thing->contacts = array();
 			$thing->contact_keyids = array();
 			$thing->contact_dicts = array();
-			$thing->contact_role_dicts = array();
+			$thing->contact_roles_dict = array();
 			foreach ($contact_assignments as $contact_assignment) {
 				if ($contact_assignment->object->id == $thing->id) {
 					$name = $contact_assignment->contact->name;
@@ -93,15 +93,15 @@ class ImportSource extends ImportSourceHook
 					$thing->contacts[] = $name;
 					$thing->contact_keyids[] = $keyid;
 
-					if (!isset($thing->contact_role_dicts[$role_name])) {
-						$thing->contact_role_dicts[$role_name] = array();
+					if (!isset($thing->contact_roles_dict[$role_name])) {
+						$thing->contact_roles_dict[$role_name] = array();
 					}
-					array_push($thing->contact_role_dicts[$role_name], $name);
+					array_push($thing->contact_roles_dict[$role_name], $name);
 
-					if (!isset($thing->contact_role_dicts[$role_name . "_keyids"])) {
-						$thing->contact_role_dicts[$role_name . "_keyids"] = array();
+					if (!isset($thing->contact_roles_dict[$role_name . "_keyids"])) {
+						$thing->contact_roles_dict[$role_name . "_keyids"] = array();
 					}
-					array_push($thing->contact_role_dicts[$role_name . "_keyids"], $keyid);
+					array_push($thing->contact_roles_dict[$role_name . "_keyids"], $keyid);
 				}
 			}
 			$output = array_merge($output, [(object)$thing]);
