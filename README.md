@@ -359,8 +359,8 @@ This structure useful outside of the Netbox Import Module in automated satellite
 - Lists to groups can be done using a Sync Rule Property `assign_filter`'s. eg: To make Icinga Groups from Netbox tags create Icinga Host Group objects from a Netbox `tags` Import Source and set the `assign_filter` value to `%22${name}%22=host.vars.tags`, the `host.vars.tags` is the list set on host objects from the value `tag_slugs`, the Netbox Tag object `name` is the value in this list.
 - You can push large nested dicts in `icinga_service` or `icinga_var`, eg: `icinga_var = {"arrive": "hello", "leave": "goodbye"}` to `host.vars.arrive = "hello"` and `host.vars.leave = "goodbye"`using a single Sync Rule Property with All Custom Vars. When doing this All Custom Vars should be the first var based property and it should use a filter `icinga_var_type=object` so it is only added if Netbox config context has dict values for these vars. If All Custom Vars isn't first is can remove previously set vars, if All Custom Vars isn't filtered it can remove preveiously set vars regardless of order, both the filter and order are needed.
 
-## Baskets (experimental)
-This repository contains baskets in `docs/baskets` directory to help you configure your host automation, they have been broken up so you can import the bits you want. 
+## Baskets
+This repository contains baskets in [`doc/baskets`](doc/baskets) directory to help you configure your host automation, they have been broken up so you can import the bits you want. 
 It is recommeneded that after you import the baskets you require and modify them to suit your needs you then save them again. 
 
 The baskets follow a series of patterns to make managing your infrastructure easier. This includes 
@@ -372,7 +372,7 @@ The baskets follow a series of patterns to make managing your infrastructure eas
 
 These imported director Import Sources and Sync Rules should be altered, or parts removed, to suit your needs. These baskets represent a good starting point based on our experience. 
 
-There is a more detailed [baskets README](doc/baskets/README.md) in the `doc/baskets` directory.
+There is a more detailed [baskets README](doc/baskets/README.md) in the [`doc/baskets`](doc/baskets) directory.
 
 ### Import Source Filtering
 While this automation doesn't include many filters it is likely that some filtering will be added specific to your setup. The typical filter sets we use are a *dedicated import source custom field in Netbox* as outlined in Best Practices above along with tags to identify Icinga cluster elements, eg: `icinga-headend`, `icinga-satellite` and `icinga-agent`.
