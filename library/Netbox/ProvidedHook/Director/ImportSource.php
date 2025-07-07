@@ -302,7 +302,9 @@ class ImportSource extends ImportSourceHook
 		$m = array();
 		foreach ($services as $service) {
 			$servicename = "";
-			if (isset($service->device)) {
+			if (isset($service->parent)) {
+				$servicename = $service->parent->name;
+			} elseif (isset($service->device)) {
 				$servicename = $service->device->name;
 			} elseif (isset($service->virtual_machine)) {
 				$servicename = $service->virtual_machine->name;
