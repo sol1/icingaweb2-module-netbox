@@ -172,6 +172,14 @@ class ImportSource extends ImportSourceHook
 			foreach ($interfaces as $interface) {
 				if ((isset($interface->{$content_name}->id) && $interface->{$content_name}->id == $thing->id) && (!isset($interface->custom_fields->icinga_monitored) || $interface->custom_fields->icinga_monitored === true)) {
 					$icinga_dict = isset($interface->custom_fields->icinga_dict) ? $interface->custom_fields->icinga_dict : (object)[];
+					// {netbox_fields: {index_key:label, example_key:custom_fields.example}}
+					if (isset($icinga_dict->netbox_fields)){
+						foreach ($icinga_dict->netbox_fields as $key => $property_path) {
+							$icinga_dict->$key = $this->getValueByPath($interface, $property_path);
+						}
+						// Remove the mapping now that we've expanded it.
+						unset($icinga_dict->netbox_fields);
+					}
 					if ($interface->enabled) {
 						array_push($thing->interfaces_up, $interface->name);
 						$thing->interfaces_up_dict->{$interface->name} = $icinga_dict;
@@ -293,6 +301,20 @@ class ImportSource extends ImportSourceHook
 		}
 
 		return array_map('trim', $list);
+	}
+
+	// Takes the path and returns just the value at the end into the key
+	private function getValueByPath($object, $path) {
+		$segments = explode('.', $path);
+			$current = $object;
+			foreach ($segments as $segment) {
+				if (is_object($current) && isset($current->$segment)) {
+					$current = $current->$segment;
+				} else {
+					return null;
+				}
+			}
+		return $current;
 	}
 
 	// servicearray returns an array of services belonging to $device from $services.
