@@ -118,13 +118,14 @@ Creates the vars `interfaces_down`, `interfaces_up`, `interfaces_down_dict` and 
 Interfaces monitoring management can be enhanced by the creation of 2 custom fields in Netbox on Interface objects.
 - If `icinga_monitored` is created as a boolean custom field and it set to `true` the import module will add the interface to the lists above, if the custom field doesn't exist or is set to `false` the interface will be excluded from the lists above.
 - If `icinga_dict` is created as a json custom field it's values will be added to the dicts for each interface.
+  - Additional functionality: If key `netbox_fields` in icinga_dict, the key will be added to the dicts for each interface, the value should be the path to a netbox field. i.e label or within a nested dict, i.e type.value
 
 eg: for a host with  
 - 8 interfaces
 - `GigabitEthernet1/4` being disabled
 - interfaces `GigabitEthernet1/[7-8]` with `icinga_monitored` set to `false`
-- interface `GigabitEthernet1/1` with a `icinga_dict` json custom field containing `warning` and `critical` values 
-and added to a host as a var you'd end up with
+- interface `GigabitEthernet1/1` with an `icinga_dict` json custom field containing `warning` and `critical` values with values of `5` and `10` respectively
+- interface `GigabitEthernet1/6` with `label` set to `7001` and `type` set to `4G` with an `icinga_dict` with json containing `{netbox_fields: {"index_id": "label", "interface_type": "type.value"}}` you'd end up with
 ```
     vars.interfaces_down = [ "GigabitEthernet1/4" ]
     vars.interfaces_up = {
@@ -135,11 +136,13 @@ and added to a host as a var you'd end up with
         "GigabitEthernet1/2" = {}
         "GigabitEthernet1/3" = {}
         "GigabitEthernet1/5" = {}
-        "GigabitEthernet1/6" = {}
+        "GigabitEthernet1/6" = {
+          "interface_type": "4G",
+          "index_id": "7001"
+        }
     }
 
 ```
-
 
 
 ### Example sync of devices to hosts
