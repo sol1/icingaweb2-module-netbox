@@ -55,6 +55,12 @@ eg: `http://netbox.example.com/api`
 #### API Token
 Netbox api token
 
+#### Proxy
+Proxy server ip, hostname, port combo in the format `proxy.example.com:1234`
+
+#### Enable SSL checks
+Enables SSL certificate verification and SSL hostname check on the Base URL
+
 #### Object type to import
 Netbox object set to be imported
 
@@ -78,9 +84,6 @@ _Note `keyid` and `*_keyid` is a built in munge of the object type and Icinga sa
 
 #### Search filter
 Adds the filter string to the api call. The default filter is `status=active`, if you add your own filter it overwrites the default filter value.
-
-#### Proxy
-Proxy server ip, hostname, port combo in the format `proxy.example.com:1234`
 
 #### Link Services/Contacts/Interfaces
 For Objects that link to Services, Contacts or Interfaces toggle the creation of useful values from the linked objects on targeted objects.

@@ -383,6 +383,14 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Optional proxy server setting in the format <address>:<port>')
 		));
 
+		$form->addElement('checkbox', 'ssl_enable', array(
+			'label' => $form->translate('Enable SSL checks'),
+			'required' => false,
+			'description' => $form->translate('Checking this box will cause the Netbox import module enable SSL certificate verification and SSL hostname check.')
+			// 'value' => 1 // Checked by default 
+			//TODO: in future versions uncomment the value, inital releases not getting this so the current disabled behaviour is saved to the database
+		));
+
 		$form->addElement('select', 'mode', array(
 			'label' => $form->translate('Object type to import'),
 			'description' => $form->translate('Not all object types are supported'),
@@ -489,7 +497,7 @@ class ImportSource extends ImportSourceHook
 		$form->addElement('checkbox', 'parse_all_data_for_listcolumns', array(
 			'label' => $form->translate('Parse all data for list columns'),
 			'required' => false,
-			'description' => $form->translate('Checking this box will cause link the Netbox import module to parse the full data set when listing coloumns instead of a single row. WARNING: This increases API load to Netbox and slow parts of director config management down.')
+			'description' => $form->translate('Checking this box will cause the Netbox import module to parse the full data set when listing coloumns instead of a single row. WARNING: This increases API load to Netbox and slow parts of director config management down.')
 		));
 
 		// $form->addElement('multiCheckbox', 'associations', array(
@@ -505,9 +513,9 @@ class ImportSource extends ImportSourceHook
 
 	}
 
-	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
+	private function getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
 	{
-		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
+		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, $sslenable, "", "", "");
 		$services = array();
 		if ($linkservices) {
 			$services = $netboxLinked->allservices("", 0);
@@ -560,7 +568,8 @@ class ImportSource extends ImportSourceHook
 		$linkservices = $this->getSetting('linked_services');
 		$parsealldataforlistcolumns = $this->getSetting('parse_all_data_for_listcolumns');
 		$linkinterfaces = $this->getSetting('linked_interfaces');
-		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
+		$sslenable = $this->getSetting('ssl_enable');
+		$netbox = new Netbox($baseurl, $apitoken, $proxy, $sslenable, $flatten, $flattenkeys, $munge);
 
 		if ($parsealldataforlistcolumns) {
 			// We need to set the limit to 0 to parse the data from Netbox and create column headings 
@@ -572,7 +581,7 @@ class ImportSource extends ImportSourceHook
 		switch ($mode) {
 			// VM's
 			case self::VMMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -584,7 +593,7 @@ class ImportSource extends ImportSourceHook
 							
 			// Device
 			case self::DeviceMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, "dcim.device", $netbox->devices($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, "dcim.device", $netbox->devices($filter, $limit));
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:

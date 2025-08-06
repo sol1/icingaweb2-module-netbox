@@ -12,10 +12,10 @@ class Netbox
 	public $baseurl = '';
 	public $token = '';
 	public $proxy = '';
+	public $sslenable = '';
 	public $flattenseparator = '';
 	public $flattenkeys = '';
 	public $munge = '';
-
 
 	// Netbox now stores some linked object in a generic 'object' which then has a type to say 
 	// what kind of object it is, this maps those values to the $object types used in this module
@@ -25,11 +25,12 @@ class Netbox
 		"dcim.site" => "site"
 	);
 
-	function __construct($baseurl, $token, $proxy, $flattenseparator, $flattenkeys, $munge)
+	function __construct($baseurl, $token, $proxy, $sslenable, $flattenseparator, $flattenkeys, $munge)
 	{
 		$this->baseurl = $baseurl;
 		$this->token = $token;
 		$this->proxy = $proxy;
+		$this->sslenable = $sslenable;
 		$this->flattenseparator = $flattenseparator;
 		$this->flattenkeys = $flattenkeys;
 		$this->munge = $munge;
@@ -46,7 +47,13 @@ class Netbox
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			"Authorization: Token " . $this->token,
 		));
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		if ($this->sslenable) {
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		} else {
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		}
 		$body = curl_exec($ch);
 		$status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
 		$curlerror = curl_error($ch);
