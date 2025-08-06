@@ -1,0 +1,125 @@
+{
+    "ImportSource": {
+        "Netbox Device Roles": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${device_count}${virtualmachine_count}"
+                    },
+                    "target_property": "total_count"
+                },
+                {
+                    "priority": "3",
+                    "property_name": "total_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "22",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Device Roles"
+        }
+    },
+    "HostTemplate": {
+        "Netbox Device Roles": {
+            "fields": [],
+            "object_name": "Netbox Device Roles",
+            "object_type": "template"
+        }
+    },
+    "SyncRule": {
+        "Netbox Device Roles -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Device Roles",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Device Roles",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Device Roles",
+                    "source_expression": "Netbox Device Roles"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Device Roles -> Host Templates",
+            "description": "Netbox Device Role Icinga Host Templates inheriting a common Host Template.",
+            "update_policy": "override"
+        },
+        "Netbox Device Roles -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Device Roles",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Device Roles",
+                    "source_expression": "Role: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Device Roles",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Device Roles -> Host Groups",
+            "description": "Netbox Device Roles Icinga Host Groups populated using an assign_filter that matches the Device Roles Template.",
+            "update_policy": "override"
+        }
+    }
+}

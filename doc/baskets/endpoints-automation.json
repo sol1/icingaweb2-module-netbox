@@ -1,0 +1,374 @@
+{
+    "ImportSource": {
+        "Netbox Devices (Zones)": {
+            "key_column": "icinga_satellite_client_zone",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "icinga_satellite_client_zone",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "icinga_satellite_client_zone",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "is_null",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "3",
+                    "property_name": "icinga_satellite_parent_zone",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "is_null",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "status=active&tag=icinga-endpoint",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "20",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Devices (Zones)"
+        },
+        "Netbox Devices (Endpoints)": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "status=active&tag=icinga-endpoint",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "20",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Devices (Endpoints)"
+        },
+        "Netbox Virtual Machines (Zones)": {
+            "key_column": "icinga_satellite_client_zone",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "icinga_satellite_client_zone",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "icinga_satellite_client_zone",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "is_null",
+                        "policy": "reject"
+                    }
+                },
+                {
+                    "priority": "3",
+                    "property_name": "icinga_satellite_parent_zone",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "is_null",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "status=active&tag=icinga-endpoint",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "16",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Virtual Machines (Zones)"
+        },
+        "Netbox Virtual Machines (Endpoints)": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "status=active&tag=icinga-endpoint",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "16",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Virtual Machines (Endpoints)"
+        }
+    },
+    "HostTemplate": {
+        "Zones": {
+            "accept_config": true,
+            "fields": [],
+            "has_agent": true,
+            "master_should_connect": true,
+            "object_name": "Zones",
+            "object_type": "template"
+        },
+        "Netbox Zones": {
+            "fields": [],
+            "imports": [
+                "Zones"
+            ],
+            "object_name": "Netbox Zones",
+            "object_type": "template"
+        }
+    },
+    "SyncRule": {
+        "Netbox Devices (Endpoints) -> Endpoint": {
+            "object_type": "endpoint",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Devices (Endpoints)",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "host",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Devices (Endpoints)",
+                    "source_expression": "${address}"
+                },
+                {
+                    "destination_field": "port",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Devices (Endpoints)",
+                    "source_expression": "5665"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Devices (Endpoints)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Devices (Endpoints) -> Endpoint",
+            "update_policy": "override"
+        },
+        "Netbox Devices (Zones) -> Zone": {
+            "object_type": "zone",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Devices (Zones)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                },
+                {
+                    "destination_field": "parent",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Devices (Zones)",
+                    "source_expression": "${icinga_satellite_parent_zone}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Devices (Zones) -> Zone",
+            "update_policy": "override"
+        },
+        "Netbox Devices (Zones) -> Host Template": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Devices (Zones)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Devices (Zones)",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Devices (Zones)",
+                    "source_expression": "Netbox Zones"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Devices (Zones)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Devices (Zones) -> Host Template",
+            "update_policy": "merge"
+        },
+        "Netbox Virtual Machines (Endpoints) -> Endpoint": {
+            "object_type": "endpoint",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Virtual Machines (Endpoints)",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "host",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Virtual Machines (Endpoints)",
+                    "source_expression": "${address}"
+                },
+                {
+                    "destination_field": "port",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Virtual Machines (Endpoints)",
+                    "source_expression": "5665"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Virtual Machines (Endpoints)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Virtual Machines (Endpoints) -> Endpoint",
+            "update_policy": "override"
+        },
+        "Netbox Virtual Machines (Zones) -> Zone": {
+            "object_type": "zone",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Virtual Machines (Zones)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                },
+                {
+                    "destination_field": "parent",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Virtual Machines (Zones)",
+                    "source_expression": "${icinga_satellite_parent_zone}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Virtual Machines (Zones) -> Zone",
+            "update_policy": "override"
+        },
+        "Netbox Virtual Machines (Zones) -> Host Template": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Virtual Machines (Zones)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Virtual Machines (Zones)",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Virtual Machines (Zones)",
+                    "source_expression": "Netbox Zones"
+                },
+                {
+                    "destination_field": "zone",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "4",
+                    "source": "Netbox Virtual Machines (Zones)",
+                    "source_expression": "${icinga_satellite_client_zone}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Virtual Machines (Zones) -> Host Template",
+            "update_policy": "merge"
+        }
+    }   
+}

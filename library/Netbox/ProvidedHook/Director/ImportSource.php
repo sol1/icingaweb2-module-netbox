@@ -38,7 +38,7 @@ class ImportSource extends ImportSourceHook
 	const RegionMode = 42;
 	const SiteGroupMode = 44;
 	const SiteMode = 46;
-    const RackMode = 48;
+	const RackMode = 48;
 
 	// Who
 	const TenantGroupMode = 50;
@@ -52,6 +52,7 @@ class ImportSource extends ImportSourceHook
 	const PlatformMode = 60;
 	const ServiceMode = 62;
 	const TagMode = 64;
+	const CustomFieldChoiceExtraChoices = 66;
 
 	// Circuits
 	const CircuitMode = 70;
@@ -81,10 +82,26 @@ class ImportSource extends ImportSourceHook
 			// make an array here for a list of contacts
 			$thing->contacts = array();
 			$thing->contact_keyids = array();
+			$thing->contact_dicts = array();
+			$thing->contact_roles_dict = array();
 			foreach ($contact_assignments as $contact_assignment) {
 				if ($contact_assignment->object->id == $thing->id) {
-					array_push($thing->contacts, $contact_assignment->contact->name);
-					array_push($thing->contact_keyids, strtolower("nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $contact_assignment->contact->name))));
+					$name = $contact_assignment->contact->name;
+					$keyid = strtolower("nbcontact " . preg_replace('/__+/i', '_', preg_replace('/[^0-9a-zA-Z_\-. ]+/i', '_', $name)));
+					$role_name = isset($contact_assignment->role) ? $contact_assignment->role->name : null;
+
+					$thing->contacts[] = $name;
+					$thing->contact_keyids[] = $keyid;
+
+					if (!isset($thing->contact_roles_dict[$role_name])) {
+						$thing->contact_roles_dict[$role_name] = array();
+					}
+					array_push($thing->contact_roles_dict[$role_name], $name);
+
+					if (!isset($thing->contact_roles_dict[$role_name . "_keyids"])) {
+						$thing->contact_roles_dict[$role_name . "_keyids"] = array();
+					}
+					array_push($thing->contact_roles_dict[$role_name . "_keyids"], $keyid);
 				}
 			}
 			$output = array_merge($output, [(object)$thing]);
@@ -128,14 +145,56 @@ class ImportSource extends ImportSourceHook
 	private function ip_in_range($lower_range_ip_address, $upper_range_ip_address, $needle_ip_address)
 	{
 		# Get the numeric reprisentation of the IP Address with IP2long
-		$min    = ip2long(explode('/', $lower_range_ip_address)[0]);
-		$max    = ip2long(explode('/', $upper_range_ip_address)[0]);
-		$needle = ip2long(explode('/', $needle_ip_address)[0]);
+                $min    = ip2long(explode('/', $lower_range_ip_address ?? '')[0]);
+                $max    = ip2long(explode('/', $upper_range_ip_address ?? '')[0]);
+                $needle = ip2long(explode('/', $needle_ip_address ?? '')[0]);
+
 
 		return (($needle >= $min) AND ($needle <= $max));
 	}   
 
-	// devices_with_services returns a copy of $devices with any services
+	// Makes 4 lists of interfaces for use a host.vars
+	// 2 lists are lists of interface names as string
+	// 2 lists are lists of interface names and the value of the custom field `icinga_dict` if it exists
+	private function get_interfaces($interfaces, $things, $content_type)
+	{
+		if (empty($interfaces)) {
+			return $things;
+		}
+		$output = array();
+		$content_name = (strpos($content_type, 'virtualmachine') !== false) ? 'virtual_machine' : 'device';
+		foreach ($things as $thing) {
+			// make an array here for a list of contacts
+			$thing->interfaces_down = array();
+			$thing->interfaces_up = array();
+			$thing->interfaces_down_dict = (object)[];
+			$thing->interfaces_up_dict = (object)[];
+			foreach ($interfaces as $interface) {
+				if ((isset($interface->{$content_name}->id) && $interface->{$content_name}->id == $thing->id) && (!isset($interface->custom_fields->icinga_monitored) || $interface->custom_fields->icinga_monitored === true)) {
+					$icinga_dict = isset($interface->custom_fields->icinga_dict) ? $interface->custom_fields->icinga_dict : (object)[];
+					// {netbox_fields: {index_key:label, example_key:custom_fields.example}}
+					if (isset($icinga_dict->netbox_fields)){
+						foreach ($icinga_dict->netbox_fields as $key => $property_path) {
+							$icinga_dict->$key = $this->getValueByPath($interface, $property_path);
+						}
+						// Remove the mapping now that we've expanded it.
+						unset($icinga_dict->netbox_fields);
+					}
+					if ($interface->enabled) {
+						array_push($thing->interfaces_up, $interface->name);
+						$thing->interfaces_up_dict->{$interface->name} = $icinga_dict;
+					} else {
+						array_push($thing->interfaces_down, $interface->name);
+						$thing->interfaces_down_dict->{$interface->name} = $icinga_dict;
+					}
+				}
+			}
+			$output = array_merge($output, [(object)$thing]);
+		}
+		return $output;
+	}
+
+		// devices_with_services returns a copy of $devices with any services
 	// from $services belonging to it merged in. Each device has a new field
 	// "services" which contains an array of service objects belonging to the
 	// device. For example:
@@ -148,15 +207,114 @@ class ImportSource extends ImportSourceHook
 	// data as a stdClass.
 	private function devices_with_services($services, $devices)
 	{
+		# first pass is for getting the list of columns for service dicts as these columns are dynamic
+		$icinga_list_type_keys = [];
+		$icinga_dict_type_keys = [];
 		foreach ($devices as &$device) {
-			$a = $this->servicearray($device, $services);
-			$device->services = (object) $a;
+			$service_array = $this->servicearray($device, $services);
+			foreach ($service_array as $k => $v) {
+				// dict
+				if (property_exists($v['custom_fields'], 'icinga_dict_type') && isset($v['custom_fields']->icinga_dict_type)) {
+					$icinga_dict_type_keys = array_unique(array_merge($icinga_dict_type_keys, $this->valuetolist($v['custom_fields']->icinga_dict_type)));
+				}
+				// list
+				if (property_exists($v['custom_fields'], 'icinga_list_type') && isset($v['custom_fields']->icinga_list_type)) {
+					$icinga_list_type_keys = array_unique(array_merge($icinga_list_type_keys, $this->valuetolist($v['custom_fields']->icinga_list_type)));
+				}
+			}
+		}
+
+		# second pass is for the values for columns
+		foreach ($devices as &$device) {
+			$service_array = $this->servicearray($device, $services);
+			$device->services = (object) $service_array;
 			$device->service_names = array(); 
-			foreach ($a as $k => $v) {
+			// setting empty values at the device level
+			// dict
+			foreach ($icinga_dict_type_keys as $var_type) {
+				$icinga_dict_type_name = 'service_dict_' . $var_type;
+				// If the icinga_dict_type holder hasn't been created before create the empty one
+				if (!isset($device->{$icinga_dict_type_name})) {
+					$device->{$icinga_dict_type_name} = (object)[]; 
+				}
+			}
+			// list
+			foreach ($icinga_list_type_keys as $var_type) {
+				$icinga_list_type_name = 'service_list_' . $var_type;
+				// If the icinga_dict_type holder hasn't been created before create the empty one
+				if (!isset($device->{$icinga_list_type_name})) {
+					$device->{$icinga_list_type_name} = []; 
+				}
+			}
+
+			foreach ($service_array as $k => $v) {
 				array_push($device->service_names, $k);
+
+				// if icinga_dict_type is set and icinga_dict exists then add to service_dict_<typename>
+				if (property_exists($v['custom_fields'], 'icinga_dict') && property_exists($v['custom_fields'], 'icinga_dict_type')) {
+					foreach ($icinga_dict_type_keys as $var_type) {
+						if ($this->contains($v['custom_fields']->icinga_dict_type, $var_type)) {
+							$key_name = 'service_dict_' . $var_type;
+							$icinga_dict = isset($v['custom_fields']->icinga_dict) ? $v['custom_fields']->icinga_dict : (object)[];
+							$device->{$key_name}->{$k} = $icinga_dict;
+						}
+					}
+				}
+
+				// if icinga_list exists and icinga_monitored is not false and icinga_list_type doesn't exist then add to default service_dict_<service name>
+				if (property_exists($v['custom_fields'], 'icinga_list') && !property_exists($v['custom_fields'], 'icinga_list_type') && (!isset($v['custom_fields']->icinga_monitored) || $v['custom_fields']->icinga_monitored === true)) {
+					$key_name = 'service_list_' . $k;
+					if (!isset($device->{$key_name})) {
+						$device->{$key_name} = []; 
+					}
+					$device->{$key_name} = array_merge($device->{$key_name}, $this->valuetolist($v['custom_fields']->icinga_list));
+				}
+
+				// if icinga_list_type is set and icinga_list exists then add to service_list_<typename>
+				if (property_exists($v['custom_fields'], 'icinga_list') && property_exists($v['custom_fields'], 'icinga_list_type')) {
+					foreach ($icinga_list_type_keys as $var_type) {
+						if ($this->contains($v['custom_fields']->icinga_list_type, $var_type)) {
+							$key_name = 'service_list_' . $var_type;
+							$device->{$key_name} = array_merge($device->{$key_name}, $this->valuetolist($v['custom_fields']->icinga_list));
+						}
+					}
+				}
 			}
 		}
 		return $devices;
+	}
+
+	function contains($haystack, $needle) {	
+		return in_array($needle, $this->valuetolist($haystack)); // Use in_array for arrays
+	}
+	
+
+	// Takes a comma seperated string or list and returns a list
+	private function valuetolist($value) {
+		$list = [];
+		if (is_string($value) && !$value == '') {
+			$list = explode(',', $value);
+		} elseif (is_array($value) && !empty($value)) {
+			$list = $value;
+		} else {
+			// TODO: this isn't right, it needs to throw a error to director
+		}
+
+		return array_map('trim', $list);
+	}
+
+	// Takes the path and returns just the value at the end into the key
+	private function getValueByPath($object, $path) {
+		$segments = explode('.', $path);
+			$current = $object;
+			foreach ($segments as $segment) {
+				if (is_object($current) && isset($current->$segment)) {
+					$current = $current->$segment;
+				} else {
+					return null;
+				}
+			}
+		return $current;
 	}
 
 	// servicearray returns an array of services belonging to $device from $services.
@@ -166,7 +324,9 @@ class ImportSource extends ImportSourceHook
 		$m = array();
 		foreach ($services as $service) {
 			$servicename = "";
-			if (isset($service->device)) {
+			if (isset($service->parent)) {
+				$servicename = $service->parent->name;
+			} elseif (isset($service->device)) {
 				$servicename = $service->device->name;
 			} elseif (isset($service->virtual_machine)) {
 				$servicename = $service->virtual_machine->name;
@@ -267,6 +427,7 @@ class ImportSource extends ImportSourceHook
 				self::PlatformMode => $form->translate('Platforms'),
 				self::ServiceMode => $form->translate('Services'),
 				self::TagMode => $form->translate('Tags'),
+				self::CustomFieldChoiceExtraChoices => $form->translate('Custom Field Choice Choices'),
 
 				// Circuits
 				self::CircuitMode => $form->translate('Circuits'),
@@ -319,6 +480,18 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Checking this box will link Contact objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of contact assignements.')
 		));
 
+		$form->addElement('checkbox', 'linked_interfaces', array(
+			'label' => $form->translate('Link Interfaces'),
+			'required' => false,
+			'description' => $form->translate('Checking this box will link Interface objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of interfaces.')
+		));
+
+		$form->addElement('checkbox', 'parse_all_data_for_listcolumns', array(
+			'label' => $form->translate('Parse all data for list columns'),
+			'required' => false,
+			'description' => $form->translate('Checking this box will cause link the Netbox import module to parse the full data set when listing coloumns instead of a single row. WARNING: This increases API load to Netbox and slow parts of director config management down.')
+		));
+
 		// $form->addElement('multiCheckbox', 'associations', array(
 		// 	'label' => $form->translate("Associate additional data"),
 		// 	'required' => false,
@@ -332,7 +505,7 @@ class ImportSource extends ImportSourceHook
 
 	}
 
-	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $content_type, $things)
+	private function getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
 	{
 		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, "", "", "");
 		$services = array();
@@ -343,8 +516,33 @@ class ImportSource extends ImportSourceHook
 		if ($linkcontacts) {
 			$contact_assignments = $netboxLinked->contactAssignments("content_type=" . $content_type, 0);
 		}
+		$interfaces = array();
+		if ($linkinterfaces) {
+			if ($content_type == "virtualization.virtualmachine") {
+				$vm_filter = "";
+				foreach ($things as $vm) {
+					$vm_filter .= "&virtual_machine_id=" . $vm->id;
+					if (strlen($vm_filter) > 1500) {
+						$interfaces = array_merge($interfaces, $netboxLinked->virtualMachineInterfaces($vm_filter, 0));
+						$vm_filter = "";
+					}
+				}
+				$interfaces = array_merge($interfaces, $netboxLinked->virtualMachineInterfaces($vm_filter, 0));
+			}
+			if ($content_type == "dcim.device") {
+				$device_filter = "";
+				foreach ($things as $device) {
+					$device_filter .= "&device_id=" . $device->id;
+					if (strlen($device_filter) > 1500) {
+						$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
+						$device_filter = "";
+					}
+				}
+				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
+			}
+		}
 		$ranges = $netboxLinked->ipRanges("", 0);
-		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $things)));
+		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $this->get_interfaces($interfaces ,$things, $content_type))));
 
 	}
 
@@ -360,11 +558,21 @@ class ImportSource extends ImportSourceHook
 		$munge = ((string)$this->getSetting('munge') == '') ? array() : explode(",", (string)$this->getSetting('munge'));
 		$linkcontacts = $this->getSetting('linked_contacts');
 		$linkservices = $this->getSetting('linked_services');
+		$parsealldataforlistcolumns = $this->getSetting('parse_all_data_for_listcolumns');
+		$linkinterfaces = $this->getSetting('linked_interfaces');
 		$netbox = new Netbox($baseurl, $apitoken, $proxy, $flatten, $flattenkeys, $munge);
+
+		if ($parsealldataforlistcolumns) {
+			// We need to set the limit to 0 to parse the data from Netbox and create column headings 
+			if ($limit = 1) {
+				$limit = 0;
+			}
+		}
+
 		switch ($mode) {
 			// VM's
 			case self::VMMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -376,7 +584,7 @@ class ImportSource extends ImportSourceHook
 							
 			// Device
 			case self::DeviceMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, "dcim.device", $netbox->devices($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $linkservices, $linkcontacts, $linkinterfaces, "dcim.device", $netbox->devices($filter, $limit));
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:
@@ -430,6 +638,8 @@ class ImportSource extends ImportSourceHook
 				return $netbox->allservices($filter, $limit);
 			case self::TagMode:
 				return $netbox->tags($filter, $limit);
+			case self::CustomFieldChoiceExtraChoices:
+				return $netbox->customfieldchoiceextrachoices($filter, $limit);
 
 			// Circuits
 			case self::CircuitMode:

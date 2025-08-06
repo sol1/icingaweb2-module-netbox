@@ -1,0 +1,357 @@
+{
+    "ImportSource": {
+        "Netbox Clusters": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${device_count}${virtualmachine_count}"
+                    },
+                    "target_property": "total_count"
+                },
+                {
+                    "priority": "3",
+                    "property_name": "total_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "12",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Clusters"
+        },
+        "Netbox Cluster Groups": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "cluster_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "0",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "10",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Cluster Groups"
+        },
+        "Netbox Cluster Types": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "keyid",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierSkipDuplicates",
+                    "settings": {}
+                },
+                {
+                    "priority": "2",
+                    "property_name": "cluster_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "0",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "14",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Cluster Types"
+        }
+    },
+    "HostTemplate": {
+        "Netbox Clusters": {
+            "fields": [],
+            "object_name": "Netbox Clusters",
+            "object_type": "template"
+        },
+        "Netbox Cluster Groups": {
+            "fields": [],
+            "object_name": "Netbox Cluster Groups",
+            "object_type": "template"
+        },
+        "Netbox Cluster Types": {
+            "fields": [],
+            "object_name": "Netbox Cluster Types",
+            "object_type": "template"
+        }
+    },
+    "SyncRule": {
+        "Netbox Clusters -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Clusters",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Clusters",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Clusters",
+                    "source_expression": "Netbox Clusters"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Clusters",
+                    "source_expression": "${cluster_group_keyid}"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Clusters",
+                    "source_expression": "${cluster_type_keyid}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Clusters -> Host Templates",
+            "description": "Netbox Cluster Icinga Host Templates inheriting a common Host Template.",
+            "update_policy": "override"
+        },
+        "Netbox Cluster Groups -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Cluster Groups",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Cluster Groups",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Cluster Groups",
+                    "source_expression": "Netbox Cluster Groups"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Cluster Groups -> Host Templates",
+            "description": "Netbox Cluster Group Icinga Host Templates inheriting a common Host Template.",
+            "update_policy": "override"
+        },
+        "Netbox Cluster Types -> Host Templates": {
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Cluster Types",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Cluster Types",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Cluster Types",
+                    "source_expression": "Netbox Cluster Types"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Cluster Types -> Host Templates",
+            "description": "Netbox Cluster Types Icinga Host Templates inheriting a common Host Template.",
+            "update_policy": "override"
+        },
+        "Netbox Clusters -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Clusters",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Clusters",
+                    "source_expression": "Cluster: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Clusters",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Clusters -> Host Groups",
+            "description": "Netbox Cluster Icinga Host Groups populated using an assign_filter that matches the Cluster Template.",
+            "update_policy": "override"
+        },
+        "Netbox Cluster Groups -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Cluster Groups",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Cluster Groups",
+                    "source_expression": "Cluster Group: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Cluster Groups",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Cluster Groups -> Host Groups",
+            "description": "Netbox Cluster Group Icinga Host Groups populated using an assign_filter that matches the Cluster Group Template.",
+            "update_policy": "override"
+        },
+        "Netbox Cluster Types -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Cluster Types",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Cluster Types",
+                    "source_expression": "Cluster Type: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Cluster Types",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Cluster Types -> Host Groups",
+            "description": "Netbox Cluster Types Icinga Host Groups populated using an assign_filter that matches the Cluster Types Template.",
+            "update_policy": "override"
+        }
+    }
+}
