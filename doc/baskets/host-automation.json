@@ -420,7 +420,7 @@
                     "filter_expression": null,
                     "merge_policy": "override",
                     "priority": "18",
-                    "source": "Netbox Default Virtual Machines",
+                    "source": "Netbox Default Devices",
                     "source_expression": "${contacts}"
                 }
             ],
