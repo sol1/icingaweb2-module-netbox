@@ -11,6 +11,7 @@ The baskets setup Icinga objects directly related to Netbox objects as well as o
 _Hosts generally have their own sets of unique requirements for configuration. A virtual machine, AWS RDS instance and device will all have different host config requirements. The configuration provided here is a starting point for host automation based on the other baskets._
 
 **Depends on in Netbox**
+
 A Netbox custom field `icinga_import_source` as described in the [Zone and Endpoint Creation section of the main README](../../README.md) applied to Netbox Devices (`dcim/devices`) and Virtual Machines (`virtualization/virtual-machines`)
 
 This custom field should have one selection option per import type such as `do_not_monitor`, `default`, `aws_rds` which will map to a source + object combination to create a unique Import Source data set.
@@ -52,6 +53,7 @@ The Netbox Cluster host templates created from this can be imported to your Icin
 Automation of endpoints from Netbox into Icinga has the advantage of allowing you to use Netbox as a way to automate the installation of endpoints using tools like Ansible, etc... because both Icinga and the installation automation tools are using the same source of truth.
 
 **Depends on in Netbox**
+
 A Netbox `tag` with the slug `icinga-endpoint` which would be applied to each device or virtual machine with Icinga to be installed on it. 
 
 An alternative way to impliment this would be to have seperate tags for `icinga-satellite` and `icinga-agent` and have seperate imports sources and sync rules for each of these tags. The reason you need seperate import sources and sync rules with different tags is Netbox filters for tags are `and` not `or`, so we need seperate import sources.
@@ -79,6 +81,7 @@ The Netbox Platform host templates created from this can be imported to your Ici
 - Platform Host Versions Group
 
 **Depends on in Netbox**
+
 The platform automation depends on 3 custom fields on Netbox Platforms
 - `platform_type` 
 - `platform_family`
