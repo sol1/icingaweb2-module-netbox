@@ -383,7 +383,13 @@ While this automation doesn't include many filters it is likely that some filter
 ### Zone and Endpoint Creation
 Zone and endpoint creation can be automated from Netbox, but the exact rules will depend on how you use Netbox to define the zones. As such the included Basket is a guide to how zones and endpoints can be automated. 
 
-In practice we've found a dedicated Netbox import source custom field that is `required` and has a negative value `do_not_monitor` allows us to import all zones and endpoints by using a filter `cf_icinga_import_source__n=do_not_monitor` as "breaking up" zone and endpoint creation doesn't have any value. Where as "breaking up" host creation Import Source and Sync Rules can have value. Doing this however this does seperates the creation of host object and zone and endpoint objects.
+In practice we've found a dedicated Netbox import source custom field that is 
+* `required` 
+* is a select
+* the select choice set contains a negative value `do_not_monitor:Do not montitor` 
+* the select choice set contains one or more positive values `default:Default` 
+
+This allows us to import all zones and endpoints by using the filter `cf_icinga_import_source__n=do_not_monitor` as "breaking up" zone and endpoint creation doesn't have any value. Where as "breaking up" host creation Import Source and Sync Rules can have value. Doing this however this does seperates the creation of host object and zone and endpoint objects.
 
 ## Acknowledgements
 
