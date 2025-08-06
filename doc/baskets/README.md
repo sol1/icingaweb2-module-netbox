@@ -89,7 +89,7 @@ The platform automation depends on 3 custom fields on Netbox Platforms
 
 These custom fields would contain platform information in a monitoring friendly format. 
 
-For example  
+_The table below shows how these custom fields can be used_  
 | Name              | Version  | Family  | Type  |
 |-------------------|----------|---------|-------|
 | Debian 12 (x64)                   | Debian 12             | Debian            | linux |
