@@ -728,6 +728,7 @@ class Netbox
 	{
 		$this->object_type = 'platform';
 		$this->type_map = array(
+			"parent" => "platform",
 			"manufacturer" => "manufacturer"
 		);
 		return $this->get_netbox("/dcim/platforms/?" . $this->default_filter($filter, "status=active"), $limit);
