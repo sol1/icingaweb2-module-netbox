@@ -16,6 +16,7 @@ class Netbox
 	public $flattenseparator = '';
 	public $flattenkeys = '';
 	public $munge = '';
+	public $slug = false;
 
 	// Netbox now stores some linked object in a generic 'object' which then has a type to say 
 	// what kind of object it is, this maps those values to the $object types used in this module
@@ -25,7 +26,7 @@ class Netbox
 		"dcim.site" => "site"
 	);
 
-	function __construct($baseurl, $token, $proxy, $sslenable, $flattenseparator, $flattenkeys, $munge)
+	function __construct($baseurl, $token, $proxy, $sslenable, $flattenseparator, $flattenkeys, $munge, $slug = false)
 	{
 		$this->baseurl = $baseurl;
 		$this->token = $token;
@@ -34,6 +35,7 @@ class Netbox
 		$this->flattenseparator = $flattenseparator;
 		$this->flattenkeys = $flattenkeys;
 		$this->munge = $munge;
+		$this->slug = $slug;
 	}
 
 	private function httpget(string $url)
@@ -152,6 +154,11 @@ class Netbox
 				$row->keyid = $this->keymaker($row->name);
 			}
 
+			// The slug of the current row
+			if ($this->slug and property_exists($row, 'slug')) {
+				$row->keyid = $this->keymaker($row->slug);
+			}
+
 			// Contact assignment uses linked object, build a key id from the contact and object names
 			if ($this->object_type == 'contact_assignment')  {
 				if (property_exists($row, 'object') and property_exists($row, 'contact')) {
@@ -225,16 +232,17 @@ class Netbox
 				if (is_object($v)) {
 					// Device type is a special snowflake, it doesn't use name and also has a manufacture (it is a nice setup, it just needs more config to get the settings in Icinga)
 					if ($k == 'device_type') {
-						$row->device_model_keyid = $this->keymaker($v->model, 'model');
+						$row->device_model_keyid = $this->keymaker(($this->slug ? $v->slug : $v->model), 'model');
 						$row->device_model = $v->model;
-						$row->device_manufacturer_keyid = $this->keymaker($v->manufacturer->name, 'manufacturer');
+						$row->device_manufacturer_keyid = $this->keymaker(($this->slug ? $v->manufacturer->slug : $v->manufacturer->name), 'manufacturer');
 						$row->device_manufacturer = $v->manufacturer->name;
 					} elseif (! is_null($v) and property_exists($v, 'name')) {
 						$key = $k;
 						if (array_key_exists($k, $this->type_map)) {
 							$key = $this->type_map[$k];
 						}
-						$row->{$key . '_keyid'} = $this->keymaker($v->name, $key);
+						$keyid = ($this->slug and property_exists($v, 'slug')) ? $v->slug : $v->name;
+						$row->{$key . '_keyid'} = $this->keymaker($keyid, $key);
 					}
 				} elseif (is_null($v) and array_key_exists($k, $this->type_map)) {
 					$key = $this->type_map[$k];
@@ -246,7 +254,8 @@ class Netbox
 			// This turns a linked object into it's proper key id if we know how to match that.
 			if (property_exists($row, 'object') and property_exists($row, 'content_type') and array_key_exists($row->content_type, $this->netbox_object_map)) {
 				if (property_exists($row->object, 'name')) {
-					$row->object_keyid = $this->keymaker($row->object->name, $this->netbox_object_map[$row->content_type]);
+					$keyid = ($this->slug and property_exists($row->object, 'slug')) ? $row->object->slug : $row->object->name;
+					$row->object_keyid = $this->keymaker($keyid, $this->netbox_object_map[$row->content_type]);
 				}
 			}
 
