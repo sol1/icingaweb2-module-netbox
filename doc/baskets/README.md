@@ -70,9 +70,22 @@ If you have a Netbox custom field `icinga_import_source` as described in the [Zo
 - Virtual Machine Zone
 
 ## Platform Automation
-[`platform-automation.json`](platform-automation.json) imports Netbox Platforms (`dcim/platforms`). 
 
 The Netbox Platform host templates created from this can be imported to your Icinga host objects created from virtual machines or devices, these host objects will then have all templates and groups associated.
+
+_As of Netbox 4.4.x there are 2 ways to automate platforms due to a change in the Netbox data structure_
+
+### via parent/child
+[`platform-parent-child-automation.json`](platform-parent-child-automation.json) imports Netbox Platforms (`dcim/platforms`). 
+**Objects Created**
+- Platform Host Template
+- Platform Host Group
+
+**Depends on in Netbox**
+Netbox 4.4+ and platforms arranged with a parent/child relationships, eg: Linux -> Debian -> Debian 12 -> Debian 12 (x64). 
+
+### via Custom Fields
+[`platform-custom-fields-automation.json`](platform-custom-fields-automation.json) imports Netbox Platforms (`dcim/platforms`). 
 
 **Objects Created**
 - Platform Host Template

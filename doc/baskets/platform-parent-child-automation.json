@@ -1,0 +1,191 @@
+{
+    "ImportSource": {
+        "Netbox Platforms": {
+            "key_column": "keyid",
+            "modifiers": [
+                {
+                    "priority": "1",
+                    "property_name": "virtualmachine_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierCombine",
+                    "settings": {
+                        "pattern": "${virtualmachine_count}${device_count}"
+                    },
+                    "target_property": "virtualmachine_count_device_count"
+                },
+                {
+                    "priority": "2",
+                    "property_name": "virtualmachine_count_device_count",
+                    "provider_class": "Icinga\\Module\\Director\\PropertyModifier\\PropertyModifierRejectOrSelect",
+                    "settings": {
+                        "filter_method": "wildcard",
+                        "filter_string": "00",
+                        "policy": "reject"
+                    }
+                }
+            ],
+            "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
+            "settings": {
+                "apitoken": "your_token_here",
+                "baseurl": "https://netbox.example.com/api",
+                "filter": "",
+                "flatten": "",
+                "flattenkeys": "",
+                "linked_contacts": "0",
+                "linked_services": "0",
+                "mode": "60",
+                "munge": "",
+                "proxy": ""
+            },
+            "source_name": "Netbox Platforms"
+        }
+    },
+    "HostTemplate": {
+        "Netbox Platforms": {
+            "fields": [],
+            "object_name": "Netbox Platforms",
+            "object_type": "template"
+        }
+    },
+    "SyncRule": {
+        "Netbox Platforms -> Host Templates (parent 0)": {
+            "filter_expression": "_depth=0",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platforms",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Platforms",
+                    "source_expression": "Netbox Platforms"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Platforms -> Host Templates (parent 0)",
+            "description": "Top level Netbox Platform Icinga Host Templates inheriting a common Host Template. Levels are used so regions are created in a top down order.",
+            "update_policy": "merge"
+        },
+        "Netbox Platforms -> Host Templates (parent 1)": {
+            "filter_expression": "_depth=1",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platforms",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${platform_keyid}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Platforms -> Host Templates (parent 1)",
+            "description": "Level 1 Netbox Platform Icinga Host Templates inheriting a level 0 parent Platforms. Levels are used so platforms are created in a top down order.",
+            "update_policy": "merge"
+        },
+        "Netbox Platforms -> Host Templates (parent 2)": {
+            "filter_expression": "_depth=2",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platforms",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${platform_keyid}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Platforms -> Host Templates (parent 2)",
+            "description": "Level 2 Netbox Platform Icinga Host Templates inheriting a level 1 parent Platforms. Levels are used so platforms are created in a top down order.",
+            "update_policy": "merge"
+        },
+        "Netbox Platforms -> Host Templates (parent not 0)": {
+            "filter_expression": "_depth!=0",
+            "object_type": "host",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "object_type",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platforms",
+                    "source_expression": "template"
+                },
+                {
+                    "destination_field": "import",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "3",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${platform_keyid}"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Platforms -> Host Templates (parent not 0)",
+            "description": "Catch all everything but top level Netbox Platform Icinga Host Templates inheriting parent Parents. Levels are used so regions are created in a top down order.",
+            "update_policy": "merge"
+        }
+    }
+}
