@@ -186,6 +186,40 @@
             "rule_name": "Netbox Platforms -> Host Templates (parent not 0)",
             "description": "Catch all everything but top level Netbox Platform Icinga Host Templates inheriting parent Parents. Levels are used so regions are created in a top down order.",
             "update_policy": "merge"
+        },
+        "Netbox Platforms -> Host Groups": {
+            "object_type": "hostgroup",
+            "properties": [
+                {
+                    "destination_field": "object_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "1",
+                    "source": "Netbox Platforms",
+                    "source_expression": "${keyid}"
+                },
+                {
+                    "destination_field": "display_name",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platforms",
+                    "source_expression": "Platform: ${display}"
+                },
+                {
+                    "destination_field": "assign_filter",
+                    "filter_expression": null,
+                    "merge_policy": "override",
+                    "priority": "2",
+                    "source": "Netbox Platforms",
+                    "source_expression": "%22${keyid}%22=host.templates"
+                }
+            ],
+            "purge_action": "delete",
+            "purge_existing": true,
+            "rule_name": "Netbox Platforms -> Host Groups",
+            "description": "Netbox Platforms Icinga Host Groups populated using an assign_filter that matches the Platforms Template.",
+            "update_policy": "override"
         }
     }
 }
