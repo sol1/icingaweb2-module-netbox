@@ -365,21 +365,26 @@ class ImportSource extends ImportSourceHook
 
 	public static function addSettingsFormFields(QuickForm $form)
 	{
+		$global_config = Config::module('netbox');
+
+		$global_baseurl = $global_config->get('netbox', 'baseurl');
 		$form->addElement('text', 'baseurl', array(
 			'label' => $form->translate('Base URL'),
-			'required' => true,
+			'required' => ($global_baseurl == ''),
+			'placeholder' => ($global_baseurl != '' ? $global_baseurl : 'https://netbox.example.com/api'),
 			'description' => $form->translate('Base URL to the Netbox API, e.g. https://netbox.example.com/api')
 		));
 
 		$form->addElement('text', 'apitoken', array(
 			'label' => $form->translate('API token'),
-			'required' => true,
+			'required' => ($global_config->get('netbox', 'apitoken') == ''),
 			'description' => $form->translate('See https://netbox.example.com/user/api-tokens')
 		));
 
 		$form->addElement('text', 'proxy', array(
 			'label' => $form->translate('Proxy'),
 			'required' => false,
+			'placeholder' => $global_config->get('netbox', 'proxy'),
 			'description' => $form->translate('Optional proxy server setting in the format <address>:<port>')
 		));
 
