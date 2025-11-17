@@ -1,13 +1,18 @@
 <?php
-namespace Icinga\Module\Clustergraph\Controllers;
+namespace Icinga\Module\Netbox\Controllers;
 
 use Icinga\Application\Config;
-use Icinga\Forms\ConfigForm;
 use Icinga\Web\Controller;
 use Icinga\Module\Netbox\Forms\Config\ConfigForm;
 
-class Netbox_ConfigController extends Controller
+class ConfigController extends Controller
 {
+    public function init(): void
+    {
+        $this->assertPermission('config/modules');
+        parent::init();
+    }
+
     public function indexAction()
     {
         // Load (or create) the module's config.ini
@@ -18,5 +23,6 @@ class Netbox_ConfigController extends Controller
         $form->handleRequest();
 
         $this->view->form = $form;
+        $this->view->tabs = $this->Module()->getConfigTabs()->activate('config');
     }
 }
