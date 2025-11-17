@@ -515,7 +515,7 @@ class ImportSource extends ImportSourceHook
 
 	private function getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
 	{
-		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, $sslenable, "", "", "");
+		$netboxLinked = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable);
 		$services = array();
 		if ($linkservices) {
 			$services = $netboxLinked->allservices("", 0);
@@ -569,7 +569,7 @@ class ImportSource extends ImportSourceHook
 		$parsealldataforlistcolumns = $this->getSetting('parse_all_data_for_listcolumns');
 		$linkinterfaces = $this->getSetting('linked_interfaces');
 		$sslenable = $this->getSetting('ssl_enable');
-		$netbox = new Netbox($baseurl, $apitoken, $proxy, $sslenable, $flatten, $flattenkeys, $munge);
+		$netbox = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable, $flatten, $flattenkeys, $munge);
 
 		if ($parsealldataforlistcolumns) {
 			// We need to set the limit to 0 to parse the data from Netbox and create column headings 

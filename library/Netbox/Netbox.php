@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Netbox;
 
+use Icinga\Application\Config;
 // use Icinga\Module\Director\Daemon\Logger;
 
 class Netbox
@@ -36,6 +37,22 @@ class Netbox
 		$this->flattenkeys = $flattenkeys;
 		$this->munge = $munge;
 		$this->slug = $slug;
+	}
+
+	public static function fromConfig($baseurl = '', $token = '', $proxy = '', $sslenable = '', $flattenseparator = '', $flattenkeys = '', $munge = '')
+	{
+		$config = Config::module('netbox');
+
+        return new Netbox(
+            (($baseurl != '') ? $baseurl : $config->get('netbox', 'baseurl')),
+            (($token != '') ? $token : $config->get('netbox', 'apitoken')),
+            (($proxy != '') ? $proxy : $config->get('netbox', 'proxy')),
+            (($sslenable != '') ? $sslenable : $config->get('netbox', 'ssl')),
+            $flattenseparator,
+            $flattenkeys,
+            $munge,
+            $config->get('netbox', 'slug')
+        );
 	}
 
 	private function httpget(string $url)
