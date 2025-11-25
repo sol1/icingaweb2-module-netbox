@@ -30,8 +30,8 @@
             ],
             "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
             "settings": {
-                "apitoken": "your_token_here",
-                "baseurl": "https://netbox.example.com/api",
+                "apitoken": "",
+                "baseurl": "",
                 "filter": "status=active&tag=icinga-endpoint",
                 "flatten": "",
                 "flattenkeys": "",
@@ -55,8 +55,8 @@
             ],
             "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
             "settings": {
-                "apitoken": "your_token_here",
-                "baseurl": "https://netbox.example.com/api",
+                "apitoken": "",
+                "baseurl": "",
                 "filter": "status=active&tag=icinga-endpoint",
                 "flatten": "",
                 "flattenkeys": "",
@@ -98,8 +98,8 @@
             ],
             "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
             "settings": {
-                "apitoken": "your_token_here",
-                "baseurl": "https://netbox.example.com/api",
+                "apitoken": "",
+                "baseurl": "",
                 "filter": "status=active&tag=icinga-endpoint",
                 "flatten": "",
                 "flattenkeys": "",
@@ -123,8 +123,8 @@
             ],
             "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
             "settings": {
-                "apitoken": "your_token_here",
-                "baseurl": "https://netbox.example.com/api",
+                "apitoken": "",
+                "baseurl": "",
                 "filter": "status=active&tag=icinga-endpoint",
                 "flatten": "",
                 "flattenkeys": "",

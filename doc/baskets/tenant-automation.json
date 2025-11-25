@@ -31,8 +31,8 @@
             ],
             "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
             "settings": {
-                "apitoken": "your_token_here",
-                "baseurl": "https://netbox.example.com/api",
+                "apitoken": "",
+                "baseurl": "",
                 "filter": "",
                 "flatten": "",
                 "flattenkeys": "",
@@ -66,8 +66,8 @@
             ],
             "provider_class": "Icinga\\Module\\Netbox\\ProvidedHook\\Director\\ImportSource",
             "settings": {
-                "apitoken": "your_token_here",
-                "baseurl": "https://netbox.example.com/api",
+                "apitoken": "",
+                "baseurl": "",
                 "filter": "",
                 "flatten": "",
                 "flattenkeys": "",
