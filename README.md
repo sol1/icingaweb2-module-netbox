@@ -39,10 +39,38 @@ icingacli module enable netbox
 
 ## Configuration
 
-Configuration is done in the web interface under the "Automation" tab
+Configuration can be set in both the module Global config and in each Import Source found in the web interface under the "Automation" tab
 of Icinga Director, [official documentation](https://www.icinga.com/docs/director/latest/doc/70-Import-and-Sync/).
 
-### Module specific options
+### Module Global Config options
+Module Global options are found in the Gear Icon (bottom left) -> Modules -> Netbox -> Config
+
+#### Base URL
+Url to netbox install api with no trailing slash (/).
+
+eg: `http://netbox.example.com/api`
+
+_This is a required field, it is the default value for all Import Sources_
+
+#### API Token
+Netbox api token
+
+_This is a required field, it is the default value for all Import Sources_
+
+#### Proxy
+Proxy server ip, hostname, port combo in the format `proxy.example.com:1234`
+
+#### Enable SSL checks
+Enables SSL certificate verification and SSL hostname check on the Base URL
+
+#### Slug keyid's
+Uses the `slug` field on any Netbox objects that contain `slugs` when building `keyid` instead of the default name fields.
+This is a global option only as all imports must use the same field key for keyid's to match between them.
+
+_Note: this option relys on Netbox's continued use of the slug in objects (eg: site) and linked objects (eg: device.site)_
+_Warning: toggling this option on setups with existing import and sync rules can result in many object keyid's changing_
+
+### Import Source specific options
 
 #### Key column name
 This is used by director and icingaweb2 to find objects before sync rules are parsed, your Icinga object names should use the key column name to avoid issues.
@@ -52,8 +80,12 @@ Url to netbox install api with no trailing slash (/).
 
 eg: `http://netbox.example.com/api`
 
+_This is not a required field on import source as the Module Global Config contains defaults for this value, this is only needed if you want to override the default Netbox url for this import source only_
+
 #### API Token
 Netbox api token
+
+_This is not a required field on import source as the Module Global Config contains defaults for this value, this is only needed if you want to override the default Netbox url for this import source only_
 
 #### Proxy
 Proxy server ip, hostname, port combo in the format `proxy.example.com:1234`
