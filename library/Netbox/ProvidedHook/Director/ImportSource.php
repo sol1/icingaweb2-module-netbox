@@ -365,21 +365,26 @@ class ImportSource extends ImportSourceHook
 
 	public static function addSettingsFormFields(QuickForm $form)
 	{
+		$global_config = Config::module('netbox');
+
+		$global_baseurl = $global_config->get('netbox', 'baseurl');
 		$form->addElement('text', 'baseurl', array(
 			'label' => $form->translate('Base URL'),
-			'required' => true,
+			'required' => ($global_baseurl == ''),
+			'placeholder' => ($global_baseurl != '' ? $global_baseurl : 'https://netbox.example.com/api'),
 			'description' => $form->translate('Base URL to the Netbox API, e.g. https://netbox.example.com/api')
 		));
 
 		$form->addElement('text', 'apitoken', array(
 			'label' => $form->translate('API token'),
-			'required' => true,
+			'required' => ($global_config->get('netbox', 'apitoken') == ''),
 			'description' => $form->translate('See https://netbox.example.com/user/api-tokens')
 		));
 
 		$form->addElement('text', 'proxy', array(
 			'label' => $form->translate('Proxy'),
 			'required' => false,
+			'placeholder' => $global_config->get('netbox', 'proxy'),
 			'description' => $form->translate('Optional proxy server setting in the format <address>:<port>')
 		));
 
@@ -515,7 +520,7 @@ class ImportSource extends ImportSourceHook
 
 	private function getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
 	{
-		$netboxLinked = new Netbox($baseurl, $apitoken, $proxy, $sslenable, "", "", "");
+		$netboxLinked = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable);
 		$services = array();
 		if ($linkservices) {
 			$services = $netboxLinked->allservices("", 0);
@@ -569,7 +574,7 @@ class ImportSource extends ImportSourceHook
 		$parsealldataforlistcolumns = $this->getSetting('parse_all_data_for_listcolumns');
 		$linkinterfaces = $this->getSetting('linked_interfaces');
 		$sslenable = $this->getSetting('ssl_enable');
-		$netbox = new Netbox($baseurl, $apitoken, $proxy, $sslenable, $flatten, $flattenkeys, $munge);
+		$netbox = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable, $flatten, $flattenkeys, $munge);
 
 		if ($parsealldataforlistcolumns) {
 			// We need to set the limit to 0 to parse the data from Netbox and create column headings 
