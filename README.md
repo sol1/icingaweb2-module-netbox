@@ -426,6 +426,13 @@ In practice we've found a dedicated Netbox import source custom field that is
 
 This allows us to import all zones and endpoints by using the filter `cf_icinga_import_source__n=do_not_monitor` as "breaking up" zone and endpoint creation doesn't have any value. Where as "breaking up" host creation Import Source and Sync Rules can have value. Doing this however this does seperates the creation of host object and zone and endpoint objects.
 
+## Contributing
+Pull requests are welcome. For all changes, please open an issue first to discuss what you'd like to change.
+
+Please start branch names with the issue id and test not only the code but also the resulting Icinga config is viable. 
+
+**All changes should be backwards compaible, any changes that could result production Icinga config being altered in a upgrade should be avoided.**
+
 ## Acknowledgements
 
 This module was initially based on a module by Uberspace:
