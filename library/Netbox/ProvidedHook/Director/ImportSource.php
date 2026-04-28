@@ -499,6 +499,12 @@ class ImportSource extends ImportSourceHook
 			'description' => $form->translate('Checking this box will link Interface objects for devices and virtual machines during their import. WARNING: This could increase API load to Netbox if you have a lot of interfaces.')
 		));
 
+		$form->addElement('checkbox', 'linked_module_bays', array(
+			'label' => $form->translate('Link Module Bays'),
+			'required' => false,
+			'description' => $form->translate('Checking this box will link Module Bay objects for devices during their import. Each device gets a host.vars.module_bays dictionary keyed by bay (bay1, bay2, controller, ...) with the installed module type as the value (or null for empty bays). Apply rules can dispatch directly, e.g. "assign where host.vars.module_bays.bay1 == \"*LINECARD*\"". WARNING: increases API load to Netbox.')
+		));
+
 		$form->addElement('checkbox', 'parse_all_data_for_listcolumns', array(
 			'label' => $form->translate('Parse all data for list columns'),
 			'required' => false,
@@ -518,7 +524,7 @@ class ImportSource extends ImportSourceHook
 
 	}
 
-	private function getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, $content_type, $things)
+	private function getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, $linkmodulebays, $content_type, $things)
 	{
 		$netboxLinked = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable);
 		$services = array();
@@ -554,8 +560,23 @@ class ImportSource extends ImportSourceHook
 				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
 			}
 		}
+		$module_bays = array();
+		$modules = array();
+		if ($linkmodulebays && $content_type == "dcim.device") {
+			$device_filter = "";
+			foreach ($things as $device) {
+				$device_filter .= "&device_id=" . $device->id;
+				if (strlen($device_filter) > 1500) {
+					$module_bays = array_merge($module_bays, $netboxLinked->deviceModuleBays($device_filter, 0));
+					$device_filter = "";
+				}
+			}
+			$module_bays = array_merge($module_bays, $netboxLinked->deviceModuleBays($device_filter, 0));
+			// One bulk fetch is cheaper than per-device once we already have the bay list
+			$modules = $netboxLinked->deviceModules("", 0);
+		}
 		$ranges = $netboxLinked->ipRanges("", 0);
-		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $this->get_interfaces($interfaces ,$things, $content_type))));
+		return $this->devices_with_services($services, $this->get_contact_assignments($contact_assignments, $this->get_ip_range($ranges, $this->get_interfaces($interfaces, $netboxLinked->get_module_bays($module_bays, $modules, $things), $content_type))));
 
 	}
 
@@ -573,6 +594,7 @@ class ImportSource extends ImportSourceHook
 		$linkservices = $this->getSetting('linked_services');
 		$parsealldataforlistcolumns = $this->getSetting('parse_all_data_for_listcolumns');
 		$linkinterfaces = $this->getSetting('linked_interfaces');
+		$linkmodulebays = $this->getSetting('linked_module_bays');
 		$sslenable = $this->getSetting('ssl_enable');
 		$netbox = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable, $flatten, $flattenkeys, $munge);
 
@@ -586,7 +608,7 @@ class ImportSource extends ImportSourceHook
 		switch ($mode) {
 			// VM's
 			case self::VMMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, $linkmodulebays, "virtualization.virtualmachine", $netbox->virtualMachines($filter, $limit));
 			case self::ClusterMode:
 				return $netbox->clusters($filter, $limit);
 			case self::ClusterGroupMode:
@@ -598,7 +620,7 @@ class ImportSource extends ImportSourceHook
 							
 			// Device
 			case self::DeviceMode:
-				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, "dcim.device", $netbox->devices($filter, $limit));
+				return $this->getLinkedObjects($baseurl, $apitoken, $proxy, $sslenable, $linkservices, $linkcontacts, $linkinterfaces, $linkmodulebays, "dcim.device", $netbox->devices($filter, $limit));
 			case self::DeviceRoleMode:
 				return $netbox->deviceRoles($filter, $limit);
 			case self::DeviceTypeMode:

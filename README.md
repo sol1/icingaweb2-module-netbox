@@ -117,8 +117,8 @@ _Note `keyid` and `*_keyid` is a built in munge of the object type and Icinga sa
 #### Search filter
 Adds the filter string to the api call. The default filter is `status=active`, if you add your own filter it overwrites the default filter value.
 
-#### Link Services/Contacts/Interfaces
-For Objects that link to Services, Contacts or Interfaces toggle the creation of useful values from the linked objects on targeted objects.
+#### Link Services/Contacts/Interfaces/Module Bays
+For Objects that link to Services, Contacts, Interfaces or Module Bays toggle the creation of useful values from the linked objects on targeted objects.
 
 ##### Services
 Creates the vars `service_names` and `services`.
@@ -177,6 +177,29 @@ eg: for a host with
         }
     }
 
+```
+
+##### Module Bays
+Creates a single dictionary `vars.module_bays` per device, keyed by bay identifier with the installed module's type as the value (or `null` for empty bays). Bay keys are derived from the bay's NetBox `position` (numeric positions become `bayN`) or its `name` (slugified for non-numeric bays).
+
+For example, a chassis-based device with four numeric module bays and one named "Controller" bay produces:
+```
+    vars.module_bays = {
+        "bay1"       = "10G-LINECARD"
+        "bay2"       = "10G-LINECARD"
+        "bay3"       = null
+        "bay4"       = "FAN-MODULE"
+        "controller" = "ROUTE-PROCESSOR"
+    }
+```
+
+Director apply rules can then dispatch directly on a bay's installed module type:
+```
+    apply Service "Linecard Bay1" {
+        import "generic-service"
+        check_command = "snmp-linecard-status"
+        assign where match("*LINECARD*", host.vars.module_bays.bay1)
+    }
 ```
 
 
