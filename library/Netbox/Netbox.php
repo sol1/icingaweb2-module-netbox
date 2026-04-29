@@ -822,7 +822,106 @@ class Netbox
 		$this->type_map = array(
 			"device" => "device",
 			"virtual_machine" => "vm"
-		);		
+		);
 		return $this->get_netbox("/ipam/services/?device=" . urlencode($device), $limit);
+	}
+
+	public function deviceModuleBays($filter, int $limit = 0)
+	{
+		$this->object_type = 'device_module_bay';
+		$this->type_map = array(
+			"device" => "device",
+			"module" => "device_module"
+		);
+		return $this->get_netbox("/dcim/module-bays/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function deviceModules($filter, int $limit = 0)
+	{
+		$this->object_type = 'device_module';
+		$this->type_map = array(
+			"module_type" => "device_module_type"
+		);
+		return $this->get_netbox("/dcim/modules/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function deviceModuleTypes($filter, int $limit = 0)
+	{
+		$this->object_type = 'device_module_type';
+		$this->type_map = array(
+			"manufacturer" => "manufacturer"
+		);
+		return $this->get_netbox("/dcim/module-types/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	// Attach a position-keyed module_bays dictionary to each device, mapping
+	// each bay's key to the installed module's type string (or null for
+	// empty bays). Bay keys are stable, Director-friendly identifiers:
+	//   - bay.position "1"                     -> "bay1"
+	//   - bay.position empty, name "Controller"-> "controller"
+	//   - bay.position empty, name "PSU A"     -> "psu_a"
+	//
+	// Director apply rules can then reference a bay directly, e.g.
+	//   assign where host.vars.module_bays.bay1 == "*LINECARD*"
+	public function get_module_bays($module_bays, $modules, $things)
+	{
+		if (empty($module_bays)) {
+			return $things;
+		}
+
+		// Index modules by their installed-bay id for O(1) lookup
+		$modules_by_bay_id = array();
+		foreach ($modules as $module) {
+			if (isset($module->module_bay->id)) {
+				$modules_by_bay_id[$module->module_bay->id] = $module;
+			}
+		}
+
+		// Group bays by device id so we don't rescan the full bay list per device
+		$bays_by_device_id = array();
+		foreach ($module_bays as $bay) {
+			if (!isset($bay->device->id)) {
+				continue;
+			}
+			$bays_by_device_id[$bay->device->id][] = $bay;
+		}
+
+		foreach ($things as $thing) {
+			$thing->module_bays = (object)[];
+
+			if (!isset($bays_by_device_id[$thing->id])) {
+				continue;
+			}
+
+			foreach ($bays_by_device_id[$thing->id] as $bay) {
+				$key = $this->module_bay_key($bay);
+				if ($key === null) {
+					continue;
+				}
+
+				$installed = isset($modules_by_bay_id[$bay->id]) ? $modules_by_bay_id[$bay->id] : null;
+				$thing->module_bays->{$key} = ($installed && isset($installed->module_type->model))
+					? $installed->module_type->model
+					: null;
+			}
+		}
+
+		return $things;
+	}
+
+	// Derive a stable Director-friendly key for a NetBox module bay.
+	// Numeric positions become bay1..bayN; named bays become slugified names
+	// (e.g. "Controller" -> "controller", "PSU A" -> "psu_a").
+	private function module_bay_key($bay)
+	{
+		if (isset($bay->position) && $bay->position !== '') {
+			return 'bay' . $bay->position;
+		}
+		if (isset($bay->name) && $bay->name !== '') {
+			$slug = preg_replace('/[^0-9a-zA-Z_]/', '_', strtolower($bay->name));
+			$slug = trim(preg_replace('/_+/', '_', $slug), '_');
+			return $slug !== '' ? $slug : null;
+		}
+		return null;
 	}
 }
