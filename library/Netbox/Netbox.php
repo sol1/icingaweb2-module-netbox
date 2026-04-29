@@ -357,6 +357,42 @@ class Netbox
 		return $output;
 	}
 
+
+	// Simple function to convert an IP address to a group number between 1 and $groups
+	// This is useful for splitting hosts into zones based on IP address in a static by random way as long as the ip doesn't change
+	function ip_to_group(string $ip, int $groups): ?int {
+		if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) || $groups <= 0) {
+			return null;
+		}
+
+		$sum = array_sum(explode('.', $ip));
+		return ($sum % $groups) + 1;
+	}
+
+	// allocates a group of hosts into a number of zones based on their primary ip address
+	private function zoneAllocator(array $in) 	{
+		$output = array();
+		// Implement your custom zone mapping logic here
+		$ZONE_PREFIX = 'prod'; // Change this to your desired zone prefix
+		$ZONE_COUNT = 2; // Change this to the number of zones you want to split into
+		foreach ($in as $row) {
+			$row->deterministic_zone = NULL;	// set the default zone, it gets overwritten if we can find a group from the primary ip info
+			// We only try if the there is a primary_ip
+			if (property_exists($row,'primary_ip')) {
+				if (! is_null($row->primary_ip) and property_exists($row->primary_ip, 'address')) {
+					// Extract the address for the primary ip and attempt to determine the zone group
+					$zone_group_number = $this->ip_to_group(explode('/', $row->primary_ip->address)[0], $ZONE_COUNT);
+					// Set the zone if we got a valid group number
+					if (! is_null($zone_group_number)) {
+						$row->deterministic_zone = $ZONE_PREFIX . $zone_group_number;
+					}
+				}
+			} 
+		$output = array_merge($output, [(object)$row]);
+		}
+		return $output;
+	}
+
 	// This is a function that you can use to add complex rules to define 
 	// host zones based on netbox data, eg: ip range mapping to zone.
 	// While possible using Import modifiers and Sync rule property filters 
