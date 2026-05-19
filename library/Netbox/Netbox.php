@@ -822,7 +822,35 @@ class Netbox
 		$this->type_map = array(
 			"device" => "device",
 			"virtual_machine" => "vm"
-		);		
+		);
 		return $this->get_netbox("/ipam/services/?device=" . urlencode($device), $limit);
+	}
+
+	public function deviceModuleBays($filter, int $limit = 0)
+	{
+		$this->object_type = 'device_module_bay';
+		$this->type_map = array(
+			"device" => "device",
+			"module" => "device_module"
+		);
+		return $this->get_netbox("/dcim/module-bays/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function deviceModules($filter, int $limit = 0)
+	{
+		$this->object_type = 'device_module';
+		$this->type_map = array(
+			"module_type" => "device_module_type"
+		);
+		return $this->get_netbox("/dcim/modules/?" . $this->default_filter($filter, ""), $limit);
+	}
+
+	public function deviceModuleTypes($filter, int $limit = 0)
+	{
+		$this->object_type = 'device_module_type';
+		$this->type_map = array(
+			"manufacturer" => "manufacturer"
+		);
+		return $this->get_netbox("/dcim/module-types/?" . $this->default_filter($filter, ""), $limit);
 	}
 }
