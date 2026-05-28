@@ -117,7 +117,7 @@ class Netbox
 			if (empty($response->results)) {
 				throw new \Exception("no results field in response");
 			}
-			$results = array_merge($results, $response->results);
+			array_push($results, ...$response->results);
 		}
 		return $results;
 	}
@@ -362,12 +362,12 @@ class Netbox
 				}
 			}
 
-			$output = array_merge($output, [(object)$row]);
+			$output[] = (object)$row;
 		}
 		return $output;
 	}
 
-	// This is a function that you can use to add complex rules to define 
+	// This is a function that you can use to add complex rules to define
 	// host zones based on netbox data, eg: ip range mapping to zone.
 	// While possible using Import modifiers and Sync rule property filters 
 	// forking this repo and writing your own function reduces the number require in complex setups.
@@ -390,10 +390,10 @@ class Netbox
 				foreach ($row->{$key} as $ip) {
 					$row->primary_ip_address = $ip;
 					$row->description = $description . " " . $ip;
-					$output = array_merge($output, [(object)clone($row)]);
+					$output[] = (object)clone($row);
 				}
 			} else {
-				$output = array_merge($output, [(object)$row]);
+				$output[] = (object)$row;
 			}
 		}
 		return $output;
@@ -465,7 +465,7 @@ class Netbox
 					}
 				}
 				$this->flattenRecursive($out, '', $in, $this->flattenseparator);
-				$fnew = array_merge($fnew, [(object)$out]);
+				$fnew[] = (object)$out;
 			}
 			$output = $fnew;
 		}
@@ -484,7 +484,7 @@ class Netbox
 					}
 				}
 				$row->{$mungeheading} = implode("_", $mungevalue);
-				$mnew = array_merge($mnew, [(object)$row]);
+				$mnew[] = (object)$row;
 			}
 			$output = $mnew;
 		}
