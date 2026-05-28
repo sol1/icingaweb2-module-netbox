@@ -632,12 +632,26 @@ class Netbox
 		return $this->get_netbox("/dcim/interfaces/?" . $this->default_filter($filter, ""), $limit);
 	}
 
-	public function virtualChassis($filter, int $limit = 0)
+	public function virtualChassisMaster($filter, int $limit = 0)
 	{
 		$this->object_type = 'virtual_chassis';
 		$this->type_map = array(
-			"master" => "device",
+			"role" => "device_role",
+			"platform" => "platform",
+			"location" => "location",
+			"rack" => "rack",
+			"cluster" => "cluster",
+			"site" => "site",
+			"tenant" => "tenant",
+			"members" => "members"
 		);
+		return $this->get_netbox("/dcim/devices/?virtual_chassis_member=True&vc_position=1&" . $this->default_filter($filter, "status=active"), $limit);
+	}
+
+	public function virtualChassis($filter, int $limit = 0)
+	{
+		$this->object_type = 'virtual_chassis';
+		$this->type_map = array();
 		return $this->get_netbox("/dcim/virtual-chassis/?" . $this->default_filter($filter, "status=active"), $limit);
 	}
 

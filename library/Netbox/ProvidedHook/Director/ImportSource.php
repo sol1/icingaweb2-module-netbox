@@ -290,7 +290,7 @@ class ImportSource extends ImportSourceHook
 				return $netbox->deviceInterfaces($filter, $limit);
 			case self::VirtualChassisMode:
 				$netboxLinked = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable);
-				return NetboxMerge::getLinkedObjects($netboxLinked, $linkservices, $linkcontacts, $linkinterfaces, $linkmodulebays, "dcim.virtual_chassis", $netbox->virtualChassis($filter, $limit));
+				return NetboxMerge::getLinkedObjects($netboxLinked, $linkservices, $linkcontacts, $linkinterfaces, $linkmodulebays, "dcim.virtual_chassis", $netbox->virtualChassisMaster($filter, $limit));
 
 			// IPAM
 			case self::IPAddressMode:

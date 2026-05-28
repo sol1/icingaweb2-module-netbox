@@ -42,11 +42,15 @@ class NetboxMerge
 			}
 			if ($content_type == "dcim.virtual_chassis"){
 				$virtual_chassis_filter = "";
-				foreach ($things as $virtual_chassis) {
-					$virtual_chassis_filter .= "&virtual_chassis_id=" . $virtual_chassis->id;
+				foreach ($things as $virtual_chassis_master) {
+					$virtual_chassis_filter .= "&virtual_chassis_id=" . $virtual_chassis_master->virtual_chassis->id;
 					if (strlen($virtual_chassis_filter) > 1500) {
 						$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
 						$virtual_chassis_filter = "";
+					}
+					$virtual_chassis = $netboxLinked->virtualChassis("id=" . $virtual_chassis_master->virtual_chassis->id);
+					if (count($virtual_chassis) === 1) {
+						$virtual_chassis_master->members = reset($virtual_chassis)->members;
 					}
 				}
 				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
