@@ -28,6 +28,9 @@ class ImportSource extends ImportSourceHook
 	const ManufacturerMode = 25;
 	const DeviceInterfaceMode = 26;
 
+// Virtual Chassis
+	const VirtualChassisMode = 28;
+
 	// IPAM
 	const IPAddressMode = 30;
 	const IPRangeMode = 32;
@@ -119,6 +122,9 @@ class ImportSource extends ImportSourceHook
 				self::DeviceTypeMode => $form->translate('Device Types'),
 				self::ManufacturerMode => $form->translate('Manufacturers'),
 				self::DeviceInterfaceMode => $form->translate('Device Interfaces'),
+
+				// Virtual Chassis
+				self::VirtualChassisMode => $form->translate('Virtual Chassis'),
 			
 				// IPAM
 				self::IPAddressMode => $form->translate('IP Addresses'),
@@ -282,6 +288,9 @@ class ImportSource extends ImportSourceHook
 				return $netbox->manufacturers($filter, $limit);
 			case self::DeviceInterfaceMode:
 				return $netbox->deviceInterfaces($filter, $limit);
+			case self::VirtualChassisMode:
+				$netboxLinked = Netbox::fromConfig($baseurl, $apitoken, $proxy, $sslenable);
+				return NetboxMerge::getLinkedObjects($netboxLinked, $linkservices, $linkcontacts, $linkinterfaces, $linkmodulebays, "dcim.virtual_chassis", $netbox->virtualChassisMaster($filter, $limit));
 
 			// IPAM
 			case self::IPAddressMode:
