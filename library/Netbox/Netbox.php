@@ -117,7 +117,7 @@ class Netbox
 			if (empty($response->results)) {
 				throw new \Exception("no results field in response");
 			}
-			$results = array_merge($results, $response->results);
+			array_push($results, ...$response->results);
 		}
 		return $results;
 	}
@@ -244,7 +244,7 @@ class Netbox
 			if (property_exists($row, 'tags')) {
 				$row->tag_slugs = array();
 				foreach ($row->tags as $tag) {
-					$row->tag_slugs = array_merge($row->tag_slugs, [$tag->slug]);
+					$row->tag_slugs[] = $tag->slug;
 				}
 			}
 
@@ -362,7 +362,7 @@ class Netbox
 				}
 			}
 
-			$output = array_merge($output, [(object)$row]);
+			$output[] = (object)$row;
 		}
 		return $output;
 	}
@@ -390,10 +390,10 @@ class Netbox
 				foreach ($row->{$key} as $ip) {
 					$row->primary_ip_address = $ip;
 					$row->description = $description . " " . $ip;
-					$output = array_merge($output, [(object)clone($row)]);
+					$output[] = (object)clone($row);
 				}
 			} else {
-				$output = array_merge($output, [(object)$row]);
+				$output[] = (object)$row;
 			}
 		}
 		return $output;
@@ -465,7 +465,7 @@ class Netbox
 					}
 				}
 				$this->flattenRecursive($out, '', $in, $this->flattenseparator);
-				$fnew = array_merge($fnew, [(object)$out]);
+				$fnew[] = (object)$out;
 			}
 			$output = $fnew;
 		}
@@ -478,29 +478,16 @@ class Netbox
 				$mungevalue = array();
 				foreach ($this->munge as $key) {
 					if (strpos($key, "s=") !== false) {
-						$mungevalue = array_merge($mungevalue, [str_replace("s=", "", $key)]);
+						$mungevalue[] = str_replace("s=", "", $key);
 					} else {
-						$mungevalue = array_merge($mungevalue, [$row->{$key}]);
+						$mungevalue[] = $row->{$key};
 					}
 				}
 				$row->{$mungeheading} = implode("_", $mungevalue);
-				$mnew = array_merge($mnew, [(object)$row]);
+				$mnew[] = (object)$row;
 			}
 			$output = $mnew;
 		}
-
-		// // Because netbox changed tags and it is easy to add an array to icinga and see if a tag exists in it
-		// $tnew = array();
-		// foreach ($output as $row) {
-		// 	if (property_exists($row, 'tags')) {
-		// 		$row->tag_slugs = array();
-		// 		foreach ($row->tags as $tag) {
-		// 			$row->tag_slugs = array_merge($row->tag_slugs, [$tag->slug]);
-		// 		}
-		// 	}
-		// 	$tnew = array_merge($tnew, [(object)$row]);
-		// }
-		// $output = $tnew;
 
 		return $output;
 	}

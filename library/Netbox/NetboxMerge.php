@@ -23,22 +23,22 @@ class NetboxMerge
 				foreach ($things as $vm) {
 					$vm_filter .= "&virtual_machine_id=" . $vm->id;
 					if (strlen($vm_filter) > 1500) {
-						$interfaces = array_merge($interfaces, $netboxLinked->virtualMachineInterfaces($vm_filter, 0));
+						$interfaces[] = $netboxLinked->virtualMachineInterfaces($vm_filter, 0);
 						$vm_filter = "";
 					}
 				}
-				$interfaces = array_merge($interfaces, $netboxLinked->virtualMachineInterfaces($vm_filter, 0));
+				$interfaces[] = $netboxLinked->virtualMachineInterfaces($vm_filter, 0);
 			}
 			if ($content_type == "dcim.device") {
 				$device_filter = "";
 				foreach ($things as $device) {
 					$device_filter .= "&device_id=" . $device->id;
 					if (strlen($device_filter) > 1500) {
-						$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
+						$interfaces[] = $netboxLinked->deviceInterfaces($device_filter, 0);
 						$device_filter = "";
 					}
 				}
-				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
+				$interfaces[] = $netboxLinked->deviceInterfaces($device_filter, 0);
 			}
 		}
 		$module_bays = array();
@@ -48,11 +48,11 @@ class NetboxMerge
 			foreach ($things as $device) {
 				$device_filter .= "&device_id=" . $device->id;
 				if (strlen($device_filter) > 1500) {
-					$module_bays = array_merge($module_bays, $netboxLinked->deviceModuleBays($device_filter, 0));
+					$module_bays[] = $netboxLinked->deviceModuleBays($device_filter, 0);
 					$device_filter = "";
 				}
 			}
-			$module_bays = array_merge($module_bays, $netboxLinked->deviceModuleBays($device_filter, 0));
+			$module_bays[] = $netboxLinked->deviceModuleBays($device_filter, 0);
 			// One bulk fetch is cheaper than per-device once we already have the bay list
 			$modules = $netboxLinked->deviceModules("", 0);
 		}
@@ -95,7 +95,7 @@ class NetboxMerge
 					}
 				}
 			}
-			$output = array_merge($output, [(object)$thing]);
+			$output[] = (object)$thing;
 		}
 		return $output;
 	}
@@ -137,7 +137,7 @@ class NetboxMerge
 					}
 				}
 			}
-			$output = array_merge($output, [(object)$thing]);
+			$output[] = (object)$thing;
 		}
 		return $output;
 	}
@@ -182,7 +182,7 @@ class NetboxMerge
 					array_push($thing->contact_roles_dict[$role_name . "_keyids"], $keyid);
 				}
 			}
-			$output = array_merge($output, [(object)$thing]);
+			$output[] = (object)$thing;
 		}
 		return $output;
 	}
@@ -273,20 +273,22 @@ class NetboxMerge
 	{
 		# first pass is for getting the list of columns for service dicts as these columns are dynamic
 		$icinga_list_type_keys = [];
-		$icinga_dict_type_keys = [];
-		foreach ($devices as &$device) {
-			$service_array = self::servicearray($device, $services);
-			foreach ($service_array as $k => $v) {
-				// dict
-				if (property_exists($v['custom_fields'], 'icinga_dict_type') && isset($v['custom_fields']->icinga_dict_type)) {
-					$icinga_dict_type_keys = array_unique(array_merge($icinga_dict_type_keys, self::valuetolist($v['custom_fields']->icinga_dict_type)));
-				}
-				// list
-				if (property_exists($v['custom_fields'], 'icinga_list_type') && isset($v['custom_fields']->icinga_list_type)) {
-					$icinga_list_type_keys = array_unique(array_merge($icinga_list_type_keys, self::valuetolist($v['custom_fields']->icinga_list_type)));
-				}
-			}
-		}
+        $icinga_dict_type_keys = [];
+        foreach ($devices as &$device) {
+            $service_array = self::servicearray($device, $services);
+            foreach ($service_array as $k => $v) {
+                // dict
+                if (property_exists($v['custom_fields'], 'icinga_dict_type') && isset($v['custom_fields']->icinga_dict_type)) {
+                    array_push($icinga_dict_type_keys, ...self::valuetolist($v['custom_fields']->icinga_dict_type));
+                }
+                // list
+                if (property_exists($v['custom_fields'], 'icinga_list_type') && isset($v['custom_fields']->icinga_list_type)) {
+                    array_push($icinga_list_type_keys, ...self::valuetolist($v['custom_fields']->icinga_list_type));
+                }
+            }
+        }
+        $icinga_dict_type_keys = array_values(array_unique($icinga_dict_type_keys));
+        $icinga_list_type_keys = array_values(array_unique($icinga_list_type_keys));
 
 		# second pass is for the values for columns
 		foreach ($devices as &$device) {
@@ -329,7 +331,7 @@ class NetboxMerge
 					if (!isset($device->{$key_name})) {
 						$device->{$key_name} = [];
 					}
-					$device->{$key_name} = array_merge($device->{$key_name}, self::valuetolist($v['custom_fields']->icinga_list));
+					$device->{$key_name}[] = self::valuetolist($v['custom_fields']->icinga_list);
 				}
 
 				// if icinga_list_type is set and icinga_list exists then add to service_list_<typename>
@@ -337,7 +339,7 @@ class NetboxMerge
 					foreach ($icinga_list_type_keys as $var_type) {
 						if (self::contains($v['custom_fields']->icinga_list_type, $var_type)) {
 							$key_name = 'service_list_' . $var_type;
-							$device->{$key_name} = array_merge($device->{$key_name}, self::valuetolist($v['custom_fields']->icinga_list));
+							$device->{$key_name}[] = self::valuetolist($v['custom_fields']->icinga_list);
 						}
 					}
 				}
