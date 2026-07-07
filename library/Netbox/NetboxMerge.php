@@ -331,7 +331,7 @@ class NetboxMerge
 					if (!isset($device->{$key_name})) {
 						$device->{$key_name} = [];
 					}
-					$device->{$key_name}[] = self::valuetolist($v['custom_fields']->icinga_list);
+					array_push($device->{$key_name}, ...self::valuetolist($v['custom_fields']->icinga_list));
 				}
 
 				// if icinga_list_type is set and icinga_list exists then add to service_list_<typename>
@@ -339,7 +339,7 @@ class NetboxMerge
 					foreach ($icinga_list_type_keys as $var_type) {
 						if (self::contains($v['custom_fields']->icinga_list_type, $var_type)) {
 							$key_name = 'service_list_' . $var_type;
-							$device->{$key_name}[] = self::valuetolist($v['custom_fields']->icinga_list);
+							array_push($device->{$key_name}, ...self::valuetolist($v['custom_fields']->icinga_list));
 						}
 					}
 				}
