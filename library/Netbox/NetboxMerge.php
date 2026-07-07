@@ -23,22 +23,22 @@ class NetboxMerge
 				foreach ($things as $vm) {
 					$vm_filter .= "&virtual_machine_id=" . $vm->id;
 					if (strlen($vm_filter) > 1500) {
-						$interfaces[] = $netboxLinked->virtualMachineInterfaces($vm_filter, 0);
+						array_push($interfaces, ...$netboxLinked->virtualMachineInterfaces($vm_filter, 0));
 						$vm_filter = "";
 					}
 				}
-				$interfaces[] = $netboxLinked->virtualMachineInterfaces($vm_filter, 0);
+				array_push($interfaces, ...$netboxLinked->virtualMachineInterfaces($vm_filter, 0));
 			}
 			if ($content_type == "dcim.device") {
 				$device_filter = "";
 				foreach ($things as $device) {
 					$device_filter .= "&device_id=" . $device->id;
 					if (strlen($device_filter) > 1500) {
-						$interfaces[] = $netboxLinked->deviceInterfaces($device_filter, 0);
+						array_push($interfaces, ...$netboxLinked->deviceInterfaces($device_filter, 0));
 						$device_filter = "";
 					}
 				}
-				$interfaces[] = $netboxLinked->deviceInterfaces($device_filter, 0);
+				array_push($interfaces, ...$netboxLinked->deviceInterfaces($device_filter, 0));
 			}
 		}
 		$module_bays = array();
@@ -48,11 +48,11 @@ class NetboxMerge
 			foreach ($things as $device) {
 				$device_filter .= "&device_id=" . $device->id;
 				if (strlen($device_filter) > 1500) {
-					$module_bays[] = $netboxLinked->deviceModuleBays($device_filter, 0);
+					array_push($module_bays, ...$netboxLinked->deviceModuleBays($device_filter, 0));
 					$device_filter = "";
 				}
 			}
-			$module_bays[] = $netboxLinked->deviceModuleBays($device_filter, 0);
+			array_push($module_bays, ...$netboxLinked->deviceModuleBays($device_filter, 0));
 			// One bulk fetch is cheaper than per-device once we already have the bay list
 			$modules = $netboxLinked->deviceModules("", 0);
 		}

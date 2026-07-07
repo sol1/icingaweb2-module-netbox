@@ -153,7 +153,7 @@ Creates the vars `interfaces_down`, `interfaces_up`, `interfaces_down_dict` and 
 - `interfaces_up_dict` is a dictionary of interface names that are enabled as keys and a dict var read from the custom field `icinga_dict`. Useful in Icinga Service `apply for` rules.
 
 Interfaces monitoring management can be enhanced by the creation of 2 custom fields in Netbox on Interface objects.
-- If `icinga_monitored` is created as a boolean custom field and it set to `true` the import module will add the interface to the lists above, if the custom field doesn't exist or is set to `false` the interface will be excluded from the lists above.
+- If `icinga_monitored` is created as a boolean custom field and it set to `true` the import module will add the interface to the lists above, if the custom field is set to `false` the interface will be excluded from the lists above, the `icinga_monitored` doesn't exist all interfaces for a host will be added to the lists above.
 - If `icinga_dict` is created as a json custom field it's values will be added to the dicts for each interface.
   - Additional functionality: If key `netbox_fields` in icinga_dict, the key will be added to the dicts for each interface, the value should be the path to a netbox field. i.e label or within a nested dict, i.e type.value
 
