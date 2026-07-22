@@ -55,6 +55,17 @@ class Netbox
         );
 	}
 
+	// v2 tokens are in the format nbt_<id>.<token> and use Bearer auth, automatically detect token version
+	// https://github.com/netbox-community/netbox/issues/20210
+	private function http_header_auth_string()
+	{
+		$token = trim($this->token);
+		if (str_starts_with($token, "nbt_")) {
+			return "Authorization: Bearer " . $token;
+		}
+		return "Authorization: Token " . $token;
+	}
+
 	private function httpget(string $url)
 	{
 		$ch = curl_init($url);
@@ -63,8 +74,7 @@ class Netbox
 		}
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			"Authorization: Token " . $this->token,
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array($this->http_header_auth_string(),
 		));
 		if ($this->sslenable) {
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);

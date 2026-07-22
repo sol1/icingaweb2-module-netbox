@@ -21,11 +21,11 @@ rm -r /usr/share/icingaweb2/modules/netbox
 
 Download and extract the new release, then
 move the module into the icingaweb2 modules path.
-For example for version 4.4.0.2:
+For example for version 4.6.0.1:
 
 ```
-curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v4.4.0.2.tar.gz | tar xz
-mv icingaweb2-module-netbox-4.4.0.2 /usr/share/icingaweb2/modules/netbox
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v4.6.0.1.tar.gz | tar xz
+mv icingaweb2-module-netbox-4.6.0.1 /usr/share/icingaweb2/modules/netbox
 icingacli module enable netbox
 ```
 
@@ -53,7 +53,9 @@ eg: `http://netbox.example.com/api`
 _This is a required field, it is the default value for all Import Sources_
 
 #### API Token
-Netbox api token
+Netbox api token.
+
+From Netbox version 4.5 onwards there is a new token format available, v2. These tokens have the format `nbt_<id>.<token>` where `nbt_<id>.` is a token identifier and `<token>` is the secret, they also use different headers. Add the entire identifier and token to the API Token field, `nbt_<id>.<token>`, the module will detect the v2 format, using string match on `nbt_`, and use correct header for the token version. 
 
 _This is a required field, it is the default value for all Import Sources_
 
