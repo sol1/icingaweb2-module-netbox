@@ -40,6 +40,21 @@ class NetboxMerge
 				}
 				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($device_filter, 0));
 			}
+			if ($content_type == "dcim.virtual_chassis"){
+				$virtual_chassis_filter = "";
+				foreach ($things as $virtual_chassis_master) {
+					$virtual_chassis_filter .= "&virtual_chassis_id=" . $virtual_chassis_master->virtual_chassis->id;
+					if (strlen($virtual_chassis_filter) > 1500) {
+						$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
+						$virtual_chassis_filter = "";
+					}
+					$virtual_chassis = $netboxLinked->virtualChassis("id=" . $virtual_chassis_master->virtual_chassis->id);
+					if (count($virtual_chassis) === 1) {
+						$virtual_chassis_master->members = reset($virtual_chassis)->members;
+					}
+				}
+				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
+			}
 		}
 		$module_bays = array();
 		$modules = array();
@@ -71,12 +86,18 @@ class NetboxMerge
 		$output = array();
 		$content_name = (strpos($content_type, 'virtualmachine') !== false) ? 'virtual_machine' : 'device';
 		foreach ($things as $thing) {
+			if ($content_type == "dcim.virtual_chassis"){
+				$member_ids = array();
+				foreach ($thing->members as $member) {
+    			array_push($member_ids,$member->id);
+				}
+			}
 			$thing->interfaces_down = array();
 			$thing->interfaces_up = array();
 			$thing->interfaces_down_dict = (object)[];
 			$thing->interfaces_up_dict = (object)[];
 			foreach ($interfaces as $interface) {
-				if ((isset($interface->{$content_name}->id) && $interface->{$content_name}->id == $thing->id) && (!isset($interface->custom_fields->icinga_monitored) || $interface->custom_fields->icinga_monitored === true)) {
+				if ((isset($interface->{$content_name}->id) && ($interface->{$content_name}->id == $thing->id || (isset($member_ids) && in_array($interface->{$content_name}->id,$member_ids)))) && (!isset($interface->custom_fields->icinga_monitored) || $interface->custom_fields->icinga_monitored === true)) {
 					$icinga_dict = isset($interface->custom_fields->icinga_dict) ? $interface->custom_fields->icinga_dict : (object)[];
 					// {netbox_fields: {index_key:label, example_key:custom_fields.example}}
 					if (isset($icinga_dict->netbox_fields)){
