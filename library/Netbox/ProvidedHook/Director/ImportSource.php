@@ -27,8 +27,6 @@ class ImportSource extends ImportSourceHook
 	const DeviceTypeMode = 24;
 	const ManufacturerMode = 25;
 	const DeviceInterfaceMode = 26;
-
-// Virtual Chassis
 	const VirtualChassisMode = 28;
 
 	// IPAM

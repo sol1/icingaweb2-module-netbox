@@ -45,7 +45,7 @@ class NetboxMerge
 				foreach ($things as $virtual_chassis_master) {
 					$virtual_chassis_filter .= "&virtual_chassis_id=" . $virtual_chassis_master->virtual_chassis->id;
 					if (strlen($virtual_chassis_filter) > 1500) {
-						$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
+						array_push($interfaces, ...$netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
 						$virtual_chassis_filter = "";
 					}
 					$virtual_chassis = $netboxLinked->virtualChassis("id=" . $virtual_chassis_master->virtual_chassis->id);
@@ -53,7 +53,7 @@ class NetboxMerge
 						$virtual_chassis_master->members = reset($virtual_chassis)->members;
 					}
 				}
-				$interfaces = array_merge($interfaces, $netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
+				array_push($interfaces, ...$netboxLinked->deviceInterfaces($virtual_chassis_filter, 0));
 			}
 		}
 		$module_bays = array();
