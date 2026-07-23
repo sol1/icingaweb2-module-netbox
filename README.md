@@ -21,11 +21,11 @@ rm -r /usr/share/icingaweb2/modules/netbox
 
 Download and extract the new release, then
 move the module into the icingaweb2 modules path.
-For example for version 4.6.0.1:
+For example for version 4.6.0.2:
 
 ```
-curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v4.6.0.1.tar.gz | tar xz
-mv icingaweb2-module-netbox-4.6.0.1 /usr/share/icingaweb2/modules/netbox
+curl -L https://github.com/sol1/icingaweb2-module-netbox/archive/v4.6.0.2.tar.gz | tar xz
+mv icingaweb2-module-netbox-4.6.0.2 /usr/share/icingaweb2/modules/netbox
 icingacli module enable netbox
 ```
 
@@ -101,7 +101,7 @@ Netbox object set to be imported
 _Import types `Devices` and `Virtual Machines` also import linked Services, linked Contacts, linked interfaces  and IP Ranges from Netbox_
 _Import type `FHRP Groups Split (on IP)` also import linked IP Ranges from Netbox_
 
-_Import type `Virtual Chassis` imports `Devices` using the netbox filter `?virtual_chassis_member=True&vc_position=1` and combines the interfaces of all members. So all the informations like primary_ip etc. are coming from the member on position 1 within the chassis._
+_Import type `Virtual Chassis` imports `Devices` using the netbox filter `?virtual_chassis_member=True&vc_position=1` and combines the interfaces of all members. So all the informations like primary_ip etc. are coming from the member on position 1 within the chassis. `Virtual Chassis` works with linked Services, linked Contacts, linked interfaces and IP Ranges but the data may be duplicative as that is how Netbox presents it._
 
 #### Flatten seperator
 This will take nested data (`{ "foo": { "bar": "123 }, "bar": "321" }`) and use the seperator specified to flatten it (`{ foo__bar: 123, "bar": 321" }`)
