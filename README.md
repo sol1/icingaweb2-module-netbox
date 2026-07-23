@@ -101,6 +101,8 @@ Netbox object set to be imported
 _Import types `Devices` and `Virtual Machines` also import linked Services, linked Contacts, linked interfaces  and IP Ranges from Netbox_
 _Import type `FHRP Groups Split (on IP)` also import linked IP Ranges from Netbox_
 
+_Import type `Virtual Chassis` imports `Devices` using the netbox filter `?virtual_chassis_member=True&vc_position=1` and combines the interfaces of all members. So all the informations like primary_ip etc. are coming from the member on position 1 within the chassis._
+
 #### Flatten seperator
 This will take nested data (`{ "foo": { "bar": "123 }, "bar": "321" }`) and use the seperator specified to flatten it (`{ foo__bar: 123, "bar": 321" }`)
 
