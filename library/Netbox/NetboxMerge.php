@@ -417,7 +417,7 @@ class NetboxMerge
 				$m[$service->name] = array(
 					"port" => $first_port,
 					"ports" => self::defaultValue($service->ports, NULL),
-					"port_mappings" => $service->port_mappings,
+					"port_mappings" => self::defaultValue($service->port_mappings, NULL),
 					"protocol" => self::defaultValue($service->protocol->value, NULL),
 					"ipaddresses" => $ipaddr,
 					"cidrs" => $cidr,
