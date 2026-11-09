@@ -405,33 +405,29 @@ class NetboxMerge
 			if ($servicename == $device->name) {
 				$ipaddr = array();
 				$cidr = array();
-				foreach (self::defaultValue($service->ipaddresses, []) as $ip) {
+				foreach ($service->ipaddresses ?? [] as $ip) {
 					array_push($ipaddr, current(explode('/', $ip->address)));
 					array_push($cidr, $ip->address);
 				}
 				// Hack for netbox 2.10+: sync rules assuming one port continue to work after service.port became service.ports array
 				$first_port = "";
-				if (!empty(self::defaultValue($service->ports, NULL))) {
+				if (!empty($service->ports ?? NULL)) {
 					$first_port = $service->ports[0];
 				}
 				$m[$service->name] = array(
 					"port" => $first_port,
-					"ports" => self::defaultValue($service->ports, NULL),
-					"port_mappings" => self::defaultValue($service->port_mappings, NULL),
-					"protocol" => self::defaultValue($service->protocol->value, NULL),
+					"ports" => $service->ports ?? NULL,
+					"port_mappings" => $service->port_mappings ?? NULL,
+					"protocol" => $service->protocol->value ?? NULL,
 					"ipaddresses" => $ipaddr,
 					"cidrs" => $cidr,
 					"description" => $service->description,
-					"tags" => self::defaultValue($service->tags, []),
-					"custom_fields" => self::defaultValue($service->custom_fields, [])
+					"tags" => $service->tags ?? [],
+					"custom_fields" => $service->custom_fields ?? [],
 				);
 			}
 		}
 		return $m;
 	}
 
-	private static function defaultValue($var, $default)
-	{
-		return isset($var) ? $var : $default;
-	}
 }
