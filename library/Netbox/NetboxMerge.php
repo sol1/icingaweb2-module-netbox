@@ -411,12 +411,13 @@ class NetboxMerge
 				}
 				// Hack for netbox 2.10+: sync rules assuming one port continue to work after service.port became service.ports array
 				$first_port = "";
-				if (!empty($service->ports)) {
+				if (!empty(self::defaultValue($service->ports, NULL))) {
 					$first_port = $service->ports[0];
 				}
 				$m[$service->name] = array(
 					"port" => $first_port,
-					"ports" => $service->ports,
+					"ports" => self::defaultValue($service->ports, NULL),
+					"port_mappings" => $service->port_mappings,
 					"protocol" => self::defaultValue($service->protocol->value, NULL),
 					"ipaddresses" => $ipaddr,
 					"cidrs" => $cidr,
